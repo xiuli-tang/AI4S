@@ -1,0 +1,5 @@
+{
+  "name": "AMI-AL: Materials Active Learning System",
+  "description": "A research prototype for active learning optimization of battery materials (solid-state electrolytes) using Bayesian optimization and uncertainty-aware modeling.",
+  "requestFramePermissions": []
+}
