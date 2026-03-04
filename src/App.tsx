@@ -103,8 +103,15 @@ export default function App() {
   const t = translations[lang];
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
   const [pool, setPool] = useState<Material[]>([]);
   const [strategy, setStrategy] = useState<AcquisitionStrategy>("UCB");
+  
+  // Dynamic Configs
+  const [batchSize, setBatchSize] = useState(AL_CONFIG.BATCH_SIZE);
+  const [totalBudget, setTotalBudget] = useState(AL_CONFIG.TOTAL_BUDGET);
+  const [searchSpaceSize, setSearchSpaceSize] = useState(400);
+
   const [state, setState] = useState<ALState>({
     iteration: 0,
     budget: AL_CONFIG.TOTAL_BUDGET,
@@ -115,30 +122,41 @@ export default function App() {
   const [isAutoRunning, setIsAutoRunning] = useState(false);
   const [isRealData, setIsRealData] = useState(false);
 
+  const loadData = async (size: number) => {
+    setIsLoadingData(true);
+    const success = await engine.loadRealData(size);
+    setPool(engine.getPool());
+    setIsRealData(success);
+    setIsLoadingData(false);
+    setIsLoaded(true);
+  };
+
   useEffect(() => {
-    const init = async () => {
-      const success = await engine.loadRealData(150);
-      setPool(engine.getPool());
-      setIsRealData(success);
-      setIsLoaded(true);
-    };
-    init();
+    loadData(searchSpaceSize);
   }, []);
 
   const sampledMaterials = useMemo(() => pool.filter(m => m.isSampled), [pool]);
   const unsampledMaterials = useMemo(() => pool.filter(m => !m.isSampled), [pool]);
 
   const runIteration = async () => {
-    if (state.sampledCount >= AL_CONFIG.TOTAL_BUDGET) return;
+    if (state.sampledCount >= totalBudget) return;
 
-    const newState = { ...state };
-    const newPool = [...pool];
+    // Deep clone state and pool to avoid "object is not extensible" errors
+    const newState = { 
+      ...state, 
+      history: [...state.history] 
+    };
+    // Map to new objects to ensure they are extensible
+    const newPool = pool.map(m => ({ ...m }));
 
     // 1. Initial Sampling if iteration 0
     if (state.iteration === 0 && state.sampledCount === 0) {
-      const initialIndices = Array.from({ length: AL_CONFIG.INITIAL_SAMPLES }, () => 
-        Math.floor(Math.random() * newPool.length)
-      );
+      const initialIndices: number[] = [];
+      while (initialIndices.length < AL_CONFIG.INITIAL_SAMPLES) {
+        const idx = Math.floor(Math.random() * newPool.length);
+        if (!initialIndices.includes(idx)) initialIndices.push(idx);
+      }
+      
       initialIndices.forEach(idx => {
         newPool[idx].isSampled = true;
         newPool[idx].iteration = 0;
@@ -172,13 +190,13 @@ export default function App() {
       const candidates = newPool
         .filter(m => !m.isSampled)
         .sort((a, b) => (b.acquisitionValue || 0) - (a.acquisitionValue || 0))
-        .slice(0, AL_CONFIG.BATCH_SIZE);
+        .slice(0, batchSize);
 
       candidates.forEach(c => {
         c.isSampled = true;
         c.iteration = state.iteration;
       });
-      newState.sampledCount += AL_CONFIG.BATCH_SIZE;
+      newState.sampledCount += batchSize;
     }
 
     // 6. Update State
@@ -188,11 +206,15 @@ export default function App() {
 
     newState.iteration += 1;
     newState.bestValue = bestVal;
+    
+    // Calculate regret with higher precision to avoid premature 0
+    const currentRegret = globalMax - bestVal;
+    
     newState.history.push({
       iteration: newState.iteration,
       bestValue: bestVal,
-      avgError: 0, // Simplified
-      regret: globalMax - bestVal,
+      avgError: 0, 
+      regret: currentRegret > 1e-6 ? currentRegret : 0,
     });
 
     setPool(newPool);
@@ -200,11 +222,20 @@ export default function App() {
   };
 
   const reset = () => {
-    const freshEngine = new MaterialsEngine();
-    setPool(freshEngine.getPool());
+    // In-place reset of the current pool to avoid re-loading from API
+    const resetPool = pool.map(m => ({
+      ...m,
+      isSampled: false,
+      iteration: undefined,
+      predictedMean: undefined,
+      predictedStd: undefined,
+      acquisitionValue: undefined
+    }));
+    
+    setPool(resetPool);
     setState({
       iteration: 0,
-      budget: AL_CONFIG.TOTAL_BUDGET,
+      budget: totalBudget,
       sampledCount: 0,
       bestValue: -Infinity,
       history: [],
@@ -214,7 +245,7 @@ export default function App() {
 
   useEffect(() => {
     let interval: any;
-    if (isAutoRunning && state.sampledCount < AL_CONFIG.TOTAL_BUDGET) {
+    if (isAutoRunning && state.sampledCount < totalBudget) {
       interval = setInterval(() => {
         runIteration();
       }, 800);
@@ -222,7 +253,7 @@ export default function App() {
       setIsAutoRunning(false);
     }
     return () => clearInterval(interval);
-  }, [isAutoRunning, state.sampledCount]);
+  }, [isAutoRunning, state.sampledCount, totalBudget]);
 
   if (!isLoaded) {
     return (
@@ -262,7 +293,7 @@ export default function App() {
           </button>
           <button 
             onClick={() => setIsAutoRunning(!isAutoRunning)}
-            disabled={state.sampledCount >= AL_CONFIG.TOTAL_BUDGET}
+            disabled={state.sampledCount >= totalBudget}
             className={`flex items-center gap-2 px-6 py-2 ${isAutoRunning ? 'bg-red-500 text-white border-red-500' : 'bg-[#141414] text-[#F5F5F0]'} border border-[#141414] transition-colors text-xs uppercase font-bold tracking-tighter disabled:opacity-30`}
           >
             {isAutoRunning ? <><AlertCircle size={14} /> {t.stop}</> : <><Play size={14} /> {t.runLoop}</>}
@@ -277,28 +308,41 @@ export default function App() {
             <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
               <Database size={14} /> 数据概况
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] uppercase font-bold opacity-60">数据源</span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${isRealData ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                   {isRealData ? 'Materials Project' : '模拟数据 (Mock)'}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] uppercase font-bold opacity-60">样本总量</span>
-                <span className="text-sm font-mono font-bold">{pool.length}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] uppercase font-bold opacity-60">特征维度</span>
-                <span className="text-sm font-mono font-bold">{pool[0]?.features.length || 0}</span>
-              </div>
-              {!isRealData && (
-                <div className="mt-4 p-3 bg-orange-50 rounded-xl border border-orange-100">
-                  <p className="text-[9px] text-orange-800 leading-tight">
-                    提示：未检测到 MP_API_KEY。请在环境变量中配置以启用真实 DFT 数据对接。
-                  </p>
+              
+              <div>
+                <div className="flex justify-between">
+                  <label className="text-[10px] uppercase font-bold opacity-60">搜索空间规模</label>
+                  <span className="text-[10px] font-mono font-bold">{searchSpaceSize}</span>
                 </div>
-              )}
+                <input 
+                  type="range" min="100" max="10000" step="100"
+                  value={searchSpaceSize}
+                  onChange={(e) => setSearchSpaceSize(parseInt(e.target.value))}
+                  disabled={state.iteration > 0 || isLoadingData}
+                  className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#141414] mt-2"
+                />
+                <button 
+                  onClick={() => loadData(searchSpaceSize)}
+                  disabled={state.iteration > 0 || isLoadingData}
+                  className="w-full mt-3 py-1.5 border border-[#141414] text-[10px] font-bold uppercase tracking-tighter hover:bg-[#141414] hover:text-white transition-all disabled:opacity-20"
+                >
+                  {isLoadingData ? '正在同步...' : '同步数据 (Sync Data)'}
+                </button>
+              </div>
+
+              <div className="pt-2 border-t border-gray-100 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] uppercase font-bold opacity-60">特征维度</span>
+                  <span className="text-sm font-mono font-bold">{pool[0]?.features.length || 0}</span>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -320,14 +364,32 @@ export default function App() {
                   <option value="Random">{lang === 'en' ? 'Random (Baseline)' : '随机采样 (基准)'}</option>
                 </select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <p className="text-[10px] uppercase font-bold opacity-60">{t.batchSize}</p>
-                  <p className="text-xl font-serif italic">{AL_CONFIG.BATCH_SIZE}</p>
+                  <div className="flex justify-between">
+                    <label className="text-[10px] uppercase font-bold opacity-60">{t.batchSize}</label>
+                    <span className="text-[10px] font-mono font-bold">{batchSize}</span>
+                  </div>
+                  <input 
+                    type="range" min="1" max="20" step="1"
+                    value={batchSize}
+                    onChange={(e) => setBatchSize(parseInt(e.target.value))}
+                    disabled={state.iteration > 0}
+                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#141414] mt-2"
+                  />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold opacity-60">{t.budget}</p>
-                  <p className="text-xl font-serif italic">{AL_CONFIG.TOTAL_BUDGET}</p>
+                  <div className="flex justify-between">
+                    <label className="text-[10px] uppercase font-bold opacity-60">{t.budget}</label>
+                    <span className="text-[10px] font-mono font-bold">{totalBudget}</span>
+                  </div>
+                  <input 
+                    type="range" min="10" max="200" step="10"
+                    value={totalBudget}
+                    onChange={(e) => setTotalBudget(parseInt(e.target.value))}
+                    disabled={state.iteration > 0}
+                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#141414] mt-2"
+                  />
                 </div>
               </div>
             </div>
@@ -346,13 +408,13 @@ export default function App() {
                 <p className="text-[10px] uppercase font-bold opacity-40">{t.sampledTotal}</p>
                 <div className="flex items-end gap-2">
                   <p className="text-3xl font-serif italic">{state.sampledCount}</p>
-                  <p className="text-sm opacity-40 mb-1">/ {AL_CONFIG.TOTAL_BUDGET}</p>
+                  <p className="text-sm opacity-40 mb-1">/ {totalBudget}</p>
                 </div>
                 <div className="w-full bg-white/10 h-1 mt-2 rounded-full overflow-hidden">
                   <motion.div 
                     className="bg-emerald-400 h-full"
                     initial={{ width: 0 }}
-                    animate={{ width: `${(state.sampledCount / AL_CONFIG.TOTAL_BUDGET) * 100}%` }}
+                    animate={{ width: `${(state.sampledCount / totalBudget) * 100}%` }}
                   />
                 </div>
               </div>
@@ -440,6 +502,7 @@ export default function App() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-[#F5F5F0]/50">
+                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">ID</th>
                     <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.formula}</th>
                     <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.status}</th>
                     <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.predMean}</th>
@@ -467,6 +530,7 @@ export default function App() {
                           key={m.id} 
                           className={`border-b border-[#141414]/5 hover:bg-[#F5F5F0]/30 transition-colors ${m.isSampled ? 'bg-emerald-50/30' : ''}`}
                         >
+                          <td className="p-4 font-mono text-[10px] opacity-40">{m.id}</td>
                           <td className="p-4 font-serif italic text-lg">{m.formula}</td>
                           <td className="p-4">
                             {m.isSampled ? (

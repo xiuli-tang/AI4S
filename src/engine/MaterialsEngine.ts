@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Material } from "../types";
 import { MaterialsProjectService, MPData } from "../services/MaterialsProjectService";
 
@@ -40,22 +41,15 @@ export class MaterialsEngine {
   }
 
   async loadRealData(limit: number = 150): Promise<boolean> {
-    if (!this.mpService) {
-      console.warn("MP_API_KEY not set. Falling back to mock data.");
-      this.generateMockPool(limit);
-      return false;
-    }
-
     try {
-      const data = await this.mpService.searchLithiumOxides(limit);
+      const response = await axios.get(`/api/materials?limit=${limit}`);
+      const data: MPData[] = response.data.data;
       
       this.pool = data.map(m => ({
         id: m.material_id,
         formula: m.formula_pretty,
         composition: m.composition,
         features: this.featurize(m),
-        // We optimize for Band Gap in this example (or Formation Energy)
-        // Let's say we want to find high band gap materials (insulators)
         trueProperty: m.band_gap, 
         isSampled: false,
       }));
@@ -63,6 +57,7 @@ export class MaterialsEngine {
       this.globalMax = Math.max(...this.pool.map(m => m.trueProperty));
       return true;
     } catch (e) {
+      console.warn("Failed to load real data from API, falling back to mock.");
       this.generateMockPool(limit);
       return false;
     }
