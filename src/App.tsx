@@ -7,14 +7,17 @@ import {
   Beaker, 
   Database, 
   Cpu, 
-  Zap, 
   Play, 
   RotateCcw, 
   ChevronRight, 
   AlertCircle,
   TrendingUp,
   Layers,
-  Search
+  Search,
+  FileText,
+  X,
+  Palette,
+  Zap
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { MaterialsEngine } from "./engine/MaterialsEngine";
@@ -59,7 +62,10 @@ const translations = {
     methodologyDesc: "We employ a Bayesian Optimization framework where a surrogate model (Ensemble Regressor) approximates the DFT-calculated ionic conductivity surface. The acquisition function balances exploration (uncertainty) and exploitation (predicted performance).",
     representationDesc: "Materials are featurized using a combination of compositional descriptors (Magpie) and structural motifs. The current prototype uses a 10-dimensional latent space representing chemical environment and lattice stability.",
     objectiveDesc: "Maximize Band Gap to find high-performance insulators. Target: Discover lithium oxides with the highest band gap within a 50-sample budget.",
-    langToggle: "中文"
+    langToggle: "中文",
+    docs: "Documentation",
+    docsTitle: "System Documentation & Technical Specifications",
+    close: "Close"
   },
   zh: {
     title: "AMI-AL 研究原型系统",
@@ -94,7 +100,13 @@ const translations = {
     methodologyDesc: "我们采用贝叶斯优化框架，利用代理模型（集成回归器）逼近 DFT 计算的离子电导率表面。获取函数平衡了探索（不确定性）与利用（预测性能）。",
     representationDesc: "材料通过成分描述符（Magpie）和结构基元进行特征化。当前原型使用 10 维潜空间表示化学环境和晶格稳定性。",
     objectiveDesc: "最大化带隙 (Band Gap)，寻找高性能绝缘体。目标：在 50 个样本的实验预算内发现带隙最大的锂氧化物材料。",
-    langToggle: "English"
+    langToggle: "English",
+    docs: "系统文档",
+    docsTitle: "系统文档与技术规范",
+    close: "关闭",
+    themeClassic: "经典模式",
+    themeScience: "科研蓝",
+    perfMode: "性能模式"
   }
 };
 
@@ -121,6 +133,8 @@ export default function App() {
   });
   const [isAutoRunning, setIsAutoRunning] = useState(false);
   const [isRealData, setIsRealData] = useState(false);
+  const [showDocs, setShowDocs] = useState(false);
+  const [theme, setTheme] = useState<'classic' | 'science'>('classic');
 
   const loadData = async (size: number) => {
     setIsLoadingData(true);
@@ -135,8 +149,16 @@ export default function App() {
     loadData(searchSpaceSize);
   }, []);
 
-  const sampledMaterials = useMemo(() => pool.filter(m => m.isSampled), [pool]);
-  const unsampledMaterials = useMemo(() => pool.filter(m => !m.isSampled), [pool]);
+  // Performance-optimized chart data (downsampling for large datasets)
+  const chartData = useMemo(() => {
+    if (pool.length <= 2000) return pool;
+    // If pool is large, show all sampled + a random sample of unsampled to keep 2000 points max
+    const sampled = pool.filter(m => m.isSampled);
+    const unsampled = pool.filter(m => !m.isSampled);
+    const sampleRate = Math.max(0.05, 2000 / unsampled.length);
+    const sampledUnsampled = unsampled.filter(() => Math.random() < sampleRate);
+    return [...sampled, ...sampledUnsampled];
+  }, [pool]);
 
   const runIteration = async () => {
     if (state.sampledCount >= totalBudget) return;
@@ -267,9 +289,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] text-[#141414] font-sans p-6">
+    <div className={`min-h-screen ${theme === 'classic' ? 'bg-[#F5F5F0] text-[#141414]' : 'bg-[#F0F4F8] text-[#1A365D]'} font-sans transition-colors duration-500 p-6`}>
       {/* Header */}
-      <header className="max-w-7xl mx-auto mb-8 flex justify-between items-end border-b border-[#141414]/10 pb-4">
+      <header className={`max-w-7xl mx-auto mb-8 flex justify-between items-end border-b ${theme === 'classic' ? 'border-[#141414]/10' : 'border-[#2B6CB0]/20'} pb-4`}>
         <div>
           <h1 className="text-4xl font-serif italic font-medium tracking-tight">
             {t.title}
@@ -280,21 +302,33 @@ export default function App() {
         </div>
         <div className="flex gap-4">
           <button 
+            onClick={() => setTheme(theme === 'classic' ? 'science' : 'classic')}
+            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
+          >
+            <Palette size={14} /> {theme === 'classic' ? t.themeScience : t.themeClassic}
+          </button>
+          <button 
+            onClick={() => setShowDocs(true)}
+            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
+          >
+            <FileText size={14} /> {t.docs}
+          </button>
+          <button 
             onClick={() => setLang(lang === "en" ? "zh" : "en")}
-            className="flex items-center gap-2 px-4 py-2 border border-[#141414]/20 hover:bg-[#141414]/5 transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg"
+            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
           >
             {t.langToggle}
           </button>
           <button 
             onClick={reset}
-            className="flex items-center gap-2 px-4 py-2 border border-[#141414] hover:bg-[#141414] hover:text-[#F5F5F0] transition-colors text-xs uppercase font-bold tracking-tighter"
+            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414] hover:bg-[#141414] hover:text-[#F5F5F0]' : 'border-[#2B6CB0] text-[#2B6CB0] hover:bg-[#2B6CB0] hover:text-white'} transition-colors text-xs uppercase font-bold tracking-tighter`}
           >
             <RotateCcw size={14} /> {t.reset}
           </button>
           <button 
             onClick={() => setIsAutoRunning(!isAutoRunning)}
             disabled={state.sampledCount >= totalBudget}
-            className={`flex items-center gap-2 px-6 py-2 ${isAutoRunning ? 'bg-red-500 text-white border-red-500' : 'bg-[#141414] text-[#F5F5F0]'} border border-[#141414] transition-colors text-xs uppercase font-bold tracking-tighter disabled:opacity-30`}
+            className={`flex items-center gap-2 px-6 py-2 ${isAutoRunning ? 'bg-red-500 text-white border-red-500' : (theme === 'classic' ? 'bg-[#141414] text-[#F5F5F0]' : 'bg-[#2B6CB0] text-white')} border border-transparent transition-colors text-xs uppercase font-bold tracking-tighter disabled:opacity-30`}
           >
             {isAutoRunning ? <><AlertCircle size={14} /> {t.stop}</> : <><Play size={14} /> {t.runLoop}</>}
           </button>
@@ -304,14 +338,14 @@ export default function App() {
       <main className="max-w-7xl mx-auto grid grid-cols-12 gap-8">
         {/* Sidebar: Config & Stats */}
         <div className="col-span-3 space-y-6">
-          <section className="bg-white p-6 rounded-3xl shadow-sm border border-[#141414]/5">
-            <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
+          <section className={`${theme === 'classic' ? 'bg-white' : 'bg-white/80'} p-6 rounded-3xl shadow-sm border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'}`}>
+            <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
               <Database size={14} /> 数据概况
             </h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] uppercase font-bold opacity-60">数据源</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${isRealData ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${isRealData ? (theme === 'classic' ? 'bg-blue-100 text-blue-700' : 'bg-blue-600 text-white') : 'bg-orange-100 text-orange-700'}`}>
                   {isRealData ? 'Materials Project' : '模拟数据 (Mock)'}
                 </span>
               </div>
@@ -326,12 +360,12 @@ export default function App() {
                   value={searchSpaceSize}
                   onChange={(e) => setSearchSpaceSize(parseInt(e.target.value))}
                   disabled={state.iteration > 0 || isLoadingData}
-                  className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#141414] mt-2"
+                  className={`w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer ${theme === 'classic' ? 'accent-[#141414]' : 'accent-[#2B6CB0]'} mt-2`}
                 />
                 <button 
                   onClick={() => loadData(searchSpaceSize)}
                   disabled={state.iteration > 0 || isLoadingData}
-                  className="w-full mt-3 py-1.5 border border-[#141414] text-[10px] font-bold uppercase tracking-tighter hover:bg-[#141414] hover:text-white transition-all disabled:opacity-20"
+                  className={`w-full mt-3 py-1.5 border ${theme === 'classic' ? 'border-[#141414] hover:bg-[#141414] hover:text-white' : 'border-[#2B6CB0] text-[#2B6CB0] hover:bg-[#2B6CB0] hover:text-white'} text-[10px] font-bold uppercase tracking-tighter transition-all disabled:opacity-20`}
                 >
                   {isLoadingData ? '正在同步...' : '同步数据 (Sync Data)'}
                 </button>
@@ -342,12 +376,17 @@ export default function App() {
                   <span className="text-[10px] uppercase font-bold opacity-60">特征维度</span>
                   <span className="text-sm font-mono font-bold">{pool[0]?.features.length || 0}</span>
                 </div>
+                {pool.length > 2000 && (
+                  <div className="flex items-center gap-1 text-[9px] text-emerald-600 font-bold uppercase">
+                    <Zap size={10} /> {t.perfMode}
+                  </div>
+                )}
               </div>
             </div>
           </section>
 
-          <section className="bg-white p-6 rounded-3xl shadow-sm border border-[#141414]/5">
-            <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
+          <section className={`${theme === 'classic' ? 'bg-white' : 'bg-white/80'} p-6 rounded-3xl shadow-sm border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'}`}>
+            <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
               <Layers size={14} /> {t.systemConfig}
             </h3>
             <div className="space-y-4">
@@ -356,7 +395,7 @@ export default function App() {
                 <select 
                   value={strategy}
                   onChange={(e) => setStrategy(e.target.value as AcquisitionStrategy)}
-                  className="w-full mt-1 bg-[#F5F5F0] border-none rounded-lg p-2 text-sm font-medium focus:ring-1 focus:ring-[#141414]"
+                  className={`w-full mt-1 ${theme === 'classic' ? 'bg-[#F5F5F0]' : 'bg-blue-50'} border-none rounded-lg p-2 text-sm font-medium focus:ring-1 ${theme === 'classic' ? 'focus:ring-[#141414]' : 'focus:ring-[#2B6CB0]'}`}
                 >
                   <option value="UCB">{lang === 'en' ? 'Upper Confidence Bound (UCB)' : '上置信界 (UCB)'}</option>
                   <option value="EI">{lang === 'en' ? 'Expected Improvement (EI)' : '期望改进 (EI)'}</option>
@@ -375,7 +414,7 @@ export default function App() {
                     value={batchSize}
                     onChange={(e) => setBatchSize(parseInt(e.target.value))}
                     disabled={state.iteration > 0}
-                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#141414] mt-2"
+                    className={`w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer ${theme === 'classic' ? 'accent-[#141414]' : 'accent-[#2B6CB0]'} mt-2`}
                   />
                 </div>
                 <div>
@@ -388,14 +427,14 @@ export default function App() {
                     value={totalBudget}
                     onChange={(e) => setTotalBudget(parseInt(e.target.value))}
                     disabled={state.iteration > 0}
-                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#141414] mt-2"
+                    className={`w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer ${theme === 'classic' ? 'accent-[#141414]' : 'accent-[#2B6CB0]'} mt-2`}
                   />
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="bg-[#141414] text-[#F5F5F0] p-6 rounded-3xl shadow-xl">
+          <section className={`${theme === 'classic' ? 'bg-[#141414] text-[#F5F5F0]' : 'bg-[#1A365D] text-white'} p-6 rounded-3xl shadow-xl`}>
             <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
               <TrendingUp size={14} /> {t.liveMetrics}
             </h3>
@@ -412,7 +451,7 @@ export default function App() {
                 </div>
                 <div className="w-full bg-white/10 h-1 mt-2 rounded-full overflow-hidden">
                   <motion.div 
-                    className="bg-emerald-400 h-full"
+                    className={theme === 'classic' ? "bg-emerald-400 h-full" : "bg-teal-400 h-full"}
                     initial={{ width: 0 }}
                     animate={{ width: `${(state.sampledCount / totalBudget) * 100}%` }}
                   />
@@ -420,7 +459,7 @@ export default function App() {
               </div>
               <div>
                 <p className="text-[10px] uppercase font-bold opacity-40">{t.bestConductivity}</p>
-                <p className="text-3xl font-serif italic text-emerald-400">
+                <p className={`text-3xl font-serif italic ${theme === 'classic' ? 'text-emerald-400' : 'text-teal-300'}`}>
                   {state.bestValue === -Infinity ? "N/A" : state.bestValue.toFixed(4)}
                 </p>
               </div>
@@ -432,22 +471,22 @@ export default function App() {
         <div className="col-span-9 space-y-8">
           {/* Charts Row */}
           <div className="grid grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-3xl border border-[#141414]/5 h-[350px]">
-              <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4">{t.regretCurve}</h3>
+            <div className={`${theme === 'classic' ? 'bg-white' : 'bg-white/80'} p-6 rounded-3xl border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'} h-[350px]`}>
+              <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 mb-4 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>{t.regretCurve}</h3>
               <ResponsiveContainer width="100%" height="90%">
                 <LineChart data={state.history}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#14141410" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'classic' ? "#14141410" : "#2B6CB010"} />
                   <XAxis dataKey="iteration" hide />
-                  <YAxis label={{ value: lang === 'en' ? 'Regret' : '遗憾值', angle: -90, position: 'insideLeft', style: { fontSize: 10, fontWeight: 'bold' } }} />
+                  <YAxis strokeOpacity={0.4} fontSize={10} tickFormatter={(val) => val.toFixed(2)} />
                   <Tooltip 
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="regret" 
-                    stroke="#141414" 
+                    stroke={theme === 'classic' ? "#141414" : "#2B6CB0"} 
                     strokeWidth={3} 
-                    dot={{ r: 4, fill: '#141414' }} 
+                    dot={{ r: 4, fill: theme === 'classic' ? "#141414" : "#2B6CB0" }} 
                     activeDot={{ r: 6 }}
                     animationDuration={300}
                   />
@@ -455,28 +494,46 @@ export default function App() {
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-[#141414]/5 h-[350px]">
-              <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4">{t.searchSpace}</h3>
+            <div className={`${theme === 'classic' ? 'bg-white' : 'bg-white/80'} p-6 rounded-3xl border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'} h-[350px]`}>
+              <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 mb-4 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>{t.searchSpace}</h3>
               <ResponsiveContainer width="100%" height="90%">
                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#14141410" />
-                  <XAxis type="number" dataKey="x" hide />
-                  <YAxis type="number" dataKey="y" hide />
-                  <ZAxis type="number" dataKey="z" range={[20, 400]} />
-                  <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                  <Scatter name={lang === 'en' ? 'Materials' : '材料'} data={pool.map((m, i) => ({
-                    x: m.features[0],
-                    y: m.features[1],
-                    z: m.trueProperty + 5,
-                    id: m.id,
-                    isSampled: m.isSampled,
-                    formula: m.formula
-                  }))}>
-                    {pool.map((entry, index) => (
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'classic' ? "#14141410" : "#2B6CB010"} />
+                  <XAxis type="number" dataKey="features[0]" hide />
+                  <YAxis type="number" dataKey="features[1]" hide />
+                  <Tooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload as Material;
+                        return (
+                          <div className={`${theme === 'classic' ? 'bg-[#141414] text-white' : 'bg-[#1A365D] text-white'} p-4 rounded-2xl shadow-2xl border-none text-[10px] space-y-1 backdrop-blur-md bg-opacity-90`}>
+                            <p className="font-bold uppercase tracking-widest opacity-50 mb-2">{data.formula}</p>
+                            <p>Band Gap: <span className="font-mono text-emerald-400">{data.trueProperty.toFixed(3)} eV</span></p>
+                            {data.predictedMean && <p>Pred: <span className="font-mono text-blue-300">{data.predictedMean.toFixed(3)} eV</span></p>}
+                            {data.predictedStd && <p>Unc: <span className="font-mono text-orange-300">{data.predictedStd.toFixed(3)}</span></p>}
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Scatter 
+                    name="Unsampled" 
+                    data={chartData.filter(m => !m.isSampled)} 
+                    fill={theme === 'classic' ? "#141414" : "#2B6CB0"} 
+                    fillOpacity={0.05} 
+                  />
+                  <Scatter 
+                    name="Sampled" 
+                    data={chartData.filter(m => m.isSampled)} 
+                    fill={theme === 'classic' ? "#10B981" : "#38B2AC"} 
+                  >
+                    {chartData.filter(m => m.isSampled).map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={entry.isSampled ? "#10b981" : "#14141410"} 
-                        stroke={entry.isSampled ? "#065f46" : "none"}
+                        fill={entry.trueProperty === state.bestValue ? (theme === 'classic' ? "#F59E0B" : "#F6AD55") : (theme === 'classic' ? "#10B981" : "#38B2AC")} 
+                        stroke="#fff" 
+                        strokeWidth={2}
                       />
                     ))}
                   </Scatter>
@@ -486,12 +543,12 @@ export default function App() {
           </div>
 
           {/* Data Table / Material List */}
-          <div className="bg-white rounded-3xl border border-[#141414]/5 overflow-hidden">
-            <div className="p-6 border-b border-[#141414]/5 flex justify-between items-center">
-              <h3 className="text-xs font-bold uppercase tracking-widest opacity-40">{t.recommendations}</h3>
+          <div className={`${theme === 'classic' ? 'bg-white' : 'bg-white/90'} rounded-3xl border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'} overflow-hidden`}>
+            <div className={`p-6 border-b ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'} flex justify-between items-center`}>
+              <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>{t.recommendations}</h3>
               <div className="flex gap-2">
-                <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> {t.sampled}
+                <span className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 ${theme === 'classic' ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700'} rounded-full`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${theme === 'classic' ? 'bg-emerald-500' : 'bg-teal-500'} animate-pulse`} /> {t.sampled}
                 </span>
                 <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
                   {t.candidate}
@@ -501,7 +558,7 @@ export default function App() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#F5F5F0]/50">
+                  <tr className={theme === 'classic' ? "bg-[#F5F5F0]/50" : "bg-blue-50/50"}>
                     <th className="p-4 text-[10px] uppercase font-bold opacity-40">ID</th>
                     <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.formula}</th>
                     <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.status}</th>
@@ -528,13 +585,13 @@ export default function App() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           key={m.id} 
-                          className={`border-b border-[#141414]/5 hover:bg-[#F5F5F0]/30 transition-colors ${m.isSampled ? 'bg-emerald-50/30' : ''}`}
+                          className={`border-b border-[#141414]/5 hover:bg-[#F5F5F0]/30 transition-colors ${m.isSampled ? (theme === 'classic' ? 'bg-emerald-50/30' : 'bg-teal-50/30') : ''}`}
                         >
                           <td className="p-4 font-mono text-[10px] opacity-40">{m.id}</td>
                           <td className="p-4 font-serif italic text-lg">{m.formula}</td>
                           <td className="p-4">
                             {m.isSampled ? (
-                              <span className="text-[10px] font-bold uppercase text-emerald-600">{t.iter} {m.iteration}</span>
+                              <span className={`text-[10px] font-bold uppercase ${theme === 'classic' ? 'text-emerald-600' : 'text-teal-600'}`}>{t.iter} {m.iteration}</span>
                             ) : (
                               <span className="text-[10px] font-bold uppercase opacity-30">{t.pending}</span>
                             )}
@@ -543,9 +600,9 @@ export default function App() {
                           <td className="p-4 font-mono text-xs">{m.predictedStd?.toFixed(3) || "—"}</td>
                           <td className="p-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-12 bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                              <div className={`w-12 ${theme === 'classic' ? 'bg-gray-100' : 'bg-blue-100'} h-1.5 rounded-full overflow-hidden`}>
                                 <div 
-                                  className="bg-[#141414] h-full" 
+                                  className={`${theme === 'classic' ? 'bg-[#141414]' : 'bg-[#2B6CB0]'} h-full`} 
                                   style={{ width: `${Math.min(100, (m.acquisitionValue || 0) * 20)}%` }} 
                                 />
                               </div>
@@ -566,9 +623,9 @@ export default function App() {
       </main>
 
       {/* Research Methodology Modal / Info */}
-      <footer className="max-w-7xl mx-auto mt-12 grid grid-cols-3 gap-8 border-t border-[#141414]/10 pt-8 pb-12">
+      <footer className={`max-w-7xl mx-auto mt-12 grid grid-cols-3 gap-8 border-t ${theme === 'classic' ? 'border-[#141414]/10' : 'border-[#2B6CB0]/20'} pt-8 pb-12`}>
         <div className="space-y-2">
-          <h4 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+          <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
             <Beaker size={14} /> {t.methodology}
           </h4>
           <p className="text-xs opacity-60 leading-relaxed">
@@ -576,7 +633,7 @@ export default function App() {
           </p>
         </div>
         <div className="space-y-2">
-          <h4 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+          <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
             <Cpu size={14} /> {t.representation}
           </h4>
           <p className="text-xs opacity-60 leading-relaxed">
@@ -584,7 +641,7 @@ export default function App() {
           </p>
         </div>
         <div className="space-y-2">
-          <h4 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+          <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
             <Zap size={14} /> {t.objective}
           </h4>
           <p className="text-xs opacity-60 leading-relaxed">
@@ -592,6 +649,145 @@ export default function App() {
           </p>
         </div>
       </footer>
+
+      {/* Documentation Modal */}
+      <AnimatePresence>
+        {showDocs && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#141414]/40 backdrop-blur-sm p-6"
+            onClick={() => setShowDocs(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white w-full max-w-4xl max-h-[85vh] rounded-[32px] shadow-2xl overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-8 border-b border-gray-100 flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-serif italic font-medium">{t.docsTitle}</h2>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">Version 1.2.0 • Materials Active Learning Framework</p>
+                </div>
+                <button 
+                  onClick={() => setShowDocs(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-8 space-y-10">
+                {lang === 'en' ? (
+                  <>
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">01. System Overview</h3>
+                      <p className="text-sm leading-relaxed opacity-70">
+                        The AMI-AL (Accelerated Materials Innovation - Active Learning) prototype is a closed-loop optimization system designed to accelerate the discovery of high-performance materials. By integrating real-world data from the Materials Project with Bayesian Optimization, the system minimizes the number of expensive "experiments" (DFT calculations) required to find optimal candidates.
+                      </p>
+                    </section>
+
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">02. Technical Architecture</h3>
+                      <div className="grid grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-bold uppercase">Surrogate Model</h4>
+                          <p className="text-xs opacity-60 leading-relaxed">
+                            We utilize an <strong>Ensemble of Regressors</strong> with bootstrap sampling. This approach provides not only a point prediction (Mean) but also a measure of epistemic uncertainty (Standard Deviation), which is crucial for the exploration-exploitation trade-off.
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-bold uppercase">Acquisition Functions</h4>
+                          <p className="text-xs opacity-60 leading-relaxed">
+                            <strong>UCB:</strong> Balances mean and variance using a tunable parameter κ.<br/>
+                            <strong>EI:</strong> Calculates the expected improvement over the current best observation.<br/>
+                            <strong>Uncertainty:</strong> Pure exploration focusing on high-variance regions.
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">03. Data Pipeline</h3>
+                      <p className="text-sm leading-relaxed opacity-70">
+                        The system interfaces with <strong>Materials Project API v2</strong>. Materials are featurized using a 10-dimensional vector representing atomic fractions of key elements (Li, O, P, S, Ge, Sn, La, Zr) combined with normalized electronic properties.
+                      </p>
+                    </section>
+
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">04. Usage Instructions</h3>
+                      <ul className="space-y-3 text-xs opacity-70 list-disc pl-4">
+                        <li><strong>Initialization:</strong> Set the Search Space Size (up to 10,000) and click "Sync Data" to fetch real materials.</li>
+                        <li><strong>Configuration:</strong> Adjust Batch Size (samples per iteration) and Total Budget (max experiments).</li>
+                        <li><strong>Execution:</strong> Use "Run Loop" for automated optimization or "Run Iteration" (implied) for step-by-step control.</li>
+                        <li><strong>Analysis:</strong> Monitor the Regret Curve to ensure convergence and the Search Space map to see exploration patterns.</li>
+                      </ul>
+                    </section>
+                  </>
+                ) : (
+                  <>
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">01. 系统概述</h3>
+                      <p className="text-sm leading-relaxed opacity-70">
+                        AMI-AL（加速材料创新 - 主动学习）原型系统是一个闭环优化系统，旨在加速高性能材料的发现。通过将来自 Materials Project 的真实数据与贝叶斯优化相结合，该系统最大限度地减少了寻找最优候选材料所需的昂贵“实验”（DFT 计算）次数。
+                      </p>
+                    </section>
+
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">02. 技术架构</h3>
+                      <div className="grid grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-bold uppercase">代理模型 (Surrogate Model)</h4>
+                          <p className="text-xs opacity-60 leading-relaxed">
+                            我们采用带自助采样（Bootstrap）的<strong>集成回归器 (Ensemble Regressor)</strong>。这种方法不仅提供点预测（均值），还提供认知不确定性（标准差）的度量，这对于平衡探索与利用至0重要。
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-bold uppercase">获取函数 (Acquisition Functions)</h4>
+                          <p className="text-xs opacity-60 leading-relaxed">
+                            <strong>UCB (上置信界):</strong> 使用可调参数 κ 平衡均值和方差。<br/>
+                            <strong>EI (期望改进):</strong> 计算相对于当前最佳观测值的期望改进量。<br/>
+                            <strong>不确定性采样:</strong> 纯探索策略，专注于高方差区域。
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">03. 数据流水线</h3>
+                      <p className="text-sm leading-relaxed opacity-70">
+                        系统对接 <strong>Materials Project API v2</strong>。材料通过 10 维向量进行特征化，表示关键元素（Li, O, P, S, Ge, Sn, La, Zr）的原子分数，并结合归一化的电子性质。
+                      </p>
+                    </section>
+
+                    <section className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">04. 使用说明</h3>
+                      <ul className="space-y-3 text-xs opacity-70 list-disc pl-4">
+                        <li><strong>初始化:</strong> 设置搜索空间规模（最高 10,000）并点击“同步数据”以获取真实材料。</li>
+                        <li><strong>配置:</strong> 调整批次大小（每次迭代采样的样本数）和总预算（最大实验次数）。</li>
+                        <li><strong>执行:</strong> 使用“运行循环”进行自动化优化，或通过重置按钮重新开始实验。</li>
+                        <li><strong>分析:</strong> 监控遗憾曲线 (Regret Curve) 以确保收敛，并通过搜索空间图观察探索模式。</li>
+                      </ul>
+                    </section>
+                  </>
+                )}
+              </div>
+
+              <div className="p-8 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button 
+                  onClick={() => setShowDocs(false)}
+                  className="px-8 py-3 bg-[#141414] text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-black transition-colors"
+                >
+                  {t.close}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
