@@ -17,13 +17,15 @@ import {
   FileText,
   X,
   Palette,
-  Zap
+  Zap,
+  BarChart3
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { MaterialsEngine } from "./engine/MaterialsEngine";
 import { SurrogateModel } from "./engine/SurrogateModel";
 import { AcquisitionFunction, AcquisitionStrategy } from "./engine/AcquisitionFunction";
 import { Material, ALState, AL_CONFIG } from "./types";
+import { BenchmarkSimulator } from "./components/BenchmarkSimulator";
 
 const engine = new MaterialsEngine();
 const model = new SurrogateModel();
@@ -67,6 +69,8 @@ const translations = {
     langToggle: "中文",
     docs: "Documentation",
     docsTitle: "System Documentation & Technical Specifications",
+    benchmark: "Benchmark",
+    benchmarkTitle: "Discovery Performance Validation",
     close: "Close"
   },
   zh: {
@@ -107,6 +111,8 @@ const translations = {
     langToggle: "English",
     docs: "系统文档",
     docsTitle: "系统文档与技术规范",
+    benchmark: "性能基准",
+    benchmarkTitle: "发现性能验证基准",
     close: "关闭",
     themeClassic: "经典模式",
     themeScience: "科研蓝",
@@ -138,6 +144,7 @@ export default function App() {
   const [isAutoRunning, setIsAutoRunning] = useState(false);
   const [isRealData, setIsRealData] = useState(false);
   const [showDocs, setShowDocs] = useState(false);
+  const [showBenchmark, setShowBenchmark] = useState(false);
   const [theme, setTheme] = useState<'classic' | 'science'>('classic');
 
   const loadData = async (size: number) => {
@@ -310,6 +317,12 @@ export default function App() {
             className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
           >
             <Palette size={14} /> {theme === 'classic' ? t.themeScience : t.themeClassic}
+          </button>
+          <button 
+            onClick={() => setShowBenchmark(true)}
+            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
+          >
+            <BarChart3 size={14} /> {t.benchmark}
           </button>
           <button 
             onClick={() => setShowDocs(true)}
@@ -675,7 +688,7 @@ export default function App() {
               <div className="p-8 border-b border-gray-100 flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-serif italic font-medium">{t.docsTitle}</h2>
-                  <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">Version 1.2.0 • Materials Active Learning Framework</p>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">Version 2.0.0 • Materials Active Learning Framework</p>
                 </div>
                 <button 
                   onClick={() => setShowDocs(false)}
@@ -829,6 +842,52 @@ export default function App() {
                 <button 
                   onClick={() => setShowDocs(false)}
                   className="px-8 py-3 bg-[#141414] text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-black transition-colors"
+                >
+                  {t.close}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Benchmark Simulator Modal */}
+      <AnimatePresence>
+        {showBenchmark && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#141414]/40 backdrop-blur-sm p-6"
+            onClick={() => setShowBenchmark(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[#F5F5F0] w-full max-w-6xl max-h-[90vh] rounded-[40px] shadow-2xl overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-8 border-b border-[#141414]/5 flex justify-between items-center bg-white">
+                <div>
+                  <h2 className="text-2xl font-serif italic font-medium">{t.benchmarkTitle}</h2>
+                  <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">AMI-AL Performance Verification Module • v2.0</p>
+                </div>
+                <button 
+                  onClick={() => setShowBenchmark(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-10">
+                <BenchmarkSimulator lang={lang} />
+              </div>
+
+              <div className="p-6 bg-white border-t border-[#141414]/5 flex justify-end">
+                <button 
+                  onClick={() => setShowBenchmark(false)}
+                  className="px-8 py-2 bg-[#141414] text-white text-xs font-bold uppercase tracking-widest rounded-xl"
                 >
                   {t.close}
                 </button>
