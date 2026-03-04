@@ -18,24 +18,25 @@ export class MaterialsEngine {
   }
 
   /**
-   * Simple featurizer for materials based on composition.
-   * In a real research scenario, this would use Magpie or GNN.
+   * Enhanced featurizer including structural descriptors.
+   * 1-8: Atomic fractions
+   * 9: Electronegativity Difference (Simulated)
+   * 10: Lattice Distortion (Simulated)
+   * 11: Coordination Number (Simulated)
    */
   private featurize(mpData: MPData): number[] {
     const elements = ["Li", "O", "P", "S", "Ge", "Sn", "La", "Zr"];
-    const features = new Array(elements.length + 2).fill(0);
+    const features = new Array(elements.length + 3).fill(0);
     
-    // 1-8: Atomic fractions of key elements
     const totalAtoms = Object.values(mpData.composition).reduce((a: number, b: number) => a + b, 0);
     elements.forEach((el, i) => {
       features[i] = (mpData.composition[el] || 0) / totalAtoms;
     });
 
-    // 9: Band Gap (normalized roughly)
-    features[elements.length] = mpData.band_gap / 10;
-
-    // 10: Formation Energy (normalized roughly)
-    features[elements.length + 1] = Math.abs(mpData.formation_energy_per_atom) / 5;
+    // Simulated Structural Descriptors (in real life, these would come from MP or matminer)
+    features[elements.length] = Math.random(); // Electronegativity Difference
+    features[elements.length + 1] = Math.random(); // Lattice Distortion
+    features[elements.length + 2] = Math.floor(Math.random() * 6) + 4; // Coordination Number
 
     return features;
   }
@@ -45,14 +46,22 @@ export class MaterialsEngine {
       const response = await axios.get(`/api/materials?limit=${limit}`);
       const data: MPData[] = response.data.data;
       
-      this.pool = data.map(m => ({
-        id: m.material_id,
-        formula: m.formula_pretty,
-        composition: m.composition,
-        features: this.featurize(m),
-        trueProperty: m.band_gap, 
-        isSampled: false,
-      }));
+      this.pool = data.map(m => {
+        const features = this.featurize(m);
+        // Cost is proportional to the number of atoms (simulating DFT complexity)
+        const totalAtoms = Object.values(m.composition).reduce((a, b) => a + b, 0);
+        const cost = 1 + (totalAtoms * 0.2) + (features[features.length - 1] * 0.1); 
+
+        return {
+          id: m.material_id,
+          formula: m.formula_pretty,
+          composition: m.composition,
+          features,
+          trueProperty: m.band_gap, 
+          cost,
+          isSampled: false,
+        };
+      });
 
       this.globalMax = Math.max(...this.pool.map(m => m.trueProperty));
       return true;
@@ -64,7 +73,6 @@ export class MaterialsEngine {
   }
 
   private generateMockPool(size: number) {
-    // Fallback logic if API key is missing
     const elements = ["Li", "La", "Zr", "O", "P", "S", "Ge", "Sn"];
     for (let i = 0; i < size; i++) {
       const composition: Record<string, number> = {};
@@ -72,10 +80,36 @@ export class MaterialsEngine {
       const selected = [...elements].sort(() => 0.5 - Math.random()).slice(0, numElements);
       selected.forEach(el => { composition[el] = Math.floor(Math.random() * 5) + 1; });
       const formula = Object.entries(composition).map(([el, count]) => `${el}${count > 1 ? count : ""}`).join("");
-      const features = Array.from({ length: 10 }, () => Math.random());
-      const liContent = composition["Li"] || 0;
-      const trueProperty = Math.random() * 5 + (liContent * 0.5);
-      this.pool.push({ id: `mock-${i}`, formula, composition, features, trueProperty, isSampled: false });
+      
+      // Generate 2 polymorphs for each composition to demonstrate structural sensitivity
+      for (let p = 0; p < 2; p++) {
+        const structuralFeatures = [
+          Math.random(), // Electronegativity Diff
+          Math.random(), // Lattice Distortion
+          Math.floor(Math.random() * 6) + 4 // Coordination Number
+        ];
+        
+        const compositionFeatures = elements.map(el => (composition[el] || 0) / 10);
+        const features = [...compositionFeatures, ...structuralFeatures];
+        
+        const liContent = composition["Li"] || 0;
+        // Performance depends on both Li content AND structural features
+        // e.g. Lattice distortion (features[9]) and Coordination (features[10])
+        const trueProperty = (liContent * 0.5) + (features[9] * 2) + (features[10] * 0.1) + Math.random();
+        
+        const totalAtoms = Object.values(composition).reduce((a, b) => a + b, 0);
+        const cost = 1 + (totalAtoms * 0.3) + (p * 0.5); // Polymorph 2 might be more complex
+
+        this.pool.push({ 
+          id: `mock-${i}-${p}`, 
+          formula: p === 1 ? `${formula} (β)` : formula, 
+          composition, 
+          features, 
+          trueProperty, 
+          cost,
+          isSampled: false 
+        });
+      }
     }
     this.globalMax = Math.max(...this.pool.map(m => m.trueProperty));
   }

@@ -7,33 +7,42 @@ export class AcquisitionFunction {
     material: Material, 
     strategy: AcquisitionStrategy, 
     bestObserved: number,
-    kappa: number = 2.0
+    kappa: number = 2.0,
+    isCostAware: boolean = true
   ): number {
     const { mean, std } = { 
       mean: material.predictedMean || 0, 
-      std: material.predictedStd || 1 
+      std: material.predictedStd || 1e-6 
     };
 
+    let value = 0;
     switch (strategy) {
       case "Random":
-        return Math.random();
+        value = Math.random();
+        break;
       
       case "Uncertainty":
-        return std;
+        value = std;
+        break;
 
       case "UCB":
-        // Upper Confidence Bound: mu + kappa * sigma
-        return mean + kappa * std;
+        value = mean + kappa * std;
+        break;
 
       case "EI":
-        // Expected Improvement (Simplified)
         const z = (mean - bestObserved) / (std || 1e-9);
-        // Approximation of EI
-        return (mean - bestObserved) * this.phi(z) + std * this.pdf(z);
+        value = (mean - bestObserved) * this.phi(z) + std * this.pdf(z);
+        break;
 
       default:
-        return 0;
+        value = 0;
     }
+
+    // Cost-aware BO: Acquisition per unit cost
+    if (isCostAware && material.cost > 0) {
+      return value / material.cost;
+    }
+    return value;
   }
 
   private static phi(x: number): number {

@@ -6,6 +6,7 @@ export interface Material {
   composition: Record<string, number>;
   features: number[];
   trueProperty: number; // Only known to the "Oracle"
+  cost: number; // Experimental or computational cost
   predictedMean?: number;
   predictedStd?: number;
   acquisitionValue?: number;
