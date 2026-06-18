@@ -1,5 +1,3 @@
-import { Type } from "@google/genai";
-
 export interface Material {
   id: string;
   formula: string;
