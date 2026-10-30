@@ -185,11 +185,15 @@ export class HubStore {
       datasetVersion: createHash("sha256").update(revisions.join("|")).digest("hex").slice(0, 16),
       fetchedAt: selected.length ? selected.map(r => r.provenance.retrievedAt).sort().at(-1)! : null };
   }
-  structure(source: StoredHubSource, id: string, revision?: string) {
+  record(source: StoredHubSource, id: string, revision?: string) {
     let stored = this.db.prepare(`SELECT payload,revision FROM ${tables[source]} WHERE id=?`).get(id);
     if (source === "mp-snapshot" && revision) stored = this.db.prepare("SELECT payload,revision FROM mp_snapshot_versions WHERE id=? AND revision=?").get(id, revision);
     if (!stored || (revision && stored.revision !== revision)) return null;
     const raw = JSON.parse(stored.payload), row: HubRecord = source === "dual-fidelity" ? pairRecord(raw) : raw;
-    return row.structure ? { row, structureProvenance: row.structureProvenance ?? row.provenance, revision: stored.revision } : null;
+    return { row, structureProvenance: row.structureProvenance ?? row.provenance, revision: stored.revision };
+  }
+  structure(source: StoredHubSource, id: string, revision?: string) {
+    const record = this.record(source, id, revision);
+    return record?.row.structure ? record : null;
   }
 }

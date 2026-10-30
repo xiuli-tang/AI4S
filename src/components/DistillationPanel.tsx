@@ -7,6 +7,7 @@ import { parseSupplements } from "../engine/distillation/features";
 import { hashString } from "../engine/SeededRandom";
 import { targetSpec, type TargetKind } from "../materialContext";
 import "./distillation.css";
+import MethodNote from "./MethodNote";
 
 const number = (value: number | null | undefined, digits = 4) => value == null || !Number.isFinite(value) ? "—" : Number(value.toPrecision(digits)).toString();
 const labels = (lang: "zh" | "en") => (zh: string, en: string) => lang === "zh" ? zh : en;
@@ -14,10 +15,10 @@ const labels = (lang: "zh" | "en") => (zh: string, en: string) => lang === "zh" 
 export function DistillationPanel({ controller: c, lang }: { controller: DistillationController; lang: "zh" | "en" }) {
   const t = labels(lang), result = c.result;
   const objective = result ? targetSpec(result.objective) : c.objective;
-  const [supplementText, setSupplementText] = useState("{}");
+  const supplementText = c.supplementDraft, setSupplementText = c.setSupplementDraft;
   const [supplementError, setSupplementError] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  useEffect(() => { setSupplementText("{}"); setSupplementError(null); }, [c.datasetIdentity]);
+  useEffect(() => { setSupplementError(null); }, [c.datasetIdentity]);
   const metricRows: { label: string; value: Metrics | undefined }[] = [
     { label: t("解析模型", "Symbolic model"), value: result?.metrics },
     { label: t("均值基线", "Mean baseline"), value: result?.meanBaseline },
@@ -90,15 +91,15 @@ export function DistillationPanel({ controller: c, lang }: { controller: Distill
       <div className="distillation-validation">
         <div><h3><FlaskConical size={15} />{t("保留测试组检验", "Held-out composition groups")}</h3>
           <p>{t("发现 / 选择 / 测试组成数", "Discovery / tuning / test groups")}: {result.split.discovery.length} / {result.split.tuning.length} / {result.split.test.length}</p>
-          <p>{t("本轮首次划分后固定组成归属；比较使用公式可计算的同一测试子集。", "Group membership is frozen per run; comparisons use the same formula-valid test subset.")}</p>
+          <MethodNote lang={lang}>{t("本轮首次划分后固定组成归属；比较使用公式可计算的同一测试子集。", "Group membership is frozen per run; comparisons use the same formula-valid test subset.")}</MethodNote>
           {result.target === "teacher" && <p>{t("教师仅用发现组重训", "Teacher refitted on discovery groups")}: {result.teacherTrainingRecords} {t("条已采样标签", "sampled labels")} · {result.pseudoRecords} {t("条伪目标", "pseudo targets")}<br />{t("教师忠实度 RMSE", "Fidelity RMSE")}: {number(result.fidelity?.rmse)}</p>}
         </div>
         <table><thead><tr><th>{t("模型", "Model")}</th><th>MAE</th><th>RMSE</th><th>R²</th><th>{t("条/组", "N/G")}</th></tr></thead>
           <tbody>{metricRows.map(row => <tr key={row.label}><th>{row.label}</th><td>{number(row.value?.mae)}</td><td>{number(row.value?.rmse)}</td><td>{number(row.value?.r2)}</td><td>{row.value?.count}/{row.value?.groups}</td></tr>)}</tbody></table>
       </div>
-      <p className="distillation-evidence">{t("这是当前样本支持的候选解析关系；小样本与主动采样偏差仍需前瞻性材料验证。描述符图展示特征投影，不给出热力学相边界。", "A candidate analytic relation supported by this snapshot. Small samples and adaptive sampling require prospective validation; the descriptor map does not establish thermodynamic phase boundaries.")}
-        {result.metrics.invalid > 0 && " " + result.metrics.invalid + t(" 条测试记录超出公式定义域。", " test records fall outside the expression domain.")}
-        {result.axes.some(axis => axis.auxiliary) && " " + t("第二轴仅用于展示，未进入预测方程。", "The second axis is auxiliary and not used by the predictor.")}</p>
+      {result.metrics.invalid > 0 && <p className="distillation-evidence">{result.metrics.invalid + t(" 条测试记录超出公式定义域。", " test records fall outside the expression domain.")}</p>}
+      <MethodNote lang={lang}>{t("这是当前样本支持的候选解析关系；小样本与主动采样偏差仍需前瞻性材料验证。描述符图展示特征投影，不给出热力学相边界。", "A candidate analytic relation supported by this snapshot. Small samples and adaptive sampling require prospective validation; the descriptor map does not establish thermodynamic phase boundaries.")}
+        {result.axes.some(axis => axis.auxiliary) && " " + t("第二轴仅用于展示，未进入预测方程。", "The second axis is auxiliary and not used by the predictor.")}</MethodNote>
     </>}
     <details className="distillation-advanced" open={showDetails} onToggle={event => setShowDetails(event.currentTarget.open)}>
       <summary>{t("搜索参数与补充物理数据", "Search settings and supplemental physical data")}</summary>
@@ -134,8 +135,9 @@ function hull(points: [number, number][]): [number, number][] {
   return [...a, ...b];
 }
 
-export function DescriptorMap({ pool, result, lang, enabled, onToggle, objective = "band-gap" }: {
+export function DescriptorMap({ pool, result, lang, enabled, onToggle, objective = "band-gap", highlightedId }: {
   pool: Material[]; result: DistillationResult | null; lang: "zh" | "en"; enabled: boolean; onToggle(): void; objective?: TargetKind;
+  highlightedId?: string;
 }) {
   const t = labels(lang), symbolic = enabled && Boolean(result);
   const direction = targetSpec(symbolic && result ? result.objective : objective).direction;
@@ -179,7 +181,7 @@ export function DescriptorMap({ pool, result, lang, enabled, onToggle, objective
           fill={high(point) ? "#dfb35c" : point.observed !== null ? "#4e9c85" : symbolic ? "#b4cbc3" : "#b1c7c4"}
           fillOpacity={high(point) || point.observed !== null ? 0.95 : 0.32}
           stroke={point.partition === "test" ? "#376fca" : high(point) ? "#fff1b7" : "none"} strokeWidth="1.6"
-          className={high(point) ? "descriptor-gold-point" : ""} tabIndex={point.observed !== null ? 0 : undefined}
+          className={(high(point) ? "descriptor-gold-point " : "") + (point.id === highlightedId ? "research-link-focus" : "")} tabIndex={point.observed !== null ? 0 : undefined}
           aria-label={point.formula + " · " + point.id} onMouseEnter={() => setHovered(point)} onFocus={() => setHovered(point)}>
           <title>{point.formula + " · " + point.id + "\n" + (point.observed !== null ? t("已采样", "Sampled") : t("未采样", "Unsampled"))}</title>
         </circle>)}
@@ -191,6 +193,6 @@ export function DescriptorMap({ pool, result, lang, enabled, onToggle, objective
     <footer><div><i className="descriptor-legend-green" />{t("已采样", "Sampled")}<i className="descriptor-legend-gold" />{t("优选区间", "Preferred range")}{symbolic && <><i className="descriptor-legend-test" />{t("测试组", "Test groups")}</>}</div>
       <label><input type="checkbox" checked={predictionColor} onChange={event => setPredictionColor(event.target.checked)} />{t("按预测高亮", "Highlight predictions")}</label></footer>
     {symbolic && result ? <p className="descriptor-map-note">{predictionColor ? t("金色区域基于公式预测", "Gold region uses predictions") : t("金色区域按目标方向筛选观测点", "Gold region follows the objective direction")} · {t("第", "Round")} {result.iteration}{t("轮快照", " snapshot")} · {result.invalidProjection} {t("条候选缺值/越界", "missing/out-of-domain candidates")}</p>
-      : <p className="descriptor-map-note">{t("公式生成后可一键切换。候选真实标签不参与着色。", "Switch axes once formulas are ready. Hidden candidate labels are not used for coloring.")}</p>}
+      : <MethodNote lang={lang}>{t("公式生成后可一键切换。候选真实标签不参与着色。", "Switch axes once formulas are ready. Hidden candidate labels are not used for coloring.")}</MethodNote>}
   </section>;
 }

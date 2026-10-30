@@ -6,16 +6,19 @@ import { advisorCandidates, advisorMessages, advisorQuestions, buildAdvisorConte
 import { advisorErrorMessage, requestAdvisor } from "../services/AdvisorService";
 import "./advisor.css";
 import { sourceLabel } from "../dataHub";
+import MethodNote from "./MethodNote";
+import type { Restore, AdvisorArchive } from "../research/types";
 
 export interface AdvisorRequest { requestId: number; materialId?: string; action?: AdvisorAction }
-interface Props { open: boolean; onClose(): void; input: AdvisorInput; lang: AdvisorLanguage; loading: boolean; request: AdvisorRequest | null }
+interface Props { open: boolean; onClose(): void; input: AdvisorInput; lang: AdvisorLanguage; loading: boolean; request: AdvisorRequest | null;
+  restored?: Restore<AdvisorArchive>; onState?(state: AdvisorArchive): void; onSelect?(materialId: string | null): void; }
 interface Turn {
   id: number; question: string; context: AdvisorContext; capturedAt: string;
   status: "pending" | "done" | "error" | "cancelled";
   answer?: string; error?: string; model?: string; tokens?: number; truncated?: boolean;
 }
 
-export default function MaterialsAdvisor({ open, onClose, input, lang, loading, request }: Props) {
+export default function MaterialsAdvisor({ open, onClose, input, lang, loading, request, restored, onState, onSelect }: Props) {
   const zh = lang === "zh";
   const [turns, setTurns] = useState<Turn[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -37,12 +40,19 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
     setTurns(previous => previous.map(turn => turn.status === "pending" ? { ...turn, status: "cancelled" } : turn));
   };
   const close = () => { cancel(); onClose(); };
+  const restoredToken = useRef(0);
 
   useEffect(() => {
     active.current?.abort(); active.current = null;
-    setBusy(false); setTurns([]); setSelectedId(null); setDraft(""); setCompact(false);
+    setBusy(false);
+    if (restored && restoredToken.current !== restored.token) {
+      const s = restored.value; restoredToken.current = restored.token;
+      setTurns(s.turns.map(t => t.status === "pending" ? { ...t, status: "cancelled" } : t));
+      serial.current = Math.max(0, ...s.turns.map(t => t.id)); setSelectedId(s.selectedId); setDraft(s.draft); setPreview(s.preview); setCompact(s.compact);
+    } else { setTurns([]); setSelectedId(null); setDraft(""); setCompact(false); }
     handled.current = request?.requestId ?? 0;
-  }, [input.runId]);
+  }, [input.runId, restored?.token]);
+  useEffect(() => { onState?.({ turns, selectedId, draft, preview, compact }); }, [turns, selectedId, draft, preview, compact]);
   useEffect(() => () => { active.current?.abort(); active.current = null; }, []);
   useEffect(() => {
     if (!open) { cancel(); return; }
@@ -99,6 +109,7 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
   ].map(m => [m.id, m])).values()];
   const selected = context.selected_material;
   const actions: { action: AdvisorAction; label: string; icon: typeof Sparkles }[] = [
+    { action: "integrated", label: zh ? "综合研究解读" : "Integrated research review", icon: Sparkles },
     { action: "overview", label: zh ? "复盘 Top-3" : "Review Top 3", icon: MessageCircle },
     { action: "mechanism", label: zh ? "选材解析" : "Why this?", icon: Sparkles },
     { action: "synthesis", label: zh ? "合成方案" : "Synthesis", icon: FlaskConical },
@@ -117,14 +128,15 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
       {compact && selected && <p className="advisor-compact-selection">{selected.formula} · {selected.id} · µ {selected.prediction_mean_mu ?? "—"} · σ {selected.uncertainty_sigma ?? "—"}</p>}
       <div hidden={compact}>
       <label className="advisor-select-label" htmlFor="advisor-material">{zh ? "分析对象" : "Analyze"}</label>
-      <select id="advisor-material" value={selectedId ?? ""} onChange={event => setSelectedId(event.target.value || null)} disabled={busy || loading}>
+      <select id="advisor-material" value={selectedId ?? ""} onChange={event => { const id = event.target.value || null; setSelectedId(id); onSelect?.(id); }} disabled={busy || loading}>
         <option value="">{zh ? "全局进展与 Top-3 候选" : "Overall progress & top candidates"}</option>
         {options.map(m => <option key={m.id} value={m.id}>{m.formula} · {m.id}{m.isSampled ? (zh ? " · 已采样" : " · sampled") : ""}</option>)}
       </select>
       {selected && <div className="advisor-selected-metrics"><span>µ {selected.prediction_mean_mu ?? "—"}</span><span>σ {selected.uncertainty_sigma ?? "—"}</span><span>{zh ? "成本" : "Cost"} {selected.cost.value ?? "—"}</span></div>}
       <button type="button" className="advisor-preview-toggle" onClick={() => setPreview(!preview)} aria-expanded={preview}><ChevronDown size={13} />{zh ? "查看将发送的数据摘要" : "Preview shared context"}</button>
       {preview && <div className="advisor-preview"><p>{zh ? "发送当前轮次、已采样最优材料、Top-3、选中材料的组成/特征/预测和近期收敛记录；不含未采样真实标签、密钥或结构文件。" : "Shares this round, the best sampled material, top candidates, selected composition/features/predictions and recent progress. No hidden candidate labels, keys or structure files."}</p><pre>{JSON.stringify(context, null, 2)}</pre></div>}
-      <p className="advisor-evidence-note">{context.objective.name} / {context.objective.unit}。{zh ? "来源、方法与保真度随快照保留；组成不能确定真实结构，成本为估计量。" : "The snapshot retains source, method and fidelity. Composition does not identify a crystal structure; costs are estimates."}</p>
+      <p className="advisor-evidence-note">{context.objective.name} / {context.objective.unit}</p>
+      <MethodNote lang={lang}>{zh ? "来源、方法与保真度随快照保留；组成不能确定真实结构，成本为估计量。" : "The snapshot retains source, method and fidelity. Composition does not identify a crystal structure; costs are estimates."}</MethodNote>
       </div>
       <div className="advisor-actions">{actions.map(({ action, label, icon: Icon }) => <button type="button" key={action} disabled={busy || loading || (action !== "overview" && !selected)} onClick={() => { if (action === "overview") setSelectedId(null); void send(advisorQuestions[action][lang], action === "overview" ? null : selectedId); }}><Icon size={14} />{label}</button>)}</div>
     </section>
@@ -148,7 +160,7 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
         if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(draft); }
       }} />
       <div className="advisor-composer-bottom"><button type="button" className="advisor-clear" disabled={!turns.length} onClick={() => { cancel(); setTurns([]); setCompact(false); }}><Trash2 size={13} />{zh ? "清空会话" : "Clear"}</button><span>{draft.length}/2000</span>{busy ? <button type="button" className="advisor-send" onClick={cancel}><Square size={13} />{zh ? "停止" : "Stop"}</button> : <button type="submit" className="advisor-send" disabled={!draft.trim() || loading}><Send size={14} />{zh ? "发送" : "Send"}</button>}</div>
-      <p>{zh ? "发送时会将上述摘要与最近对话交给已配置的模型服务；会话仅保留在当前页面。" : "Sending shares the summary and recent conversation with your configured model service. The conversation stays in this page session."}</p>
+      <p>{zh ? "发送摘要与最近对话至已配置的模型服务；对话及当时的上下文可随研究存档保存。" : "Send the summary and recent conversation to your configured model service; save the conversation and captured context with your research archive."}</p>
     </form>
   </aside>;
 }

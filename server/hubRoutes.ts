@@ -33,6 +33,20 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
     next();
   });
   router.get("/catalog", (_req, res) => { try { res.json(hub!.catalog()); } catch (e) { failure(res, e); } });
+  router.post("/records", (req, res) => {
+    try {
+      const refs = req.body?.refs;
+      if (!Array.isArray(refs) || refs.length > 500) throw new HubInputError("恢复引用限500条。");
+      const data = refs.map(ref => {
+        const dataset = storedSource(ref?.dataset);
+        if (typeof ref?.id !== "string" || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/.test(ref.id) || !/^[a-f0-9]{64}$/.test(ref.revision)) throw new HubInputError("记录引用无效。");
+        const record = hub!.record(dataset, ref.id, ref.revision);
+        if (!record) throw new HubInputError(`本地缺少记录版本：${ref.id}；可先展示存档成果，或导入对应源数据后继续研究。`);
+        return { ...record.row, revision: record.revision };
+      });
+      res.json({ data });
+    } catch (e) { failure(res, e); }
+  });
   router.get("/materials", async (req, res) => {
     let scope: Scope | undefined;
     try {
@@ -98,7 +112,9 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
     try {
       const objective = req.body?.objective, cohort = req.body?.cohort;
       if (typeof objective !== "string" || !Object.hasOwn(OBJECTIVES, objective) || typeof cohort !== "string" || !cohort) throw new HubInputError("请选择目标和单一配对cohort。");
-      res.json(calibratePairs(hub!.pairs(), objective as keyof typeof OBJECTIVES, cohort));
+      const ids = req.body?.ids;
+      if (ids !== undefined && (!Array.isArray(ids) || ids.length > 500 || ids.some(id => typeof id !== "string"))) throw new HubInputError("校准ID列表无效。");
+      res.json(calibratePairs(hub!.pairs().filter(p => !ids || ids.includes(p.id)), objective as keyof typeof OBJECTIVES, cohort));
     } catch (e) { failure(res, e); }
   });
   router.use((error: any, _req: Request, res: Response, _next: express.NextFunction) => {

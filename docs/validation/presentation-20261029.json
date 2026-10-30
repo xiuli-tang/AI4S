@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-29",
+  "baseCommit": "68e34e8d959b6be773285d4975e5e39cead6f7ae",
+  "tests": {
+    "total": 266,
+    "passed": 266,
+    "failed": 0,
+    "skipped": 0
+  },
+  "lint": "PASS",
+  "build": "PASS",
+  "diffCheck": "PASS",
+  "learningRounds": 20,
+  "observedMaterials": 24,
+  "formulas": 2,
+  "paretoObserved": 20,
+  "paretoFront": 8,
+  "hypervolumeGrowthPercent": 31.58646113212118,
+  "maceArchive": {
+    "sourceRunId": "dfce2840-6f79-489e-bb5f-3542af7c48b4",
+    "selectedIds": [
+      "demo-0",
+      "demo-4"
+    ],
+    "converged": 2
+  },
+  "xrd": {
+    "score": 99.98,
+    "mainFraction": 98.4,
+    "shiftDegrees": 0.04
+  },
+  "browser": {
+    "viewport": [
+      1920,
+      1080
+    ],
+    "pages": [
+      {
+        "footer": 1065.1796875,
+        "height": 1080,
+        "overflow": false,
+        "page": "overview",
+        "width": 1920
+      },
+      {
+        "footer": 1060.890625,
+        "height": 1080,
+        "page": "learning"
+      },
+      {
+        "footer": 1064.390625,
+        "height": 1080,
+        "page": "pareto"
+      },
+      {
+        "footer": 1070.78125,
+        "height": 1080,
+        "page": "validation"
+      },
+      {
+        "footer": 1079.3359375,
+        "height": 1080,
+        "page": "advisor"
+      }
+    ],
+    "statePreserved": [
+      "Pareto30/30",
+      "draft price override",
+      "imported SrTiO3",
+      "advisor draft",
+      "automatic distillation checkbox"
+    ],
+    "interactions": [
+      "preference graph and text agree",
+      "normalized weights",
+      "replay6 vs20 observations",
+      "structure switching",
+      "source report and XRD download"
+    ],
+    "narrow": {
+      "width": 502,
+      "noHorizontalOverflow": true,
+      "formulaTitleSingleLine": true
+    },
+    "consoleErrors": 0
+  },
+  "presetSHA256": "1d80c2d990251f85b2ae29cf972d8e92c7df989d0cfb6f0944adc4d5acfdddad"
+}

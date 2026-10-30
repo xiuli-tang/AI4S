@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MODEL_CATALOG, type ModelConfig } from "../engine/models/config";
 import type { ModelDiagnostics } from "../engine/SurrogateModel";
+import MethodNote from "./MethodNote";
 
 interface Props {
   config: ModelConfig;
@@ -79,7 +80,7 @@ export function ModelControls({ config, onChange, locked, busy, diagnostics, lan
       </details>
     </fieldset>
     {locked && <p className="text-[11px] text-gray-500">{zh ? "请先重置，再切换模型或参数，以保留独立的迭代记录。" : "Reset before changing models or parameters to keep runs separate."}</p>}
-    <p className="text-[11px] text-gray-500">{zh ? "GP 后验依赖核与噪声假设；集成分歧不是已校准置信区间。对非 GP 使用 EI / UCB 为启发式策略。" : "GP posteriors depend on kernel/noise assumptions. Ensemble disagreement is not a calibrated interval; non-GP EI/UCB are heuristics."}</p>
+    <MethodNote lang={lang}>{zh ? "GP 后验依赖核与噪声假设；集成分歧不是已校准置信区间。对非 GP 使用 EI / UCB 为启发式策略。" : "GP posteriors depend on kernel/noise assumptions. Ensemble disagreement is not a calibrated interval; non-GP EI/UCB are heuristics."}</MethodNote>
     <div role="status" className="rounded-lg bg-blue-50 p-3 text-xs space-y-1" aria-live="polite">
       <p>{busy ? (zh ? "后台 Worker 正在训练 / 预测…" : "Worker training / predicting…") : (zh ? "训练与批量预测在后台 Worker 执行" : "Training and batch prediction run in a Worker")}</p>
       {diagnostics && <>

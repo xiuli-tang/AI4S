@@ -98,14 +98,16 @@ export async function searchPhysicalFormulas(snapshot: DistillationSnapshot, inp
   if (snapshot.samples.length < options.minSamples) throw new Error("至少采样 " + options.minSamples + " 条记录后开始搜索");
   if (snapshot.samples.length > 1024 || snapshot.queries.length > 20000) throw new RangeError("超过公式搜索规模上限");
   if (snapshot.samples.some(row => !Number.isFinite(row.label))) throw new Error("已采样性质无效");
-  const split = splitCompositionGroups(snapshot.samples, options.seed, snapshot.partitions);
+  const calibrationGroups = snapshot.samples.filter(row => snapshot.calibration?.calibrationIds.includes(row.id)).map(row => row.group);
+  const split = splitCompositionGroups(snapshot.samples, options.seed, snapshot.partitions, calibrationGroups);
   const partition = (name: keyof typeof split) => snapshot.samples.filter(row => split[name].includes(row.group));
   const discovery = partition("discovery"), tuning = partition("tuning"), test = partition("test");
   const teacherData = snapshot.target === "teacher" ? discovery : [...discovery, ...tuning];
   const teacher = new SurrogateModel(snapshot.modelConfig);
   // The teacher never sees the test groups. In distillation mode it also never sees tuning labels.
-  await teacher.train(teacherData.map(row => ({ features: row.features, trueProperty: row.label })));
-  const targetFor = (row: SamplePoint) => snapshot.target === "teacher" ? teacher.predict(row).mean : row.label;
+  await teacher.train(teacherData.map(row => ({ features: row.features, trueProperty: snapshot.calibration ? row.pairedDft! : row.label })));
+  const teacherPrediction = (row: { features: number[] }) => (() => { const prediction = teacher.predict(row); return { ...prediction, mean: prediction.mean + (snapshot.calibration?.correction ?? 0) }; })();
+  const targetFor = (row: SamplePoint) => snapshot.target === "teacher" ? teacherPrediction(row).mean : row.label;
   const discoveryTargets = discovery.map(targetFor), discoveryWeights = weightsFor(discovery);
   const excludedFeatures: DistillationResult["excludedFeatures"] = [];
   const base = PHYSICAL_FEATURES.map((feature, index) => {
@@ -125,7 +127,7 @@ export async function searchPhysicalFormulas(snapshot: DistillationSnapshot, inp
     const forbidden = new Set([...split.tuning, ...split.test]);
     const queries = snapshot.queries.filter(row => !forbidden.has(row.group) && base.every(feature => row.values[feature.index] !== null))
       .sort((a, b) => hashString(a.id) - hashString(b.id)).slice(0, 600);
-    fitRows = queries.map(row => ({ ...row, target: teacher.predict(row).mean }));
+    fitRows = queries.map(row => ({ ...row, target: teacherPrediction(row).mean }));
   } else fitRows = discovery.map(row => ({ ...row, target: row.label }));
   if (fitRows.length < 4) throw new Error("可用于符号搜索的完整记录不足四条");
   const y = fitRows.map(row => row.target), weights = weightsFor(fitRows), targetVariance = variance(y, weights);
@@ -197,7 +199,7 @@ export async function searchPhysicalFormulas(snapshot: DistillationSnapshot, inp
   const refit = fitSparseLinear(expressions.map(expression => refitRows.map(row => evaluateExpression(expression, row.values)!)),
     refitRows.map(row => row.target), weightsFor(refitRows)) ?? best.fit;
   // The test labels are first used here, after expressions and coefficients have been frozen.
-  const truth = test.map(row => row.label), teacherPredictions = test.map(row => teacher.predict(row).mean);
+  const truth = test.map(row => row.label), teacherPredictions = test.map(row => teacherPrediction(row).mean);
   const predictions = test.map(row => predict(refit, expressions, row));
   const samePopulation = (values: number[]) => values.map((value, i) => predictions[i] === null ? null : value);
   const baselineRows = snapshot.target === "teacher" ? discovery : [...discovery, ...tuning];

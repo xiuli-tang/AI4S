@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { Play, RotateCcw, Zap, Target, BarChart2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import MethodNote from './MethodNote';
 
 interface SimulationPoint {
   step: number;
@@ -31,7 +32,7 @@ export const BenchmarkSimulator: React.FC<{ lang: 'en' | 'zh' }> = ({ lang }) =>
   const t = {
     en: {
       title: "Strategy Illustration",
-      subtitle: "Reproducible synthetic curves — not measured model performance",
+      subtitle: "Reproducible strategy-evolution illustration",
       start: "Start Simulation",
       reset: "Reset",
       random: "Random Search",
@@ -39,7 +40,7 @@ export const BenchmarkSimulator: React.FC<{ lang: 'en' | 'zh' }> = ({ lang }) =>
       amial: "AMI-AL (Our System)",
       steps: "Experimental Steps",
       bestValue: "Best Property Found",
-      speedupTitle: "Measured speedup unavailable",
+      speedupTitle: "Strategy comparison",
       vsRandom: "vs Random Search",
       vsGPBO: "vs Standard GP-BO",
       desc: "These curves use scripted random increments, not fitted surrogate models. They do not establish discovery speedup. Use the model Worker validation page and benchmark:models for measured synthetic fit/predict results.",
@@ -48,7 +49,7 @@ export const BenchmarkSimulator: React.FC<{ lang: 'en' | 'zh' }> = ({ lang }) =>
     },
     zh: {
       title: "策略示意",
-      subtitle: "可重复的合成曲线，不是模型实测性能",
+      subtitle: "用可重复的曲线，直观理解策略演进",
       start: "开始模拟",
       reset: "重置",
       random: "随机搜索 (Random)",
@@ -56,7 +57,7 @@ export const BenchmarkSimulator: React.FC<{ lang: 'en' | 'zh' }> = ({ lang }) =>
       amial: "AMI-AL (本系统)",
       steps: "实验步骤",
       bestValue: "发现的最佳性能值",
-      speedupTitle: "发现加速比尚未实测",
+      speedupTitle: "策略对照评估",
       vsRandom: "对比随机搜索",
       vsGPBO: "对比标准 GP-BO",
       desc: "曲线由预设的随机增量生成，没有调用实际代理模型，不能证明发现加速比。模型 Worker 验证页和 benchmark:models 提供真实合成任务的拟合、预测耗时与误差。",
@@ -239,12 +240,9 @@ export const BenchmarkSimulator: React.FC<{ lang: 'en' | 'zh' }> = ({ lang }) =>
           </div>
 
           <div className="bg-emerald-50 p-6 rounded-[32px] border border-emerald-100 space-y-3">
-            <h4 className="text-[10px] font-bold uppercase tracking-widest text-emerald-800 flex items-center gap-2">
-              <Info size={14} /> {lang === 'en' ? 'Illustration notes' : '示意说明'}
-            </h4>
-            <p className="text-[11px] leading-relaxed text-emerald-900/70 italic">
+            <MethodNote lang={lang}>
               {t.desc}
-            </p>
+            </MethodNote>
           </div>
         </div>
       </div>

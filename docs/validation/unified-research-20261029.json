@@ -1,0 +1,110 @@
+{
+  "schema": "ai4s-unified-workflow-validation-1",
+  "checkedAt": "2026-10-28T19:27:08.578517+00:00",
+  "branch": "codex/unified-research-workflow",
+  "baseCommit": "4d527207aebc919b8c0c2a38781f91c6cbcee83a",
+  "build": {
+    "entry": "assets/index-Cj8vyzhS.js",
+    "sha256": "21b90158a0f17c822d9afdef2aa49b8ebcd1136d6772ff3421ac762dcb795e26"
+  },
+  "automated": {
+    "tests": 281,
+    "passed": 281,
+    "failed": 0,
+    "skipped": 0,
+    "typescript": "passed",
+    "productionBuild": "passed",
+    "pythonDiffraction": "passed"
+  },
+  "realSnapshotStudy": {
+    "source": "mp-snapshot",
+    "version": "1b464075b9d2a7ba",
+    "rounds": 19,
+    "observed": 40,
+    "formulaTerms": 1,
+    "paretoObserved": 20,
+    "paretoFrontier": 8,
+    "runId": "d16f84fd-9cc8-4e78-b6ea-2d00adee9ade",
+    "modelSha256": "75428afe3a1d7d8062e19bcaabd5c433623cabf308242ec9fb493e38604fb638",
+    "model": "MACE-MPA-0 medium",
+    "runJsonSha256": "0cf59313f17c6f3fd30faddd5f20f41fef17a1a70e5b51bb674685874095cb9c",
+    "converged": [
+      {
+        "id": "cfg-1-mvsg52r9",
+        "energyPerAtomEv": -7.708802325210736,
+        "maxForceEvAngstrom": 0.06479254979272743,
+        "steps": 5
+      },
+      {
+        "id": "cfg-mvsg5dzb",
+        "energyPerAtomEv": -7.708632316182535,
+        "maxForceEvAngstrom": 0.07928823484172924,
+        "steps": 22
+      }
+    ],
+    "xrd": [
+      {
+        "candidateId": "cfg-mvsg5dzb",
+        "structureHash": "572c49991e7d5da8e91b8bffbf0a0de250a060aa97822ba0ccac0c38d3a0f795",
+        "kind": "derived",
+        "spectrumSource": "demonstration",
+        "score": 100,
+        "mainFraction": 98.4
+      },
+      {
+        "candidateId": "cfg-1-mvsg52r9",
+        "structureHash": "4b96fd0f93ef38e704ee4153b798e562dab226abfc612432533e65c7a31b4fcf",
+        "kind": "derived",
+        "spectrumSource": "demonstration",
+        "score": 100,
+        "mainFraction": 98.4
+      }
+    ],
+    "geometry": [
+      {
+        "structureHash": "4b96fd0f93ef38e704ee4153b798e562dab226abfc612432533e65c7a31b4fcf",
+        "meanBondLength": 1.9623145723232789,
+        "bondVariance": 0.00013381266203286223,
+        "octahedralDistortion": 3.47504115707733e-05,
+        "volumeChangePerAtom": 0
+      }
+    ],
+    "completedAdvisorReplies": 2
+  },
+  "isolatedCalibrationStudy": {
+    "source": "synthetic contract fixture, not experimental evidence",
+    "cohort": "UI-CONTRACT-ONLY",
+    "objective": "overpotential",
+    "unit": "mV",
+    "records": 40,
+    "correction": 20,
+    "paretoActiveAxes": [
+      0,
+      2
+    ],
+    "observedTransfer": 30,
+    "finalObserved": 40,
+    "formulaTarget": "teacher",
+    "calibrationGroupsInTest": 0,
+    "calibrationGroupsInTuning": 0,
+    "restoreRetainsEnabledCalibrationAndTeacher": true
+  },
+  "browserChecks": {
+    "validJsonImport": true,
+    "malformedJsonRejected": true,
+    "exactRevisionRestore": true,
+    "formulaAndParetoRestored": true,
+    "advisorHistoryRestored": true,
+    "portablePoscarMatchesBundledOutput": true,
+    "allFivePresentationTabs": true,
+    "configurationSwitchSelectsMatchingXrd": true,
+    "returnToResearchPreservesResults": true,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "newCompositionQueueAcceptsAnotherDatabaseMaterial": true,
+    "queueResetRetainsServerRunHistory": true,
+    "calibrationCanBeDisabledAndRestored": true
+  }
+}

@@ -1,0 +1,47 @@
+import { lazy, Suspense, useMemo, useState } from "react";
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import type { ResearchSession } from "../research/types";
+import { targetSpec } from "../materialContext";
+import { paretoFront, preferredCandidate } from "../engine/pareto/ParetoEngine";
+import { PARETO_SCALES } from "../engine/pareto/ParetoData";
+import { asCrystalStructure } from "../umlip/configurations";
+import { displayAtoms } from "../structures/geometry";
+import { downloadResearch } from "./ResearchControls";
+import XrdPlot from "./XrdPlot";
+import { configurationEvidence } from "../research/links";
+import "./presentation.css";
+import "./research.css";
+const Viewer = lazy(() => import("./StructureViewer"));
+const n = (v: number | null | undefined) => v == null || !Number.isFinite(v) ? "—" : Number(v.toPrecision(5)).toString();
+
+export default function ResearchPresentation({ session: s, onExit }: { session: ResearchSession; onExit(): void }) {
+  const [tab, setTab] = useState("overview"), [structureIndex, setStructureIndex] = useState(0);
+  const m = s.modules, f = m.formula?.result, p = m.pareto, run = m.umlip?.run;
+  const target = targetSpec(s.query.objective);
+  const observed = p?.pool.filter(c => c.observed && (c.observedAt ?? 0) <= (p.replay ?? p.state.round)) ?? [];
+  const front = p ? paretoFront(observed, p.problem) : [];
+  const selected = p ? preferredCandidate(observed, p.weights, PARETO_SCALES[p.mode], p.problem) : undefined;
+  const converged = run?.candidates.filter(c => c.status === "converged" && c.result) ?? [];
+  const candidate = converged[structureIndex] ?? converged[0];
+  const linked = candidate && run ? configurationEvidence(m, run.id, candidate.id) : null;
+  const crystal = useMemo(() => { const c = converged[structureIndex] ?? converged[0]; return c?.result ? asCrystalStructure(c.result.structure, c.name, `run ${run!.id}`) : m.structures.at(-1)?.structure ?? m.experiments[0]?.reference.structure; }, [run, structureIndex, m.structures, m.experiments]);
+  const atoms = useMemo(() => crystal ? displayAtoms(crystal, 1) : [], [crystal]);
+  const xrd = linked?.xrd ?? m.experiments[0], answers = m.advisor?.turns.filter(t => t.status === "done" && t.answer) ?? [];
+  const tabs = [["overview", "成果总览"], ["formula", "学习与公式"], ["pareto", "多目标决策"], ["validation", "结构与XRD"], ["advisor", "AI研究解读"]];
+  const chart = <div className="presentation-chart-dark"><ResponsiveContainer width="100%" height={220}><AreaChart data={s.state.history}><XAxis dataKey="iteration" stroke="#afc5b5" /><YAxis stroke="#afc5b5" /><Tooltip /><Area dataKey="bestValue" type="monotone" stroke="#cce9a8" fill="#5d806b" isAnimationActive={false} /></AreaChart></ResponsiveContainer></div>;
+  const formula = f ? <><div className="presentation-equation">ŷ = {n(f.intercept)} {f.formulas.map((t, i) => <span key={i}> {t.coefficient >= 0 ? "+" : "−"} {n(Math.abs(t.coefficient))} Φ<sub>{i + 1}</sub></span>)} {target.unit}</div><div className="presentation-formula-terms">{f.formulas.map((t, i) => <div key={i}><span>Φ{i + 1}</span><b>{t.text}</b><small>{t.unit}</small></div>)}</div></> : <p>公式尚未生成，可回研究工作台继续蒸馏。</p>;
+  const table = <div className="presentation-records"><table><thead><tr><th>候选</th><th>{p?.problem?.axes[0].zh ?? "性能"}</th><th>{p?.problem?.axes[1].zh ?? "Ehull"}</th><th>USD/kg</th></tr></thead><tbody>{front.slice(0, 12).map(c => <tr key={c.id}><td>{c.formula}</td><td>{n(c.objectives[0])}</td><td>{p?.problem?.active.includes(1) === false ? "—" : n(c.objectives[1])}</td><td>{n(c.objectives[2])}</td></tr>)}</tbody></table></div>;
+  return <div className="presentation-shell research-personal-presentation"><header className="presentation-header"><div className="presentation-brand"><div><b>{s.name}</b><span>AMI-AL · YOUR RESEARCH SNAPSHOT</span></div></div><div className="presentation-header-actions"><span className="presentation-badge">本次研究 · {new Date(s.savedAt).toLocaleDateString()}</span><button onClick={() => downloadResearch(s)}>导出研究存档</button><button onClick={onExit}>返回研究工作台</button></div></header>
+    <nav className="presentation-nav">{tabs.map(([id, label]) => <button key={id} aria-current={tab === id ? "page" : undefined} onClick={() => { setTab(id); window.scrollTo(0, 0); }}>{label}{tab === id && <span />}</button>)}</nav>
+    <div className="presentation-page-heading"><div><p>CONNECTED RESEARCH · {s.metadata?.datasetVersion}</p><h1>{target.zh} / {target.unit} · {target.direction === "min" ? "最小化" : "最大化"}</h1></div><span>当前研究成果，按原始模块身份保存</span></div>
+    <section className="presentation-kpis">{[["学习轮次", s.state.iteration], ["已观察记录", s.state.sampledCount], ["解析描述符", f?.formulas.length ?? 0], ["非支配方案", front.length], ["收敛构型 / XRD", `${converged.length} / ${m.experiments.length}`]].map(([label, v]) => <article key={String(label)}><span>{label}</span><strong>{v}</strong></article>)}</section>
+    {tab === "overview" && <main className="presentation-overview"><article className="presentation-card"><h2>学习进展与解析公式</h2>{chart}{formula}</article><article className="presentation-card"><h2>当前多目标优选</h2><p className="research-hero-value">{selected?.formula ?? "等待多目标结果"}</p>{table}</article><article className="presentation-card"><h2>结构与谱图</h2>{crystal && <div className="research-snapshot-structure"><Suspense fallback={<p>正在打开晶胞…</p>}><Viewer structure={crystal} atoms={atoms} repeats={1} showCell showNeighbors={false} cutoff={2.5} selected={[]} active onSelect={() => {}} /></Suspense></div>}{xrd ? <XrdPlot pattern={xrd.reference.xrd.pattern} comparison={xrd.comparison} compact /> : <p>已有结构可在研究工作台送入XRD分析。</p>}</article><article className="presentation-card"><h2>研究解读与下一步</h2>{answers.length ? <div className="presentation-markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>{answers.at(-1)!.answer}</ReactMarkdown></div> : <p>当前成果摘要已接入实时顾问，可返回研究工作台生成综合解读。</p>}</article></main>}
+    {tab === "formula" && <main className="presentation-two-column"><article className="presentation-card"><h2>已观察最优值 / {target.unit}</h2>{chart}<div className="presentation-records"><table><tbody>{s.candidates.filter(c => c.isSampled).map(c => <tr key={c.recordKey}><td>{c.formula}</td><td>{n(c.observedValue)}</td></tr>)}</tbody></table></div></article><article className="presentation-card"><h2>白盒公式</h2>{formula}{f && <p>测试 MAE {n(f.metrics.mae)} · RMSE {n(f.metrics.rmse)} · R² {n(f.metrics.r2)} · {f.metrics.groups}组</p>}</article></main>}
+    {tab === "pareto" && <main className="presentation-two-column"><article className="presentation-card"><h2>前沿与目标</h2>{p?.problem?.axes.filter((_, i) => p.problem!.active.includes(i as 0 | 1 | 2)).map(a => <p key={a.id}>{a.zh} · {a.direction} · {a.unit}</p>)}{table}</article><article className="presentation-card"><h2>所保存的决策</h2><p className="research-hero-value">{selected?.formula ?? "—"}</p><p>偏好权重 {p?.weights.join(" / ") ?? "—"} · 第{p?.replay ?? p?.state.round ?? 0}轮</p><ResponsiveContainer width="100%" height={260}><AreaChart data={p?.state.history.filter(h => h.round <= (p.replay ?? p.state.round))}><XAxis dataKey="round" /><YAxis /><Tooltip /><Area dataKey="hypervolume" stroke="#52785a" fill="#d6e6c8" /></AreaChart></ResponsiveContainer></article></main>}
+    {tab === "validation" && <main className="presentation-two-column"><article className="presentation-card"><h2>构型与计算链</h2><div className="research-action-row">{converged.map((c, i) => <button key={c.id} onClick={() => setStructureIndex(i)}>{c.name} · {n(c.result?.energyPerAtomEv)} eV/atom</button>)}</div>{crystal && <div className="research-snapshot-structure"><Suspense fallback={<p>正在打开晶胞…</p>}><Viewer structure={crystal} atoms={atoms} repeats={1} showCell showNeighbors={false} cutoff={2.5} selected={[]} active onSelect={() => {}} /></Suspense></div>}<p>run {run?.id ?? "—"}</p><p>{run?.model?.label} · {run?.model?.sha256.slice(0, 16)}</p></article><article className="presentation-card"><h2>XRD与合成记录</h2>{xrd?.reference.binding && <p className="research-muted">XRD参考 · {xrd.reference.binding.derived?.candidateId ?? xrd.reference.binding.structureHash.slice(0, 16)}</p>}{xrd ? <><XrdPlot pattern={xrd.reference.xrd.pattern} comparison={xrd.comparison} /><p>{xrd.formula} · {xrd.demo ? "演示谱" : "上传谱"} · {xrd.comparison.score}/100 · 主相拟合{xrd.comparison.mainFraction}%</p></> : <p>本存档尚无谱图比对记录。</p>}{(linked?.geometry ?? m.geometry).map(g => <p key={`${g.structureHash}/${g.centerSiteIndex}`}>{g.note} · 平均键长 {n(g.meanBondLength)} Å · 畸变 {n(g.octahedralDistortion)}</p>)}</article></main>}
+    {tab === "advisor" && <main className="presentation-advisor-layout"><article className="presentation-card"><h2>AI研究问答与上下文快照</h2>{answers.map(a => <section key={a.id}><h3>{a.question}</h3><div className="presentation-markdown"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>{a.answer}</ReactMarkdown></div><small>{a.model} · {a.capturedAt}</small></section>)}{!answers.length && <p>回到研究工作台，点击“综合研究解读”即可基于这些模块结果提问。</p>}</article><aside className="presentation-card"><h2>研究来源</h2><p>{s.metadata?.effectiveSource} · {s.query.cohort}</p><p>{s.config.model.kind} · {s.config.strategy}</p><p>实验记录{m.experiments.length}份 · 几何量{m.geometry.length}份</p></aside></main>}
+    <footer className="presentation-footer"><span>材料 → 结构 → 计算 → 表征 → 决策</span><span>{s.id} · {s.savedAt}</span></footer>
+  </div>;
+}

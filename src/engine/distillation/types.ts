@@ -16,7 +16,8 @@ export type Expression =
   | { op: "one" }
   | { op: "abs" | "sqrt" | "exp"; arg: Expression }
   | { op: "+" | "-" | "*" | "/"; left: Expression; right: Expression; floor?: number };
-export interface SupplementValue { value: number; unit: string; source: string; reference: string }
+export interface SupplementValue { value: number; unit: string; source: string; reference: string;
+  binding?: { recordKey: string; structureHash: string; algorithm: string; centerSiteIndex: number; cutoff: number; referenceStructureHash?: string } }
 export type Supplements = Record<string, Record<string, SupplementValue>>;
 export interface QueryPoint {
   id: string;
@@ -26,7 +27,7 @@ export interface QueryPoint {
   features: number[];
   lineage?: MaterialLineage;
 }
-export interface SamplePoint extends QueryPoint { label: number }
+export interface SamplePoint extends QueryPoint { label: number; pairedDft?: number }
 export type DistillationTarget = "observed" | "teacher";
 export type PartitionName = "discovery" | "tuning" | "test";
 export type PartitionAssignments = Record<string, PartitionName>;
@@ -56,9 +57,10 @@ export interface DistillationSnapshot {
   objective: TargetKind;
   objectiveMeta?: ReturnType<typeof targetSpec>;
   modelConfig: ModelConfig;
+  calibration?: { correction: number; cohort: string; objective: string; calibrationIds: string[]; unit: string };
   samples: SamplePoint[];
   queries: QueryPoint[];
-  supplements: { materialId: string; feature: string; source: string; reference: string }[];
+  supplements: { materialId: string; feature: string; source: string; reference: string; binding?: SupplementValue["binding"] }[];
 }
 export interface Metrics { count: number; groups: number; invalid: number; mae: number | null; rmse: number | null; r2: number | null }
 export interface FormulaTerm {

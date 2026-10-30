@@ -1,8 +1,10 @@
 import type { Material } from "../../types";
 import { extractCompositionFeatures } from "../CompositionFeatures";
 import { materialPrice, type PriceOverrides } from "./priceBook";
-import type { ObjectiveScales, ParetoCandidate } from "./ParetoEngine";
+import type { ObjectiveScales, ParetoCandidate, ParetoProblem, ParetoAxis } from "./ParetoEngine";
 import { materialLineage, materialRecordKey } from "../../materialContext";
+import { OBJECTIVES, type ObjectiveId } from "../../dataHub";
+import { canApplySynthesisFeedback, feasibilityPrior } from "../../synthesis/feedback";
 
 export interface StabilityInput { materialId: string; energyAboveHull: number; source: string; method: string; referenceSet: string; recordKey?: string }
 export function parseStabilityInputs(text: string): StabilityInput[] {
@@ -45,9 +47,9 @@ export function isParetoMaterial(material: Material): boolean {
     && (material.source === "materials-project" || material.source === "MP-DFT"
       && (material.datasetSource === "mp-live" || material.datasetSource === "mp-snapshot"));
 }
-export function bindStabilityInputs(rows: StabilityInput[], materials: Material[]): StabilityInput[] {
+export function bindStabilityInputs(rows: StabilityInput[], materials: Material[], allowHub = false): StabilityInput[] {
   return rows.map(row => {
-    const material = materials.find(material => material.id === row.materialId && isParetoMaterial(material));
+    const material = materials.find(material => material.id === row.materialId && (allowHub || isParetoMaterial(material)));
     if (!material) throw new Error("稳定性记录不属于当前 MP 带隙数据集：" + row.materialId);
     const recordKey = materialRecordKey(material);
     if (row.recordKey && row.recordKey !== recordKey) throw new Error("稳定性记录版本与当前数据不一致");
@@ -80,3 +82,40 @@ export const PARETO_SCALES: Record<"demo" | "materials-project", ObjectiveScales
   demo: { performance: 100, hull: 0.5, price: 6000 },
   "materials-project": { performance: 12, hull: 0.5, price: 6000 },
 };
+
+const NORMALIZATION: Record<ObjectiveId, [number, number]> = {
+  "band-gap": [0, 12], "formation-energy": [0, 8], "energy-above-hull": [.5, .5],
+  "vacancy-energy": [10, 10], "bond-energy": [0, 15], "polarization-resistance": [100, 100], "overpotential": [1000, 1000],
+};
+export function objectiveAxis(id: ObjectiveId): ParetoAxis {
+  const [reference, scale] = NORMALIZATION[id]; return { id, ...OBJECTIVES[id], reference, scale };
+}
+export function hubParetoCandidates(materials: Material[], primary: ObjectiveId, secondary: ObjectiveId | null,
+  overrides: PriceOverrides = {}, stability: StabilityInput[] = [], useSynthesisPrior = true) {
+  const axes: ParetoProblem["axes"] = [objectiveAxis(primary), secondary ? objectiveAxis(secondary)
+    : { id: "none", zh: "未选第二性质", en: "No secondary property", unit: "1", direction: "min", reference: 1, scale: 1 },
+    { id: "price", zh: "采购价", en: "Material price", unit: "USD/kg", direction: "min", reference: 6000, scale: 6000, log: true }];
+  const problem: ParetoProblem = { axes, active: secondary ? [0, 1, 2] : [0, 2], useSynthesisPrior };
+  const candidates: ParetoCandidate[] = []; let missingStability = 0, missingPrice = 0;
+  const imported = new Map(stability.map(row => [row.materialId, row]));
+  for (const m of materials) {
+    if (!m.datasetSource || !m.provenance || !m.recordRevision) continue;
+    const first = m.targetKind === primary ? m.trueProperty : m.objectiveValues?.[primary];
+    const firstUnit = m.objectiveUnits?.[primary] ?? (m.targetKind === primary ? OBJECTIVES[primary].unit : undefined);
+    if (!Number.isFinite(first) || firstUnit !== axes[0].unit) continue;
+    const external = imported.get(m.id);
+    const useExternal = secondary === "energy-above-hull" && external?.recordKey === materialRecordKey(m);
+    const second = secondary === null ? 0 : useExternal
+      ? external.energyAboveHull : m.objectiveValues?.[secondary] ?? (secondary === "energy-above-hull" ? m.energyAboveHull : undefined);
+    if (!Number.isFinite(second) || secondary && !useExternal && m.objectiveUnits?.[secondary] !== axes[1].unit) { missingStability++; continue; }
+    const price = materialPrice(m.composition, overrides);
+    if (price.usdKg === null) { missingPrice++; continue; }
+    const feedback = m.synthesisFeedback && canApplySynthesisFeedback(m, m.synthesisFeedback) ? m.synthesisFeedback : undefined;
+    candidates.push({ id: m.id, formula: m.formula, composition: m.composition, features: m.features,
+      objectives: [first!, second!, price.usdKg], observed: false, source: "data-hub", lineage: materialLineage(m),
+      objective: { id: primary, unit: axes[0].unit, direction: axes[0].direction }, stabilitySource: secondary ?? "inactive",
+      priceQuality: price.quality, synthesisPrior: feasibilityPrior(feedback, m), synthesisStatus: feedback?.status,
+      ...(secondary === "energy-above-hull" && external?.recordKey === materialRecordKey(m) ? { stabilityProvenance: external } : {}) });
+  }
+  return { candidates, missingStability, missingPrice, problem, scales: { performance: axes[0].scale, hull: axes[1].scale, price: axes[2].scale } };
+}

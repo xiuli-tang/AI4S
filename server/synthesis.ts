@@ -9,6 +9,7 @@ import type { PreflightResult } from "../src/synthesis/types";
 import type { HubStore } from "./hubStore";
 import type { StoredHubSource, StructureRef } from "../src/dataHub";
 import { normalizeComposition } from "../src/engine/CompositionFeatures";
+import { materialRecordKey } from "../src/materialContext";
 
 interface Dependencies { network: NetworkClient; env: Record<string, string | undefined>; materialsEndpoint: string; hub?: HubStore }
 
@@ -90,7 +91,7 @@ export function createSynthesisRouter({ network, env, materialsEndpoint, hub }: 
   const cache = new Map<string, Promise<unknown>>();
   router.post("/preflight", async (req, res) => {
     try {
-      const { composition, temperature = 900, atmosphere = "air", materialId, structureRef, source } = req.body;
+      const { composition, temperature = 900, atmosphere = "air", materialId, structureRef, source, stabilityEvaluation, allowDemo } = req.body;
       const fractions = normalizeComposition(composition);
       if (!Number.isFinite(Number(temperature)) || Number(temperature) < 0 || Number(temperature) > 3000
         || !["air", "oxygen", "inert", "reducing"].includes(atmosphere)) throw new Error("预审参数无效");
@@ -113,11 +114,20 @@ export function createSynthesisRouter({ network, env, materialsEndpoint, hub }: 
         const reference = { ...ref, source: stored.row.source, method: stored.row.methodMeta, cohort: stored.row.cohort, provenance: structuredClone(stored.row.provenance) };
         const hull = stored.row.values["energy-above-hull"], formation = stored.row.values["formation-energy"];
         const formationEnergy = Number.isFinite(formation) ? formation! : null;
+        if (stabilityEvaluation) {
+          const recordKey = materialRecordKey({ id: ref.id, composition: stored.row.composition, source: stored.row.source,
+            datasetSource: ref.dataset, recordRevision: ref.revision, cohort: stored.row.cohort, provenance: stored.row.provenance });
+          if (stabilityEvaluation.recordKey !== recordKey || stabilityEvaluation.materialId !== ref.id
+            || !Number.isFinite(stabilityEvaluation.energyAboveHull) || stabilityEvaluation.energyAboveHull < 0
+            || ![stabilityEvaluation.source, stabilityEvaluation.method, stabilityEvaluation.referenceSet].every(s => typeof s === "string" && s.trim())) throw new Error("共享稳定性结果与当前数据记录不匹配");
+          return res.json({ ...demoPreflight(composition, Number(temperature), atmosphere, stabilityEvaluation.energyAboveHull),
+            formationEnergy, source: "external", reference, stabilityEvaluation });
+        }
         if (!Number.isFinite(hull) || hull! < 0) return res.json(unavailable(formationEnergy, reference));
         return res.json({ ...demoPreflight(composition, Number(temperature), atmosphere, hull),
           formationEnergy, source: "data-hub", reference });
       }
-      if (!materialId) return res.json(demoPreflight(composition, Number(temperature), atmosphere));
+      if (!materialId) return res.json(allowDemo === false ? unavailable() : demoPreflight(composition, Number(temperature), atmosphere));
       let hull: number | undefined, formation: number | null = null;
       const key = env.MP_API_KEY?.trim();
       if (source === "materials-project" && key && !/^YOUR_|^你的|[\r\n]/.test(key) && isMaterialId(materialId)) {

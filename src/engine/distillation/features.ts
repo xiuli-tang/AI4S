@@ -1,7 +1,7 @@
 import type { Material } from "../../types";
 import { ELEMENT_TABLE_VERSION, FEATURE_SCHEMA_VERSION, extractCompositionFeatures, normalizeComposition, PROPERTY_DEFINITIONS } from "../CompositionFeatures";
 import { hashString } from "../SeededRandom";
-import { materialLineage, targetSpec } from "../../materialContext";
+import { materialLineage, materialRecordKey, targetSpec } from "../../materialContext";
 import type { ModelConfig } from "../models/config";
 import { DEFAULT_DISTILLATION_OPTIONS, type DistillationOptions, type DistillationSnapshot, type DistillationTarget,
   type PartitionAssignments, type PhysicalFeature, type QueryPoint, type SamplePoint, type Supplements } from "./types";
@@ -24,6 +24,8 @@ export const PHYSICAL_FEATURES: PhysicalFeature[] = [...COMPOSITION_FEATURES,
   { id: "volume_change_per_atom", symbol: "ΔV_atom", label: "每原子体积变化（外部参考结构）", unit: "Å³/atom", dimension: [0, 3], extra: true },
   { id: "chi_A", symbol: "χ_A", label: "A 位点电负性（外部位点定义）", unit: "1", dimension: [0, 0], extra: true },
   { id: "chi_B", symbol: "χ_B", label: "B 位点电负性（外部位点定义）", unit: "1", dimension: [0, 0], extra: true },
+  { id: "mean_mo_bond_length", symbol: "mean(d_MO)", label: "M–O 平均键长", unit: "Å", dimension: [0, 1], extra: true },
+  { id: "mo_bond_variance", symbol: "var(d_MO)", label: "M–O 键长总体方差", unit: "Å²", dimension: [0, 2], extra: true },
 ];
 
 export function compositionGroup(composition: Record<string, number>): string {
@@ -52,7 +54,10 @@ export function parseSupplements(text: string, materialIds?: ReadonlySet<string>
       if (key === "bond_energy_mo" && row.value <= 0 || key === "octahedral_distortion" && row.value < 0) {
         throw new RangeError("键解离能须为正，归一化畸变须非负");
       }
-      output[id][key] = { value: row.value, unit: feature.unit, source: row.source.slice(0, 300), reference: row.reference.slice(0, 500) };
+      const binding = row.binding as any;
+      if (binding && (typeof binding.recordKey !== "string" || !/^[a-f0-9]{64}$/.test(binding.structureHash)
+        || !Number.isInteger(binding.centerSiteIndex) || !Number.isFinite(binding.cutoff) || typeof binding.algorithm !== "string")) throw new TypeError("无效的几何数据绑定");
+      output[id][key] = { value: row.value, unit: feature.unit, source: row.source.slice(0, 300), reference: row.reference.slice(0, 500), ...(binding ? { binding: structuredClone(binding) } : {}) };
     }
   }
   return output;
@@ -63,6 +68,7 @@ export function buildDistillationSnapshot(pool: Material[], input: {
   runId: number; iteration: number; target: DistillationTarget;
   objective: DistillationSnapshot["objective"]; modelConfig: ModelConfig; supplements?: Supplements;
   partitions?: PartitionAssignments; searchOptions?: DistillationOptions;
+  calibration?: DistillationSnapshot["calibration"];
 }): DistillationSnapshot {
   if (pool.length > 20_000) throw new RangeError("公式投影最多支持 20000 条候选");
   targetSpec(input.objective);
@@ -76,7 +82,9 @@ export function buildDistillationSnapshot(pool: Material[], input: {
     const values = PHYSICAL_FEATURES.map(feature => {
       if (feature.extra) {
         const value = input.supplements?.[material.id]?.[feature.id];
-        if (value) supplements.push({ materialId: material.id, feature: feature.id, source: value.source, reference: value.reference });
+        if (value?.binding && value.binding.recordKey !== materialRecordKey(material)) throw new Error("几何补充量与当前材料版本不一致");
+        if (value) supplements.push({ materialId: material.id, feature: feature.id, source: value.source, reference: value.reference,
+          ...(value.binding ? { binding: structuredClone(value.binding) } : {}) });
         return value?.value ?? null;
       }
       const [property, statistic] = feature.id.split(".");
@@ -90,7 +98,7 @@ export function buildDistillationSnapshot(pool: Material[], input: {
     queries.push(query);
     if (material.isSampled) {
       if (!Number.isFinite(material.trueProperty)) throw new Error("已采样性质包含非有限值");
-      samples.push({ ...query, label: material.trueProperty });
+      samples.push({ ...query, label: material.trueProperty, ...(input.calibration && Number.isFinite(material.pairedDft) ? { pairedDft: material.pairedDft } : {}) });
     }
   }
   const data = {
@@ -99,6 +107,7 @@ export function buildDistillationSnapshot(pool: Material[], input: {
     target: input.target, objective: input.objective, objectiveMeta: targetSpec(input.objective), modelConfig: { ...input.modelConfig },
     partitions: { ...input.partitions }, searchOptions: { ...DEFAULT_DISTILLATION_OPTIONS, ...input.searchOptions },
     samples, queries, supplements,
+    ...(input.calibration ? { calibration: structuredClone(input.calibration) } : {}),
   };
   const lineage = JSON.stringify([data, PHYSICAL_FEATURES]);
   return { id: hashString(lineage).toString(16).padStart(8, "0") + hashString("physics:" + lineage).toString(16).padStart(8, "0"), ...data };

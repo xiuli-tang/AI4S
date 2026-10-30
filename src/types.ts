@@ -1,6 +1,6 @@
 import type { CompositionDescriptors } from "./engine/CompositionFeatures";
 import type { Fidelity, HubSource, ObjectiveId, Provenance, ScientificSource, StructureRef } from "./dataHub";
-import type { SynthesisFeedback } from "./synthesis/types";
+import type { ReferenceBinding, SynthesisFeedback } from "./synthesis/types";
 
 export interface Material {
   id: string;
@@ -26,6 +26,7 @@ export interface Material {
   objectiveValues?: Partial<Record<ObjectiveId, number>>;
   objectiveUnits?: Partial<Record<ObjectiveId, string>>;
   synthesisFeedback?: SynthesisFeedback;
+  validationStructure?: ReferenceBinding;
   trueProperty: number; // Only known to the "Oracle"
   cost: number; // Experimental or computational cost
   predictedMean?: number;

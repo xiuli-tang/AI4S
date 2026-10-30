@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   ScatterChart, Scatter, ZAxis, Cell
@@ -48,13 +48,32 @@ import { useDistillation } from "./engine/distillation/useDistillation";
 import { DescriptorMap, DistillationPanel } from "./components/DistillationPanel";
 import ParetoExplorer from "./components/ParetoExplorer";
 import type { CrystalStructure } from "./structures/types";
-import type { LabRequest, SynthesisFeedback } from "./synthesis/types";
-import { applySynthesisFeedback, canApplySynthesisFeedback, feedbackLabel, loadFeedbackRegistry, restoreFeedback, saveFeedbackRegistry } from "./synthesis/feedback";
-import { isStrontiumTitanate } from "./synthesis/client";
+import type { LabRequest, SynthesisFeedback, ExperimentRecord, ReferenceBinding } from "./synthesis/types";
+import { applySynthesisFeedback, canApplySynthesisFeedback, feedbackLabel, loadFeedbackRegistry, saveFeedbackRegistry } from "./synthesis/feedback";
+import { isStrontiumTitanate, sameComposition } from "./synthesis/client";
 import { materialRecordKey } from "./materialContext";
 import { materialForStructure } from "./synthesis/reference";
+import MethodNote from "./components/MethodNote";
+import ResearchControls from "./components/ResearchControls";
+import CandidateDetails from "./components/CandidateDetails";
+import GeometryPanel from "./components/GeometryPanel";
+import { emptyResearchModules, type ResearchSession, type Restore, type ResearchModules, type StructureDraft, type StructureArtifact, type GeometryResult, type FormulaArchive, type ParetoArchive, type AdvisorArchive, type UmlipArchive } from "./research/types";
+import { captureSession, restoreCandidatePool, parseSession } from "./research/session";
+import { researchEvidence } from "./research/evidence";
+import { calibrationObservations, calibratedSurrogate } from "./research/calibration";
+import { replaceGeometrySupplements } from "./research/geometry";
+import { restoreValidatedFeedback, rebindValidation } from "./research/validation";
+import { MaterialStructureService } from "./services/MaterialStructureService";
+import { structureFingerprint } from "./structures/fingerprint";
+import { structureComposition } from "./structures/geometry";
+import { fromCrystalStructure, asCrystalStructure } from "./umlip/configurations";
+import type { ConfigurationInput } from "./umlip/types";
+import type { CalibrationResult } from "./dataHub";
+import "./components/research.css";
 
 const SynthesisLab = React.lazy(() => import("./components/SynthesisLab"));
+const PresentationWorkspace = React.lazy(() => import("./components/PresentationWorkspace"));
+const ResearchPresentation = React.lazy(() => import("./components/ResearchPresentation"));
 
 const engine = new MaterialsEngine();
 
@@ -101,8 +120,8 @@ const translations = {
     langToggle: "中文",
     docs: "Documentation",
     docsTitle: "System Documentation & Technical Specifications",
-    benchmark: "Benchmark",
-    benchmarkTitle: "Strategy Illustration (Not a Measured Benchmark)",
+    benchmark: "Strategy demo",
+    benchmarkTitle: "Active-learning strategy evolution",
     close: "Close",
     themeClassic: "Classic",
     themeScience: "Scientific Blue",
@@ -146,8 +165,8 @@ const translations = {
     langToggle: "English",
     docs: "系统文档",
     docsTitle: "系统文档与技术规范",
-    benchmark: "性能基准",
-    benchmarkTitle: "策略示意（非实测基准）",
+    benchmark: "策略演示",
+    benchmarkTitle: "主动学习策略演进",
     close: "关闭",
     themeClassic: "经典模式",
     themeScience: "科研蓝",
@@ -156,6 +175,32 @@ const translations = {
 };
 
 export default function App() {
+  const [modules, setModules] = useState(emptyResearchModules);
+  const modulesRef = useRef(modules); modulesRef.current = modules;
+  const structureRegistry = useRef(new Map<string, StructureArtifact>());
+  const hydrating = useRef(false), transferSerial = useRef(0), sessionId = useRef<string>(crypto.randomUUID());
+  const [restoringSession, setRestoringSession] = useState(false), [sessionRestore, setSessionRestore] = useState<Restore<ResearchSession> | null>(null);
+  const [personalPresentation, setPersonalPresentation] = useState<ResearchSession | null>(null);
+  const [selectedRecordKey, setSelectedRecordKey] = useState<string | null>(null), [showCandidate, setShowCandidate] = useState(false);
+  const [researchStatus, setResearchStatus] = useState("");
+  const [structureRestore, setStructureRestore] = useState<Restore<CrystalStructure> | undefined>();
+  const [queueRequest, setQueueRequest] = useState<Restore<ConfigurationInput[]> | undefined>();
+  const [experimentRestore, setExperimentRestore] = useState<Restore<ExperimentRecord> | undefined>();
+  const [geometryArtifact, setGeometryArtifact] = useState<StructureArtifact | null>(null), [showGeometry, setShowGeometry] = useState(false);
+  const structureService = useRef(new MaterialStructureService());
+  const onFormulaState = useCallback((formula: FormulaArchive) => { if (!hydrating.current) setModules(m => ({ ...m, formula })); }, []);
+  const onParetoState = useCallback((pareto: ParetoArchive) => { if (!hydrating.current) setModules(m => ({ ...m, pareto, stability: pareto.externalStability })); }, []);
+  const onAdvisorState = useCallback((advisor: AdvisorArchive) => { if (!hydrating.current) setModules(m => ({ ...m, advisor })); }, []);
+  const onUmlipState = useCallback((umlip: UmlipArchive) => { if (!hydrating.current) setModules(m => ({ ...m, umlip })); }, []);
+  const onExperiment = useCallback((record: ExperimentRecord) => {
+    if (!hydrating.current) setModules(m => ({ ...m, experiments: [record, ...m.experiments.filter(r => r.id !== record.id)] }));
+  }, []);
+  const restoredFormula = useMemo(() => sessionRestore?.value.modules.formula ? { token: sessionRestore.token, value: sessionRestore.value.modules.formula } : undefined, [sessionRestore?.token]);
+  const restoredPareto = useMemo(() => sessionRestore?.value.modules.pareto ? { token: sessionRestore.token, value: sessionRestore.value.modules.pareto } : undefined, [sessionRestore?.token]);
+  const restoredAdvisor = useMemo(() => sessionRestore ? { token: sessionRestore.token, value: sessionRestore.value.modules.advisor ?? { turns: [], selectedId: null, draft: "", preview: false, compact: false } } : undefined, [sessionRestore?.token]);
+  const restoredUmlip = useMemo(() => sessionRestore?.value.modules.umlip ? { token: sessionRestore.token, value: sessionRestore.value.modules.umlip } : undefined, [sessionRestore?.token]);
+  const [presentation, setPresentation] = useState(() => new URLSearchParams(window.location.search).get("mode") !== "research");
+  const presentationNeedsReload = useRef(presentation);
   const [showUmlip, setShowUmlip] = useState(false);
   const [hasOpenedUmlip, setHasOpenedUmlip] = useState(false);
   const openUmlip = () => { setHasOpenedUmlip(true); setShowUmlip(true); };
@@ -192,6 +237,7 @@ export default function App() {
   const [advisorRequest, setAdvisorRequest] = useState<AdvisorRequest | null>(null);
   const advisorRequestId = useRef(0);
   const openAdvisor = (materialId?: string, action?: AdvisorAction) => {
+    const chosen = pool.find(m => m.id === materialId); setSelectedRecordKey(chosen ? materialRecordKey(chosen) : null);
     setAdvisorRequest({ requestId: ++advisorRequestId.current, materialId, action });
     setShowAdvisor(true);
   };
@@ -204,18 +250,19 @@ export default function App() {
     setStructureMaterial({ id: material.id, formula: material.formula, source: material.source, structureRef: material.structureRef, requestId: ++structureRequestId.current });
     setHasOpenedStructure(true); setShowStructure(true);
   };
-  const openSynthesisLab = (material?: Material, structure?: CrystalStructure) => {
+  const openSynthesisLab = (material?: Material, structure?: CrystalStructure, referenceBinding?: ReferenceBinding) => {
     const chosen = material || (structure ? materialForStructure(pool, structure)
       : pool.find(m => isStrontiumTitanate(m.composition)) || advisorCandidates(pool)[0] || pool[0]);
     setLabRequest({ requestId: ++labSerial.current, materialId: chosen?.id, formula: chosen?.formula,
       composition: chosen?.composition, source: chosen?.source, recordKey: chosen ? materialRecordKey(chosen) : undefined,
-      structureRef: chosen?.structureRef, structure });
+      structureRef: chosen?.structureRef, structure, referenceBinding });
     setShowStructure(false); setShowLab(true);
   };
   const [theme, setTheme] = useState<'classic' | 'science'>('classic');
   const [isIterating, setIsIterating] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
   const loadRequest = useRef(0);
+  const restoreRequest = useRef<AbortController | null>(null);
   const runVersion = useRef(0);
   const iterationInFlight = useRef(false);
   const modelClient = useRef<ModelWorkerClient | null>(null);
@@ -223,7 +270,9 @@ export default function App() {
   const stopReason = getStopReason(pool, totalBudget);
   const [formulaMap, setFormulaMap] = useState(false);
   const distillation = useDistillation({ pool, runId: advisorRunId, iteration: state.iteration,
-    isRealData, objective: hubMetadata?.objective ?? hubQuery.objective, modelConfig: modelSettings, isRunning: isAutoRunning, loading: isLoadingData });
+    isRealData, objective: hubMetadata?.objective ?? hubQuery.objective, modelConfig: modelSettings, isRunning: isAutoRunning,
+    loading: isLoadingData || presentation || restoringSession, restored: restoredFormula, onState: onFormulaState,
+    calibration: modules.calibrationEnabled ? modules.calibration : null });
 
   const cancelComputation = () => {
     runVersion.current++;
@@ -242,10 +291,14 @@ export default function App() {
     return true;
   };
   const labPanel = labRequest && <React.Suspense fallback={showLab ? <p role="status" className="fixed bottom-4 left-4 z-50 bg-white p-3 rounded shadow">正在打开合成与 XRD 实验室…</p> : null}>
-    <SynthesisLab open={showLab} onClose={() => setShowLab(false)} request={labRequest} materials={pool} onFeedback={acceptSynthesisFeedback} />
+    <SynthesisLab open={showLab} onClose={() => setShowLab(false)} request={labRequest} materials={pool} onFeedback={acceptSynthesisFeedback}
+      restored={experimentRestore} onRecord={onExperiment} stability={modules.stability} />
   </React.Suspense>;
 
   const loadData = async (query: HubQuery) => {
+    restoreRequest.current?.abort(); hydrating.current = false; setRestoringSession(false);
+    setModules(m => ({ ...m, formula: null, pareto: null, advisor: null, calibration: null, calibrationEnabled: false })); setSessionRestore(null); setSelectedRecordKey(null); setShowCandidate(false); setShowGeometry(false);
+    setQueueRequest(undefined); setExperimentRestore(undefined);
     setShowLab(false); setLabRequest(null);
     setHubQuery(query);
     setAdvisorRunId(value => value + 1);
@@ -260,7 +313,10 @@ export default function App() {
       const metadata = await engine.loadHubData(query);
       if (request !== loadRequest.current) return;
       if (!metadata) return;
-      setPool(restoreFeedback(engine.getPool(), synthesisFeedbackRef.current));
+      const connected = await restoreValidatedFeedback(engine.getPool(), synthesisFeedbackRef.current);
+      if (request !== loadRequest.current) return;
+      setPool(connected.pool);
+      if (connected.unavailable) setResearchStatus(`${connected.unavailable}份构型验证记录需重新关联本机运行历史，其余数据已载入。`);
       setHubMetadata(metadata);
       setIsRealData(true);
       setDataIssue(engine.getLoadIssue());
@@ -281,7 +337,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    void loadData(hubQuery);
+    if (!presentation) void loadData(hubQuery);
     return () => {
       loadRequest.current++;
       runVersion.current++;
@@ -303,7 +359,7 @@ export default function App() {
       if (!modelClient.current) modelClient.current = new ModelWorkerClient(modelSettings);
       const result = await runActiveLearningStep(pool, state, {
         totalBudget, batchSize, strategy, direction: objectiveSpec.direction, signal: controller.signal, random: seededRandom(modelSettings.seed),
-      }, modelClient.current);
+      }, modules.calibrationEnabled && modules.calibration ? calibratedSurrogate(modelClient.current, modules.calibration) : modelClient.current);
       if (version !== runVersion.current) return;
       setPool(result.pool);
       setState(result.state);
@@ -354,29 +410,207 @@ export default function App() {
   }, [isAutoRunning, isLoadingData, isIterating, pool, state, strategy, batchSize, totalBudget, stopReason, runError]);
 
   const topAdvisorCandidates = useMemo(() => advisorCandidates(pool), [pool]);
+  const selectedMaterial = useMemo(() => pool.find(m => materialRecordKey(m) === selectedRecordKey) ?? null, [pool, selectedRecordKey]);
+  const moduleEvidence = useMemo(() => researchEvidence(modules, selectedRecordKey), [modules, selectedRecordKey]);
+  const chooseCandidate = (recordKey: string) => { setSelectedRecordKey(recordKey); setShowCandidate(true); };
+  async function registerStructure(draft: StructureDraft): Promise<StructureArtifact> {
+    const structureHash = await structureFingerprint(draft.structure);
+    const linked = materialForStructure(pool, draft.structure);
+    const recordKey = draft.recordKey ?? (linked ? materialRecordKey(linked) : undefined);
+    const registryKey = JSON.stringify([structureHash, recordKey, draft.stage, draft.runId, draft.candidateId]);
+    const old = structureRegistry.current.get(registryKey);
+    if (old) return old;
+    const artifact: StructureArtifact = { ...draft, recordKey, structureHash, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+    structureRegistry.current.set(registryKey, artifact);
+    setModules(m => ({ ...m, structures: [...m.structures, artifact].slice(-128) })); return artifact;
+  }
+  async function rememberStructure(structure: CrystalStructure) {
+    try { await registerStructure({ structure, stage: structure.source.recordRef ? "database" : "imported" }); } catch (e) { setResearchStatus((e as Error).message); }
+  }
+  useEffect(() => {
+    const run = modules.umlip?.run; if (!run) return;
+    for (const c of run.candidates.filter(c => c.status === "converged" && c.result)) {
+      void registerStructure({ structure: asCrystalStructure(c.result!.structure, c.name, `${run.id}/${c.id}/POSCAR.relaxed`),
+        stage: "relaxed", runId: run.id, candidateId: c.id, modelSha256: run.model?.sha256,
+        recordKey: c.origin?.recordKey, parentStructureHash: c.origin?.structureHash }).catch(e => setResearchStatus((e as Error).message));
+    }
+  }, [modules.umlip?.run]);
+  async function getStructure(material: Material) {
+    const result = await structureService.current.get(material);
+    if (result.kind !== "ready") throw new Error("当前记录尚无可用晶胞，请在结构工作台导入并关联结构。");
+    return registerStructure({ structure: result.structure, recordKey: materialRecordKey(material), stage: "database" });
+  }
+  async function useStructure(draft: StructureDraft, action: "queue" | "geometry" | "xrd") {
+    try {
+      const artifact = await registerStructure(draft);
+      setShowCandidate(false); setShowStructure(false); setShowUmlip(false);
+      if (action === "geometry") { setGeometryArtifact(artifact); setShowGeometry(true); return; }
+      const material = pool.find(m => materialRecordKey(m) === artifact.recordKey);
+      if (action === "xrd") {
+        if (material && artifact.stage === "relaxed" && artifact.runId && artifact.candidateId) {
+          const response = await fetch(`/api/umlip/runs/${encodeURIComponent(artifact.runId)}/candidates/${encodeURIComponent(artifact.candidateId)}/reference`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error ?? "构型验证来源不可用。");
+          if (data.binding.recordKey !== materialRecordKey(material) || data.binding.structureHash !== artifact.structureHash) throw new Error("构型验证身份不匹配。");
+          const linkedMaterial = rebindValidation(material, data.binding as ReferenceBinding, synthesisFeedbackRef.current[artifact.recordKey!]);
+          setPool(current => current.map(m => materialRecordKey(m) === artifact.recordKey ? rebindValidation(m, data.binding, synthesisFeedbackRef.current[artifact.recordKey!]) : m));
+          openSynthesisLab(linkedMaterial, data.structure, data.binding);
+        } else openSynthesisLab(material, artifact.structure);
+        return;
+      }
+      const input: ConfigurationInput = { id: `cfg-${(++transferSerial.current).toString(36)}-${Date.now().toString(36)}`,
+        name: artifact.structure.name, source: artifact.structure.source.filename, structure: fromCrystalStructure(artifact.structure),
+        ...(artifact.recordKey ? { origin: { recordKey: artifact.recordKey, structureHash: artifact.structureHash, materialId: material?.id } } : {}) };
+      setQueueRequest({ token: ++transferSerial.current, value: [input] }); setHasOpenedUmlip(true); setShowUmlip(true);
+      setResearchStatus("已加入构型队列；可继续加入同成分结构，或生成位移候选。");
+    } catch (e) { setResearchStatus((e as Error).message); }
+  }
+  function applyGeometry(material: Material, result: GeometryResult) {
+    if (!sameComposition(material.composition, structureComposition(geometryArtifact!.structure))) { setResearchStatus("几何结构与材料组成不一致。"); return; }
+    distillation.setSupplements(replaceGeometrySupplements(distillation.supplements, material.id, result));
+    setModules(m => ({ ...m, geometry: [...m.geometry.filter(g => !(g.recordKey === result.recordKey && g.structureHash === result.structureHash && g.centerSiteIndex === result.centerSiteIndex)), result] }));
+    setSelectedRecordKey(materialRecordKey(material)); setShowGeometry(false); setFormulaMap(false);
+    setResearchStatus("几何补充量已发送到白盒公式，来源与结构版本已一并保存。");
+    document.getElementById("distillation-heading")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  async function candidateAction(action: "structure" | "queue" | "xrd" | "advisor" | "formula", material: Material) {
+    setShowCandidate(false);
+    if (action === "structure") { openMaterialStructure(material); return; }
+    if (action === "advisor") { openAdvisor(material.id, "integrated"); return; }
+    if (action === "formula") { setFormulaMap(!!distillation.result); document.getElementById("distillation-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    if (action === "xrd") { openSynthesisLab(material); return; }
+    try { const artifact = await getStructure(material); await useStructure(artifact, "queue"); } catch (e) { setResearchStatus((e as Error).message); }
+  }
+  function syncObservations(keys: string[]) {
+    cancelComputation(); setIsAutoRunning(false);
+    const known = new Set(keys); const next = pool.map(m => known.has(materialRecordKey(m)) ? { ...m, isSampled: true, iteration: m.iteration ?? state.iteration } : m);
+    const sampled = next.filter(m => m.isSampled); setPool(next); setState(s => ({ ...s, sampledCount: sampled.length,
+      bestValue: sampled.length ? (objectiveSpec.direction === "min" ? Math.min : Math.max)(...sampled.map(m => m.trueProperty)) : s.bestValue }));
+    setResearchStatus(`多目标观测已接入单目标学习，共${sampled.length}条已观测记录。`);
+  }
+  function useCalibration(result: CalibrationResult, enabled: boolean) {
+    try {
+      const calibrated = calibrationObservations(result, pool);
+      const next = enabled ? calibrated : pool.map(m => ({ ...m, predictedMean: undefined, predictedStd: undefined, acquisitionValue: undefined }));
+      cancelComputation(); setIsAutoRunning(false); modelClient.current?.dispose(); modelClient.current = null;
+      setPool(next); setModelDiagnostics(undefined);
+      if (enabled) {
+        const sampled = next.filter(m => m.isSampled);
+        setState({ ...initialState(totalBudget, objectiveSpec.direction), sampledCount: sampled.length,
+          bestValue: (objectiveSpec.direction === "min" ? Math.min : Math.max)(...sampled.map(m => m.trueProperty)) });
+        setAdvisorRunId(v => v + 1);
+      }
+      setModules(m => ({ ...m, calibration: result, calibrationEnabled: enabled }));
+      setResearchStatus(enabled ? "校准预测已接入：代理拟合DFT配对值，预测转换到实验尺度。" : "校准结果已保存，当前使用原始目标预测。");
+    } catch (e) { setResearchStatus((e as Error).message); }
+  }
+  async function captureResearch(name: string) {
+    cancelComputation(); setIsAutoRunning(false); distillation.suspend();
+    const collected = structuredClone(modulesRef.current);
+    const u = collected.umlip;
+    if (u?.run) {
+      u.files = { ...u.files };
+      for (const candidate of u.run.candidates.filter(c => c.result)) {
+        const id = candidate.id;
+        if (u.files[id]?.poscar && u.files[id]?.trajectory) continue;
+        try {
+          const base = `/api/umlip/runs/${u.run.id}/candidates/${id}`;
+          const [poscar, trajectory] = await Promise.all([fetch(base + "/poscar"), fetch(base + "/trajectory")]);
+          if (!poscar.ok || !trajectory.ok) throw new Error("原始输出文件暂不可用；结构及数值结果已保留。");
+          u.files[id] = { poscar: await poscar.text(), trajectory: await trajectory.text() };
+        } catch (e) { u.files[id] = { ...u.files[id], error: (e as Error).message }; }
+      }
+    }
+    return captureSession({ id: sessionId.current, name, query: hubQuery, metadata: hubMetadata, pool, state,
+      config: { strategy, batchSize, totalBudget, model: modelSettings }, modules: collected, selectedRecordKey });
+  }
+  async function restoreResearch(input: ResearchSession) {
+    const saved = parseSession(input); setRestoringSession(true); hydrating.current = true;
+    const version = ++loadRequest.current, controller = new AbortController(); restoreRequest.current?.abort(); restoreRequest.current = controller;
+    engine.cancelLoad(); cancelComputation(); distillation.suspend(); setIsAutoRunning(false); setIsLoadingData(false);
+    try {
+      const records = await restoreCandidatePool(saved, controller.signal);
+      const connected = await restoreValidatedFeedback(records, {}, controller.signal), restoredPool = connected.pool;
+      if (version !== loadRequest.current) throw new Error("研究恢复已取消。");
+      controller.signal.throwIfAborted();
+      if (saved.modules.calibrationEnabled && saved.modules.calibration) calibrationObservations(saved.modules.calibration, restoredPool);
+      setShowAdvisor(false); setShowLab(false); setShowStructure(false); setShowUmlip(false); setShowCandidate(false); setShowGeometry(false);
+      setPool(restoredPool); setHubQuery(saved.query); setHubMetadata(saved.metadata); setIsRealData(saved.query.source !== undefined); setIsLoaded(true); setRunError(null);
+      setStrategy(saved.config.strategy); setBatchSize(saved.config.batchSize); setTotalBudget(saved.config.totalBudget); setModelSettings(saved.config.model);
+      const value = saved.state.bestValue ?? (OBJECTIVES[saved.query.objective].direction === "min" ? Infinity : -Infinity);
+      const direction = OBJECTIVES[saved.query.objective].direction;
+      const globalBest = restoredPool.length ? (direction === "min" ? Math.min : Math.max)(...restoredPool.map(m => m.trueProperty)) : value;
+      structureRegistry.current.clear();
+      for (const a of saved.modules.structures) structureRegistry.current.set(JSON.stringify([a.structureHash, a.recordKey, a.stage, a.runId, a.candidateId]), a);
+      const restoredModules = { ...saved.modules, structures: [...structureRegistry.current.values()] };
+      setState({ ...saved.state, bestValue: value, history: saved.state.history.map(h => ({ ...h, avgError: 0,
+        regret: direction === "min" ? h.bestValue - globalBest : globalBest - h.bestValue })) }); setModules(restoredModules); sessionId.current = saved.id;
+      const registry = { ...synthesisFeedbackRef.current };
+      for (const m of restoredPool) if (m.synthesisFeedback && canApplySynthesisFeedback(m, m.synthesisFeedback)) registry[materialRecordKey(m)] = m.synthesisFeedback;
+      synthesisFeedbackRef.current = registry; setSynthesisFeedbacks(registry); saveFeedbackRegistry(registry);
+      modelClient.current?.dispose(); modelClient.current = null; setModelDiagnostics(undefined); setSelectedRecordKey(saved.selectedRecordKey);
+      const token = ++transferSerial.current; setSessionRestore({ token, value: saved }); setAdvisorRunId(v => v + 1);
+      const structure = saved.modules.structures.at(-1); setHasOpenedStructure(!!structure); setStructureMaterial(null);
+      setStructureRestore(structure ? { token, value: structure.structure } : undefined);
+      setHasOpenedUmlip(!!saved.modules.umlip); setQueueRequest(undefined);
+      const experiment = saved.modules.experiments[0];
+      setLabRequest(experiment ? { requestId: ++labSerial.current, materialId: experiment.materialId, recordKey: experiment.reference.binding?.recordKey, structure: experiment.reference.structure } : null);
+      setExperimentRestore(experiment ? { token, value: experiment } : undefined);
+      presentationNeedsReload.current = false; setPersonalPresentation(null); setPresentation(false);
+      const url = new URL(window.location.href); url.searchParams.set("mode", "research"); window.history.replaceState(null, "", url);
+      requestAnimationFrame(() => { if (version === loadRequest.current) { hydrating.current = false; setRestoringSession(false); } });
+      setResearchStatus(connected.unavailable ? `研究已恢复；${connected.unavailable}份构型验证记录需重新关联本机运行历史。` : "研究存档已按精确数据版本恢复。");
+    } catch (e) { if (version === loadRequest.current) { hydrating.current = false; setRestoringSession(false); } throw e; }
+  }
+  function presentResearch(session: ResearchSession) {
+    restoreRequest.current?.abort(); hydrating.current = false; setRestoringSession(false);
+    loadRequest.current++; engine.cancelLoad(); cancelComputation(); distillation.suspend(); setIsAutoRunning(false); setIsLoadingData(false);
+    setShowAdvisor(false); setShowLab(false); setShowStructure(false); setShowUmlip(false); setShowCandidate(false); setShowGeometry(false);
+    presentationNeedsReload.current = !isLoaded; setPersonalPresentation(session); setPresentation(true);
+  }
+
+  const openPresentation = () => {
+    restoreRequest.current?.abort(); hydrating.current = false; setRestoringSession(false);
+    setPersonalPresentation(null);
+    presentationNeedsReload.current = isLoadingData || !isLoaded;
+    loadRequest.current++; engine.cancelLoad(); cancelComputation(); distillation.suspend();
+    setIsAutoRunning(false); setIsLoadingData(false);
+    setShowLab(false); setShowStructure(false); setShowUmlip(false); setShowAdvisor(false); setShowCandidate(false); setShowGeometry(false);
+    const url = new URL(window.location.href); url.searchParams.set("mode", "showcase");
+    window.history.replaceState(null, "", url); setPresentation(true);
+  };
+  const closePresentation = () => {
+    const url = new URL(window.location.href); url.searchParams.set("mode", "research");
+    window.history.replaceState(null, "", url); setPresentation(false);
+    if (presentationNeedsReload.current) { presentationNeedsReload.current = false; void loadData(hubQuery); }
+  };
+  const presentationView = presentation && <React.Suspense fallback={<div className="presentation-loading"><p>正在打开完整路演快照…</p></div>}>
+    {personalPresentation ? <ResearchPresentation session={personalPresentation} onExit={closePresentation} /> : <PresentationWorkspace onExit={closePresentation} />}
+  </React.Suspense>;
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[#F5F5F0] flex items-center justify-center">
+      <>{presentationView}<div hidden={presentation} style={presentation ? { display: "none" } : undefined} className="min-h-screen bg-[#F5F5F0] flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-[#141414] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm font-bold uppercase tracking-widest opacity-60">正在加载 Data Hub 数据目录…</p>
+          <button type="button" onClick={openPresentation} className="presentation-entry">✦ 一键路演 · 完整成果快照</button>
           <button type="button" onClick={openStructure} className="px-4 py-2 border rounded-lg">
             {lang === "zh" ? "先导入结构 / 3D 查看" : "Import structure / 3D viewer"}
           </button>
           <button type="button" onClick={openUmlip} className="block mx-auto mt-3 px-4 py-2 border rounded-lg">uMLIP 同成分构型计算</button>
         </div>
-        {hasOpenedStructure && <React.Fragment key="structure-workspace"><StructurePanel open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} /></React.Fragment>}
-        {hasOpenedUmlip && <React.Suspense key="umlip-workspace" fallback={<p role="status">正在加载 uMLIP 工作流…</p>}><UmlipPanel open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
+        {hasOpenedStructure && <React.Fragment key="structure-workspace"><StructurePanel key={`structure-${sessionRestore?.token ?? 0}`} restored={structureRestore} onStructure={rememberStructure} onUseStructure={(structure, action) => void useStructure({ structure, stage: structure.source.recordRef ? "database" : "imported" }, action)} open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} /></React.Fragment>}
+        {hasOpenedUmlip && <React.Suspense key="umlip-workspace" fallback={<p role="status">正在加载 uMLIP 工作流…</p>}><UmlipPanel key={`umlip-${sessionRestore?.token ?? 0}`} enqueue={queueRequest} restored={restoredUmlip} onState={onUmlipState} onUseStructure={(draft, action) => void useStructure(draft, action)} open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
         {labPanel}
-      </div>
+      </div></>
     );
   }
 
   return (
-    <div className={`min-h-screen ${theme === 'classic' ? 'bg-[#F5F5F0] text-[#141414]' : 'bg-[#F0F4F8] text-[#1A365D]'} font-sans transition-colors duration-500 p-6`}>
+    <>{presentationView}<div hidden={presentation} style={presentation ? { display: "none" } : undefined} className={`ai4s-app-shell min-h-screen ${theme === 'classic' ? 'bg-[#F5F5F0] text-[#141414]' : 'bg-[#F0F4F8] text-[#1A365D]'} font-sans transition-colors duration-500 p-6`}>
       {/* Header */}
-      <header className={`max-w-7xl mx-auto mb-8 flex flex-wrap gap-5 justify-between items-end border-b ${theme === 'classic' ? 'border-[#141414]/10' : 'border-[#2B6CB0]/20'} pb-4`}>
+      <header className={`ai4s-header max-w-7xl mx-auto mb-8 flex flex-wrap gap-5 justify-between items-end border-b ${theme === 'classic' ? 'border-[#141414]/10' : 'border-[#2B6CB0]/20'} pb-4`}>
         <div>
           <h1 className="text-4xl font-serif italic font-medium tracking-tight">
             {t.title}
@@ -385,7 +619,8 @@ export default function App() {
             {t.subtitle}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="ai4s-navigation flex flex-wrap gap-2">
+          <button type="button" onClick={openPresentation} className="presentation-entry"><Sparkles size={14} />一键路演</button>
           <button type="button" onClick={openUmlip} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#486c51] bg-[#e6edde] text-[#34523d] text-xs font-bold">
             <Cpu size={14} /> {lang === "zh" ? "uMLIP 构型寻优" : "uMLIP configuration search"}
           </button>
@@ -456,13 +691,16 @@ export default function App() {
         </p>
       )}
 
-      <ParetoExplorer materials={pool} lang={lang} />
+      <ResearchControls capture={captureResearch} onRestore={restoreResearch} onPresent={presentResearch} busy={isLoadingData || restoringSession} />
+      <div className="research-linkbar"><label>材料联动<select aria-label="当前研究材料" value={selectedRecordKey ?? ""} disabled={isLoadingData || restoringSession} onChange={e => { setSelectedRecordKey(e.target.value || null); if (e.target.value) setShowCandidate(true); }}><option value="">选择候选材料</option>{pool.map(m => <option key={materialRecordKey(m)} value={materialRecordKey(m)}>{m.formula} · {m.id}</option>)}</select></label><button disabled={!selectedMaterial} onClick={() => setShowCandidate(true)}>候选详情</button><span>结构、公式、谱图与AI解读按材料身份联动</span></div>
+      {researchStatus && <p className="research-status" role="status">{researchStatus}</p>}
+      <ParetoExplorer key={`pareto-${sessionRestore?.token ?? 0}`} materials={pool} lang={lang} suspended={presentation || restoringSession || isLoadingData} restored={restoredPareto} onState={onParetoState} onSelect={chooseCandidate} onObserve={syncObservations} />
 
       <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Sidebar: Config & Stats */}
         <div className="lg:col-span-3 min-w-0 space-y-6">
-          <DataHubPanel query={hubQuery} metadata={hubMetadata} count={pool.length} loading={isLoadingData}
-            lang={lang} onChange={setHubQuery} onLoad={query => void loadData(query)} />
+          <DataHubPanel query={hubQuery} metadata={hubMetadata} count={pool.length} loading={isLoadingData || restoringSession}
+            lang={lang} onChange={setHubQuery} onLoad={query => void loadData(query)} recordIds={pool.map(m => m.id)} onCalibration={useCalibration} providedCalibration={modules.calibration} calibrationEnabled={modules.calibrationEnabled} />
 
           <section className={`${theme === 'classic' ? 'bg-white' : 'bg-white/80'} p-6 rounded-3xl shadow-sm border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'}`}>
             <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
@@ -588,7 +826,7 @@ export default function App() {
             </div>
 
             <DescriptorMap key={advisorRunId} pool={pool} result={distillation.result} lang={lang}
-              enabled={formulaMap} onToggle={() => setFormulaMap(value => !value)} objective={hubMetadata?.objective ?? hubQuery.objective} />
+              enabled={formulaMap} highlightedId={selectedMaterial?.id} onToggle={() => setFormulaMap(value => !value)} objective={hubMetadata?.objective ?? hubQuery.objective} />
           </div>
 
           <DistillationPanel controller={distillation} lang={lang} />
@@ -653,15 +891,15 @@ export default function App() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           key={m.id} 
-                          onClick={() => openMaterialStructure(m)}
+                          onClick={() => chooseCandidate(materialRecordKey(m))}
                           className={`cursor-pointer border-b border-[#141414]/5 hover:bg-[#F5F5F0]/30 transition-colors ${m.isSampled ? (theme === 'classic' ? 'bg-emerald-50/30' : 'bg-teal-50/30') : ''}`}
                         >
                           <td className="p-4 font-mono text-[10px] opacity-40">{m.id}</td>
                           <td className="p-4 font-serif italic text-lg">
-                            <button type="button" onClick={event => { event.stopPropagation(); openMaterialStructure(m); }}
+                            <button type="button" onClick={event => { event.stopPropagation(); chooseCandidate(materialRecordKey(m)); }}
                               className="text-left hover:underline focus-visible:outline-2 focus-visible:outline-teal-600"
-                              aria-label={lang === "zh" ? `查看 ${m.formula}（${m.id}）的结构` : `View structure of ${m.formula} (${m.id})`}>
-                              {m.formula}<span className="ml-2 text-[10px] font-sans not-italic text-teal-700">{canViewMaterialStructure(m) ? (lang === "zh" ? "查看 3D" : "View 3D") : (lang === "zh" ? "暂无结构" : "No structure")}</span>
+                              aria-label={lang === "zh" ? `查看 ${m.formula}（${m.id}）的候选详情` : `View candidate ${m.formula} (${m.id})`}>
+                              {m.formula}<span className="ml-2 text-[10px] font-sans not-italic text-teal-700">{canViewMaterialStructure(m) ? (lang === "zh" ? "候选详情" : "Candidate details") : (lang === "zh" ? "暂无结构" : "No structure")}</span>
                             </button>
                             <p className="mt-1 text-[9px] font-sans not-italic text-slate-500" title={m.methodMeta}>{sourceLabel(m.source, lang)} · {m.fidelity ?? "—"}</p>
                             {m.provenance && <a href={m.provenance.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-[9px] font-sans not-italic text-teal-700 underline" title={`${m.provenance.reference} · ${m.provenance.datasetVersion}`}>{lang === "zh" ? "来源 / 方法" : "Provenance"}</a>}
@@ -701,7 +939,9 @@ export default function App() {
       </main>
 
       <button type="button" onClick={() => openAdvisor()} className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full bg-[#1e5542] text-[#f8f4df] border border-[#b9ac73] shadow-xl text-xs font-semibold" aria-label={lang === "zh" ? "打开 AI 首席材料顾问" : "Open AI materials advisor"}><Sparkles size={17} />{lang === "zh" ? "问问材料顾问" : "Ask the advisor"}</button>
-      <MaterialsAdvisor open={showAdvisor} onClose={() => setShowAdvisor(false)} input={{ pool, state, strategy, batchSize, totalBudget, isRealData, runId: advisorRunId, modelConfig: modelSettings, hubMetadata, hubQuery: hubMetadata?.query ?? hubQuery, hubLoadState: isLoadingData ? "loading" : runError && !hubMetadata ? "error" : "ready" }} lang={lang} loading={isLoadingData || isIterating} request={advisorRequest} />
+      <MaterialsAdvisor open={showAdvisor} onClose={() => setShowAdvisor(false)} input={{ pool, state, strategy, batchSize, totalBudget, isRealData, runId: advisorRunId, modelConfig: modelSettings, moduleEvidence, hubMetadata, hubQuery: hubMetadata?.query ?? hubQuery, hubLoadState: isLoadingData ? "loading" : runError && !hubMetadata ? "error" : "ready" }} lang={lang} loading={isLoadingData || isIterating} request={advisorRequest} restored={restoredAdvisor} onState={onAdvisorState} onSelect={id => { const m = pool.find(m => m.id === id); setSelectedRecordKey(m ? materialRecordKey(m) : null); }} />
+      <CandidateDetails material={selectedMaterial} modules={modules} open={showCandidate} onClose={() => setShowCandidate(false)} onAction={(action, material) => void candidateAction(action, material)} />
+      <GeometryPanel artifact={geometryArtifact} materials={pool} references={modules.structures} open={showGeometry} onClose={() => setShowGeometry(false)} onApply={applyGeometry} />
       <CompositionDescriptorPanel key={`${isRealData}:${pool[0]?.id ?? "empty"}`} materials={pool} lang={lang} />
       {labPanel}
 
@@ -711,25 +951,26 @@ export default function App() {
           <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
             <Beaker size={14} /> {t.methodology}
           </h4>
-          <p className="text-xs opacity-60 leading-relaxed">
-            {t.methodologyDesc}
-          </p>
+          <div className="text-xs opacity-60 leading-relaxed">
+            <MethodNote lang={lang}>{t.methodologyDesc}</MethodNote>
+          </div>
         </div>
         <div className="space-y-2">
           <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
             <Cpu size={14} /> {t.representation}
           </h4>
-          <p className="text-xs opacity-60 leading-relaxed">
-            {t.representationDesc}
-          </p>
+          <div className="text-xs opacity-60 leading-relaxed">
+            <MethodNote lang={lang}>{t.representationDesc}</MethodNote>
+          </div>
         </div>
         <div className="space-y-2">
           <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
             <Zap size={14} /> {t.objective}
           </h4>
           <p className="text-xs opacity-60 leading-relaxed">
-            {objectiveSpec[lang]} / {objectiveSpec.unit} · {objectiveSpec.direction === "min" ? (lang === "zh" ? "最小化" : "Minimize") : (lang === "zh" ? "最大化" : "Maximize")}。{lang === "zh" ? "目标值按来源、方法与条件保留；本轮采用已有观测的离线回放。" : "Targets retain source, method and conditions; this run replays existing observations."}
+            {objectiveSpec[lang]} / {objectiveSpec.unit} · {objectiveSpec.direction === "min" ? (lang === "zh" ? "最小化" : "Minimize") : (lang === "zh" ? "最大化" : "Maximize")}
           </p>
+          <MethodNote lang={lang}>{lang === "zh" ? "目标值按来源、方法与条件保留；主工作台采用已有观测的离线回放。" : "Targets retain source, method and conditions; the main workspace replays existing observations."}</MethodNote>
         </div>
       </footer>
 
@@ -961,8 +1202,8 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-      {hasOpenedStructure && <React.Fragment key="structure-workspace"><StructurePanel open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} /></React.Fragment>}
-      {hasOpenedUmlip && <React.Suspense key="umlip-workspace" fallback={<p role="status">正在加载 uMLIP 工作流…</p>}><UmlipPanel open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
-    </div>
+      {hasOpenedStructure && <React.Fragment key="structure-workspace"><StructurePanel key={`structure-${sessionRestore?.token ?? 0}`} restored={structureRestore} onStructure={rememberStructure} onUseStructure={(structure, action) => void useStructure({ structure, stage: structure.source.recordRef ? "database" : "imported" }, action)} open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} /></React.Fragment>}
+      {hasOpenedUmlip && <React.Suspense key="umlip-workspace" fallback={<p role="status">正在加载 uMLIP 工作流…</p>}><UmlipPanel key={`umlip-${sessionRestore?.token ?? 0}`} enqueue={queueRequest} restored={restoredUmlip} onState={onUmlipState} onUseStructure={(draft, action) => void useStructure(draft, action)} open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
+    </div></>
   );
 }

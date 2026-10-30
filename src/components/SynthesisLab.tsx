@@ -10,12 +10,16 @@ import { compareSpectrum, demoCrystal, isStrontiumTitanate, parseExperimentalSpe
 import { experimentHistory, saveExperiment } from "../synthesis/records";
 import type { ComparisonResult, ExperimentRecord, LabRequest, PreflightResult, ReferenceBinding, SynthesisFeedback, XrdPoint, XrdResult } from "../synthesis/types";
 import XrdPlot from "./XrdPlot";
+import MethodNote from "./MethodNote";
+import type { Restore } from "../research/types";
+import type { StabilityInput } from "../engine/pareto/ParetoData";
 import "./synthesis.css";
 
 const StructureViewer = lazy(() => import("./StructureViewer"));
 interface Props {
   open: boolean; onClose(): void; request: LabRequest | null; materials: Material[];
   onFeedback(feedback: SynthesisFeedback): boolean;
+  restored?: Restore<ExperimentRecord>; onRecord?(record: ExperimentRecord): void; stability?: StabilityInput[];
 }
 function download(filename: string, text: string, type = "application/json") {
   const url = URL.createObjectURL(new Blob([text], { type }));
@@ -23,7 +27,7 @@ function download(filename: string, text: string, type = "application/json") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export default function SynthesisLab({ open, onClose, request, materials, onFeedback }: Props) {
+export default function SynthesisLab({ open, onClose, request, materials, onFeedback, restored, onRecord, stability }: Props) {
   const dialog = useRef<HTMLDialogElement>(null), input = useRef<HTMLInputElement>(null);
   const operation = useRef(0), active = useRef<AbortController | null>(null), autoDemo = useRef(false);
   const readyFor = useRef<number | null>(null);
@@ -41,12 +45,32 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
   const [records, setRecords] = useState<ExperimentRecord[]>([]), [currentRecord, setCurrentRecord] = useState<ExperimentRecord | null>(null);
   const [selectedAtom, setSelectedAtom] = useState<number[]>([]);
   const [presentation, setPresentation] = useState(false);
+  const restoredToken = useRef(0), archiveIdentity = useRef("");
   const atoms = useMemo(() => structure ? displayAtoms(structure, 1) : [], [structure]);
   const selectedMaterial = materials.find(m => m.id === target?.materialId && materialRecordKey(m) === target?.recordKey);
   const name = selectedMaterial?.formula || target?.formula || structure?.name || "选择材料";
   const feedbackReason = feedbackRejectionReason(selectedMaterial, currentRecord?.reference.binding ?? reference ?? undefined, currentRecord?.demo ?? demoData);
+  const stabilityEvaluation = stability?.find(row => row.recordKey === target?.recordKey);
+  const stabilityIdentity = JSON.stringify(stabilityEvaluation);
+  const setupIdentity = JSON.stringify([target?.requestId, temperature, atmosphere, wavelength, range[0], range[1], fwhm, stabilityIdentity]);
+  function restoreRecord(record: ExperimentRecord) {
+    active.current?.abort(); operation.current++; autoDemo.current = false;
+    const pattern = record.reference.xrd.pattern, id = Date.now();
+    const bound = record.reference.binding;
+    const next: LabRequest = { requestId: id, materialId: record.materialId, formula: record.formula,
+      recordKey: bound?.recordKey, structureRef: bound?.structureRef, demonstration: record.demo && bound?.kind === "demo",
+      structure: bound?.kind === "record" ? undefined : record.reference.structure, referenceBinding: bound };
+    const evalIdentity = JSON.stringify(stability?.find(row => row.recordKey === bound?.recordKey));
+    archiveIdentity.current = JSON.stringify([id, record.temperature, record.atmosphere, pattern.wavelength, pattern.min, pattern.max, pattern.fwhm, evalIdentity]);
+    readyFor.current = id; setTarget(next); setStructure(record.reference.structure); setReference(bound ?? null);
+    setXrd(record.reference.xrd); setPreflight(record.reference.preflight); setTemperature(record.temperature); setAtmosphere(record.atmosphere);
+    setWavelength(pattern.wavelength); setRange([pattern.min, pattern.max]); setFwhm(pattern.fwhm);
+    setPoints(record.points); setFilename(record.filename); setComparison(record.comparison); setDemoData(record.demo); setCurrentRecord(record);
+    setSampleId(record.feedback?.sampleId ?? "SAMPLE-001"); setSent(Boolean(record.feedback)); setBusy(""); setError(""); onRecord?.(record);
+  }
 
   function changeSetup(update: () => void) {
+    archiveIdentity.current = "";
     active.current?.abort(); operation.current++; readyFor.current = null;
     setXrd(null); setReference(null); setCurrentRecord(null); setComparison(null); setSent(false); update();
   }
@@ -69,15 +93,17 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
   }
 
   useEffect(() => { setTarget(request); setPresentation(false); }, [request?.requestId]);
+  useEffect(() => { if (restored && restored.token !== restoredToken.current) { restoredToken.current = restored.token; restoreRecord(restored.value); } }, [restored?.token]);
   useEffect(() => {
     if (open && dialog.current && !dialog.current.open) dialog.current.showModal();
     else if (!open && dialog.current?.open) dialog.current.close();
     if (!open) active.current?.abort();
     if (open) void experimentHistory().then(setRecords).catch(() => {});
   }, [open]);
-  useEffect(() => { setPoints([]); setFilename(""); setComparison(null); setCurrentRecord(null); setSent(false); }, [target?.requestId]);
+  useEffect(() => { if (archiveIdentity.current === setupIdentity) return; setPoints([]); setFilename(""); setComparison(null); setCurrentRecord(null); setSent(false); }, [target?.requestId]);
   useEffect(() => {
     if (!open || !target) return;
+    if (archiveIdentity.current === setupIdentity) { readyFor.current = target.requestId; return; }
     const controller = new AbortController(); active.current?.abort(); active.current = controller;
     const id = ++operation.current;
     readyFor.current = null;
@@ -90,8 +116,9 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
       const composition = structureComposition(crystal);
       const [diffraction, screening] = await Promise.all([
         synthesisRequest<XrdResult>("xrd", xrdPayload(crystal, { wavelength, min: range[0], max: range[1], fwhm }), controller.signal),
-        synthesisRequest<PreflightResult>("preflight", { composition, materialId: resolved.binding.kind === "record" ? target.materialId : undefined,
-          structureRef: resolved.binding.kind === "record" ? selectedMaterial?.structureRef : undefined, source: target.source, temperature, atmosphere }, controller.signal),
+        synthesisRequest<PreflightResult>("preflight", { composition, materialId: selectedMaterial ? target.materialId : undefined,
+          structureRef: selectedMaterial?.structureRef, source: target.source, allowDemo: resolved.binding.kind === "demo",
+          stabilityEvaluation, temperature, atmosphere }, controller.signal),
       ]);
       if (id !== operation.current) return;
       readyFor.current = target.requestId;
@@ -99,7 +126,7 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
     })().catch(reason => { if (!controller.signal.aborted && id === operation.current) setError(reason.message); })
       .finally(() => { if (id === operation.current) setBusy(""); });
     return () => { controller.abort(); operation.current++; };
-  }, [open, target, temperature, atmosphere, wavelength, range[0], range[1], fwhm]);
+  }, [open, target, temperature, atmosphere, wavelength, range[0], range[1], fwhm, stabilityIdentity]);
 
   async function analyze(nextPoints = points, nextFilename = filename, isDemo = demoData, expectedOperation = operation.current) {
     if (!xrd || !structure || !reference || expectedOperation !== operation.current || readyFor.current !== target?.requestId) return;
@@ -114,7 +141,8 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
         filename: nextFilename, createdAt: new Date().toISOString(), demo: isDemo, temperature, atmosphere,
         points: nextPoints, comparison: result, reference: structuredClone({ structure, xrd, preflight, binding: reference }) };
       setCurrentRecord(record);
-      try { await saveExperiment(record); setRecords(await experimentHistory()); } catch { /* Analysis remains usable without persistence. */ }
+      onRecord?.(record);
+      try { await saveExperiment(record); setRecords(await experimentHistory()); } catch { setError("比对结果已生成；浏览器保存失败，可导出报告或保存研究存档。"); }
     } catch (reason) { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "比对失败"); }
     finally { if (id === operation.current) setBusy(""); }
   }
@@ -171,7 +199,8 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
     setSent(true);
     const record = { ...currentRecord, feedback: result };
     setCurrentRecord(record);
-    try { await saveExperiment(record); setRecords(await experimentHistory()); } catch { /* Feedback is already applied in the main app. */ }
+    onRecord?.(record);
+    try { await saveExperiment(record); setRecords(await experimentHistory()); } catch { setError("先验已更新；浏览器保存失败，请保存研究存档或导出报告。"); }
   }
 
   return <dialog ref={dialog} className={`synthesis-dialog ${presentation ? "synthesis-presentation" : ""}`} aria-labelledby="synthesis-title" onClose={close}>
@@ -191,14 +220,14 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
           <section className="synthesis-card synthesis-crystal"><div className="synthesis-card-title"><h3>原子结构</h3><span>{structure?.sites.length || "—"} sites</span></div>
             {structure ? <Suspense fallback={<p>正在加载晶胞…</p>}><StructureViewer structure={structure} atoms={atoms} repeats={1} showCell showNeighbors cutoff={2.7} selected={selectedAtom} active={open} onSelect={index => setSelectedAtom([index])} /></Suspense> : <div className="synthesis-placeholder">准备晶胞</div>}
           </section>
-          <section className={`synthesis-card synthesis-grade grade-${preflight?.grade || "B"}`}><div className="synthesis-card-title"><h3>可合成性预审</h3><span>{preflight?.source === "data-hub" ? "快照 Ehull + 启发式预审" : preflight?.source === "materials-project" ? "实时 MP + 启发式预审" : preflight?.source === "unavailable" ? "稳定性数据缺失" : "演示预审"}</span></div>
+          <section className={`synthesis-card synthesis-grade grade-${preflight?.grade || "B"}`}><div className="synthesis-card-title"><h3>可合成性预审</h3><span>{preflight?.source === "data-hub" ? "快照 Ehull" : preflight?.source === "external" ? "共享稳定性评估" : preflight?.source === "materials-project" ? "Materials Project" : preflight?.source === "unavailable" ? "稳定性数据缺失" : "演示预审"}</span></div>
             <div className="synthesis-grade-main"><b>{preflight?.grade === "unknown" ? "?" : preflight?.grade || "—"}</b><div><strong>{preflight?.label || "正在预审"}</strong><p>综合评分 <em>{preflight?.score ?? "—"}</em> / 100</p></div></div>
             <div className="synthesis-energy"><span>能量高于凸包</span><b>{preflight?.energyAboveHull != null ? (preflight.energyAboveHull*1000).toFixed(1) : "—"}<small> meV/atom</small></b></div>
             {preflight?.factors.map(factor => <div className="synthesis-factor" key={factor.name}><div><span>{factor.name}</span><b>{factor.score}</b></div><i><span style={{ width: `${factor.score}%` }} /></i></div>)}
             <div className="synthesis-competitors"><small>关注的竞争相</small><div>{preflight?.competitors.map(phase => <span key={phase.formula}>{phase.formula}</span>)}</div></div>
           </section>
           <section className="synthesis-card synthesis-recipe"><h3>合成工艺窗口</h3><label>烧结温度 <b>{temperature} °C</b><input aria-label="烧结温度" type="range" min="400" max="1500" step="25" value={temperature} onChange={event => changeSetup(() => setTemperature(Number(event.target.value)))} /></label>
-            <label>烧结气氛<select aria-label="烧结气氛" value={atmosphere} onChange={event => changeSetup(() => setAtmosphere(event.target.value))}><option value="air">空气</option><option value="oxygen">富氧</option><option value="inert">惰性气氛</option><option value="reducing">还原气氛</option></select></label><p>工艺参数仅为待验证情景，需独立确认工艺窗口</p></section>
+            <label>烧结气氛<select aria-label="烧结气氛" value={atmosphere} onChange={event => changeSetup(() => setAtmosphere(event.target.value))}><option value="air">空气</option><option value="oxygen">富氧</option><option value="inert">惰性气氛</option><option value="reducing">还原气氛</option></select></label><MethodNote>预审结合对应版本的 Ehull、温度与气氛进行启发式评分；工艺窗口需结合具体样品验证。</MethodNote></section>
         </aside>
         <div className="synthesis-right">
           <section className="synthesis-card synthesis-diffraction"><div className="synthesis-card-title"><div><span className="synthesis-eyebrow">DIFFRACTION FINGERPRINT</span><h3>理论与实验，一眼对照</h3></div><span>{xrd?.engine || "pymatgen"}</span></div>
@@ -226,11 +255,11 @@ export default function SynthesisLab({ open, onClose, request, materials, onFeed
             {feedbackReason && <small role="status">{feedbackReason}</small>}
           </section> : <section className="synthesis-card synthesis-awaiting"><FlaskConical size={23} /><h3>等待一份实验谱，完成最后一公里</h3><p>拖入实验文件，或载入上方演示样例，即可查看主相占比、杂峰与反馈结果。</p></section>}
           <section className="synthesis-card synthesis-records"><div className="synthesis-card-title"><h3>实验记录</h3><span>{records.length} 次比对 · 浏览器本地保存</span></div>
-            {records.length ? records.slice(0, 5).map(record => <div className="synthesis-record" key={record.id}><span className={record.comparison.passed ? "record-pass" : "record-fail"}>{record.comparison.passed ? "✓" : "!"}</span><div><b>{record.formula}</b><small>{record.demo ? "演示谱 · " : "上传谱 · "}{record.filename} · {new Date(record.createdAt).toLocaleString()}</small></div><strong>{record.comparison.mainFraction.toFixed(1)}%</strong><button type="button" aria-label={`导出 ${record.filename} 报告`} onClick={() => download(`${record.id}.json`, JSON.stringify(record, null, 2))}><Download size={14} /></button></div>) : <p>每次比对将保存谱图、工艺条件与分析结果。</p>}
+            {records.length ? records.slice(0, 5).map(record => <div className="synthesis-record" key={record.id}><span className={record.comparison.passed ? "record-pass" : "record-fail"}>{record.comparison.passed ? "✓" : "!"}</span><div><b>{record.formula}</b><small>{record.demo ? "演示谱 · " : "上传谱 · "}{record.filename} · {new Date(record.createdAt).toLocaleString()}</small></div><strong>{record.comparison.mainFraction.toFixed(1)}%</strong><button type="button" onClick={() => restoreRecord(record)}>载入</button><button type="button" aria-label={`导出 ${record.filename} 报告`} onClick={() => download(`${record.id}.json`, JSON.stringify(record, null, 2))}><Download size={14} /></button></div>) : <p>每次比对将保存谱图、工艺条件与分析结果。</p>}
           </section>
         </div>
       </div>
-      <footer className="synthesis-footer"><span>AI4S LAB · 结构 → 合成 → 表征 → 学习</span><span>相占比是当前参考模型的拟合贡献，不等于绝对纯度或独立实验验证</span></footer>
+      <footer className="synthesis-footer"><span>AI4S LAB · 结构 → 合成 → 表征 → 学习</span><MethodNote>相占比是当前参考模型的拟合贡献，不等于经标定的绝对质量纯度。上传谱保留样品与出处；演示谱保留来源标记。反馈继续按记录版本和晶胞几何身份绑定。</MethodNote></footer>
     </div>
   </dialog>;
 }

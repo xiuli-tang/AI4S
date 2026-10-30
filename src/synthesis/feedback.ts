@@ -1,6 +1,7 @@
 import type { Material } from "../types";
 import { materialRecordKey } from "../materialContext";
 import type { ReferenceBinding, SynthesisFeedback } from "./types";
+import { sameReferenceBinding } from "./binding";
 
 const digest = (value: unknown): value is string => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 export function feedbackRejectionReason(material: Material | undefined, reference: ReferenceBinding | undefined, demo: boolean): string | null {
@@ -8,8 +9,14 @@ export function feedbackRejectionReason(material: Material | undefined, referenc
   if (!reference || !digest(reference.structureHash) || reference.recordKey !== materialRecordKey(material)) return "参考结构缺少当前记录的身份绑定。";
   if (material.source === "mock") return demo && reference.kind === "demo" ? null : "Mock 候选仅接收演示反馈；上传谱请绑定真实数据库记录。";
   if (demo) return "演示谱不能回填真实候选，也不会改变其主动学习排序。";
-  if (reference.kind !== "record") return "导入或演示晶胞仅供谱图分析；回填真实候选需加载其对应的数据库晶胞。";
-  if (!digest(material.structureHash) || reference.structureHash !== material.structureHash) return "参考几何哈希与当前数据记录不一致，请重新加载晶胞。";
+  if (reference.kind === "derived") {
+    const expected = material.validationStructure;
+    if (!expected || !sameReferenceBinding(expected, reference) || !reference.derived
+      || !digest(reference.derived.modelSha256) || reference.derived.parentStructureHash !== material.structureHash) return "构型验证方案未与当前材料和MACE运行匹配。";
+  } else {
+    if (reference.kind !== "record") return "导入或演示晶胞仅供谱图分析；回填真实候选需加载其对应的数据库晶胞。";
+    if (!digest(material.structureHash) || reference.structureHash !== material.structureHash) return "参考几何哈希与当前数据记录不一致，请重新加载晶胞。";
+  }
   const ref = material.structureRef, bound = reference.structureRef;
   if (!digest(material.recordRevision) || !ref || !bound || ref.id !== material.id || ref.revision !== material.recordRevision
     || ref.dataset !== bound.dataset || ref.id !== bound.id || ref.revision !== bound.revision) return "数据记录或参考结构版本未匹配，请重新加载并分析。";

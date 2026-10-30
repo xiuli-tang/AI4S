@@ -6,6 +6,7 @@ import { materialRecordKey } from "../materialContext";
 import { demoCrystal, sameComposition } from "./client";
 import type { LabRequest, ReferenceBinding } from "./types";
 import { structureFingerprint } from "../structures/fingerprint";
+import { sameReferenceBinding } from "./binding";
 export { structureFingerprint } from "../structures/fingerprint";
 
 const service = new MaterialStructureService();
@@ -45,6 +46,11 @@ export async function resolveSynthesisReference(request: LabRequest, material?: 
   const binding: ReferenceBinding = { kind, structureHash: await structureFingerprint(structure),
     ...(material ? { recordKey: materialRecordKey(material) } : {}),
     ...(kind === "record" && material?.structureRef ? { structureRef: { ...material.structureRef } } : {}) };
+  if (kind === "imported" && request.referenceBinding?.kind === "derived" && material?.validationStructure
+    && request.referenceBinding.structureHash === binding.structureHash
+    && sameReferenceBinding(request.referenceBinding, material.validationStructure)) {
+    Object.assign(binding, structuredClone(request.referenceBinding));
+  }
   signal?.throwIfAborted();
   return { structure, binding };
 }

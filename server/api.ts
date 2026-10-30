@@ -58,7 +58,7 @@ function sendFailure(res: Response, error: unknown, service: "materials" | "chat
 export function createApiApp({ network, env = process.env, materialsEndpoint = "https://api.materialsproject.org/materials/summary/", chatBaseURL, materialsDeadlineMs = 60_000, chatDeadlineMs = 45_000, hub, umlip }: ApiDependencies) {
   const app = express();
   app.use("/api/hub", createHubRouter({ hub, network, env, materialsEndpoint, deadline: materialsDeadlineMs, requestScope }));
-  if (umlip) app.use("/api/umlip", umlipRouter(umlip));
+  if (umlip) app.use("/api/umlip", umlipRouter(umlip, hub));
   app.use("/api/synthesis", createSynthesisRouter({ network, env, materialsEndpoint, hub }));
   app.use(express.json({ limit: "100kb" }));
   const structures = new StructureCache<{ record: unknown; fetchedAt: string }>();

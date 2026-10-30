@@ -13,6 +13,7 @@ export interface ConfigurationInput {
   name: string;
   source: string;
   structure: AtomicConfiguration;
+  origin?: { recordKey: string; structureHash: string; materialId?: string };
 }
 export interface UmlipSettings {
   budget: number;

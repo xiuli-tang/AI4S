@@ -55,7 +55,9 @@ export function validatePool(inputs: unknown): ConfigurationInput[] {
   const pool = inputs.map((item: any) => {
     if (!item || typeof item.id !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(item.id) || ids.has(item.id)) throw new Error("候选 ID 无效或重复。");
     ids.add(item.id);
-    return { id: item.id, name: String(item.name ?? item.id).slice(0, 160), source: String(item.source ?? "user input").slice(0, 300), structure: validateConfiguration(item.structure) };
+    if (item.origin && (typeof item.origin.recordKey !== "string" || item.origin.recordKey.length > 4000 || !/^[a-f0-9]{64}$/.test(item.origin.structureHash))) throw new Error("构型材料来源绑定无效。");
+    return { id: item.id, name: String(item.name ?? item.id).slice(0, 160), source: String(item.source ?? "user input").slice(0, 300), structure: validateConfiguration(item.structure),
+      ...(item.origin ? { origin: { recordKey: item.origin.recordKey, structureHash: item.origin.structureHash, materialId: item.origin.materialId } } : {}) };
   });
   const first = pool[0].structure, key = JSON.stringify(compositionOf(first));
   for (const candidate of pool) {

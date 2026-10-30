@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import type { Material } from "../types";
+import MethodNote from "./MethodNote";
 import {
   ELEMENT_SYMBOLS, ELEMENT_TABLE_VERSION, FEATURE_DEFINITIONS, PROPERTY_DEFINITIONS,
   extractCompositionFeatures, getElementConstants,
@@ -70,7 +71,7 @@ export function CompositionDescriptorPanel({ materials, lang }: { materials: Mat
           <p className="text-sm">t = (rA + rO) / [√2(rB + rO)]</p>
           {tolerance?.model ? <>
             <p className="text-xs">A: {tolerance.model.a.element} {tolerance.model.a.oxidationState > 0 ? "+" : ""}{tolerance.model.a.oxidationState}, CN12, {tolerance.model.a.radiusAngstrom} Å<br />B: {tolerance.model.b.element} +{tolerance.model.b.oxidationState}, CN6, {tolerance.model.b.radiusAngstrom} Å ({tolerance.model.b.spin})<br />O: −2, CN6, {tolerance.model.oxygen.radiusAngstrom} Å</p>
-            <p className="text-xs text-amber-800">{zh ? "这是 ABO₃ 参考位点/价态模型下的几何估算，不是已确认的晶体结构或稳定性结论。" : "A geometric estimate under reference ABO₃ sites/charges, not confirmed structure or stability."}</p>
+            <MethodNote lang={lang}>{zh ? "这是 ABO₃ 参考位点/价态模型下的几何估算；结构和稳定性由对应结构计算或实验另行确认。" : "A geometric estimate under reference ABO₃ sites/charges; structure and stability are assessed using corresponding calculations or experiments."}</MethodNote>
           </> : <p className="text-sm">{zh ? "不适用：需满足 ABO₃ 比例、电荷平衡、唯一 A/B 参考位点及相应 Shannon 半径。" : "Not applicable: requires ABO₃ ratios, charge balance, unique reference A/B sites and matching Shannon radii."}</p>}
         </div>
       </div>
@@ -83,7 +84,7 @@ export function CompositionDescriptorPanel({ materials, lang }: { materials: Mat
           })}</tbody>
         </table>
       </div>
-      <p className="text-xs text-gray-600">{zh ? "μ=Σxᵢpᵢ；σ²=Σxᵢ(pᵢ−μ)²；极差=max(pᵢ)−min(pᵢ)。只要有组成元素缺值，该属性统计即显示缺失，不对部分元素重新归一化。" : "μ=Σxᵢpᵢ; σ²=Σxᵢ(pᵢ−μ)²; range=max−min. A missing constituent value makes the full property statistic unavailable."}</p>
+      <MethodNote lang={lang}>{zh ? "μ=Σxᵢpᵢ；σ²=Σxᵢ(pᵢ−μ)²；极差=max(pᵢ)−min(pᵢ)。组成元素缺值时保留覆盖率与缺失状态，不对部分元素重新归一化。" : "μ=Σxᵢpᵢ; σ²=Σxᵢ(pᵢ−μ)²; range=max−min. Missing constituents retain their coverage and missing status."}</MethodNote>
       <details className="text-sm space-y-3">
         <summary className="cursor-pointer font-medium">{zh ? "查看内置元素常数、参考态与来源" : "Inspect offline constants, reference states and sources"} ({ELEMENT_SYMBOLS.length})</summary>
         <label htmlFor="element-constant" className="block mt-3">{zh ? "元素" : "Element"}</label>

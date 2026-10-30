@@ -1,9 +1,11 @@
 import React, { Component, lazy, Suspense } from "react";
 import type { MaterialStructureRequest } from "../structures/materialStructure";
 import type { CrystalStructure } from "../structures/types";
+import type { Restore } from "../research/types";
 
 const StructureWorkspace = lazy(() => import("./StructureWorkspace"));
-interface Props { open: boolean; onClose(): void; lang: "zh" | "en"; materialRequest?: MaterialStructureRequest | null; onImportMode?(): void; onOpenLab?(structure: CrystalStructure): void; }
+interface Props { open: boolean; onClose(): void; lang: "zh" | "en"; materialRequest?: MaterialStructureRequest | null; onImportMode?(): void; onOpenLab?(structure: CrystalStructure): void;
+  restored?: Restore<CrystalStructure>; onStructure?(structure: CrystalStructure): void; onUseStructure?(structure: CrystalStructure, action: "queue" | "geometry"): void; }
 
 class StructureBoundary extends Component<Props & { children: React.ReactNode }, { failed: boolean }> {
   declare props: Props & { children: React.ReactNode };
