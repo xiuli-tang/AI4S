@@ -78,8 +78,11 @@ export function scalarize(y: Objectives, weights: Weights, scales: ObjectiveScal
 }
 export function feasibleCandidate(c: ParetoCandidate, problem?: ParetoProblem) { return !problem?.useSynthesisPrior || c.synthesisStatus !== "impurity" && (c.synthesisPrior ?? 1) >= .25; }
 export function preferredCandidate(candidates: ParetoCandidate[], weights: Weights, scales: ObjectiveScales, problem?: ParetoProblem) {
+  return rankPreferredCandidates(candidates, weights, scales, problem)[0];
+}
+export function rankPreferredCandidates(candidates: ParetoCandidate[], weights: Weights, scales: ObjectiveScales, problem?: ParetoProblem) {
   const score = (c: ParetoCandidate) => constrainAcquisition(scalarize(c.objectives, weights, scales, problem), problem?.useSynthesisPrior ? c.synthesisPrior ?? 1 : 1);
-  return [...paretoFront(candidates.filter(c => feasibleCandidate(c, problem)), problem)].sort((a, b) => score(b) - score(a) || a.id.localeCompare(b.id))[0];
+  return [...paretoFront(candidates.filter(c => feasibleCandidate(c, problem)), problem)].sort((a, b) => score(b) - score(a) || a.id.localeCompare(b.id));
 }
 /** Exact union of origin-anchored boxes in 3D, with fixed scales and reference (0,0,0). */
 export function hypervolume(candidates: ParetoCandidate[], scales: ObjectiveScales, problem?: ParetoProblem): number {

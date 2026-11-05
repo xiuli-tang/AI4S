@@ -1,14 +1,17 @@
 import express, { type Request, type Response } from "express";
-import { OBJECTIVES, type HubMetadata, type StoredHubSource } from "../src/dataHub";
+import { OBJECTIVES, MAX_HUB_CANDIDATES, type HubRecord, type HubMetadata, type StoredHubSource } from "../src/dataHub";
+import { createHubProjection } from "./hubProjection";
 import { calibratePairs } from "../src/engine/DualFidelityCalibration";
 import { HubInputError, HubStore, parseHubQuery } from "./hubStore";
 import { fetchMPRecords } from "./mpProvider";
 import { NetworkFailure, networkFailure, type NetworkClient } from "./network";
+import type { MPSummaryStore } from "./mpSummaryStore";
 
 type Scope = { signal: AbortSignal; timedOut(): boolean; dispose(): void };
 interface Dependencies {
   hub?: HubStore; network: NetworkClient; env: Record<string, string | undefined>; materialsEndpoint: string; deadline: number;
   requestScope(req: Request, res: Response, timeout: number): Scope;
+  mpSummary?: MPSummaryStore;
 }
 const datasets: StoredHubSource[] = ["mp-snapshot", "catalysis-hub", "dual-fidelity"];
 function storedSource(value: unknown): StoredHubSource {
@@ -21,8 +24,12 @@ function failure(res: Response, error: unknown) {
   const safe = networkFailure(error);
   res.status(safe.httpStatus).json({ error: safe.message, code: safe.code, retryable: safe.retryable, service: "materials" });
 }
-export function createHubRouter({ hub, network, env, materialsEndpoint, deadline, requestScope }: Dependencies) {
+export function createHubRouter({ hub, network, env, materialsEndpoint, deadline, requestScope, mpSummary }: Dependencies) {
   const router = express.Router();
+  const project = createHubProjection();
+  const cacheRecords = (records: HubRecord[]) => {
+    for (let offset = 0; offset < records.length; offset += 500) hub!.import("mp-snapshot", records.slice(offset, offset + 500), true);
+  };
   router.use((_req, res, next) => { res.setHeader("Cache-Control", "no-store"); if (!hub) return res.status(503).json({ error: "Data Hub storage is unavailable.", code: "LOCAL_STORAGE_UNAVAILABLE" }); next(); });
   router.use(express.json({ limit: "8mb" }));
   router.use((req, res, next) => {
@@ -32,7 +39,12 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
     }
     next();
   });
-  router.get("/catalog", (_req, res) => { try { res.json(hub!.catalog()); } catch (e) { failure(res, e); } });
+  const catalog = () => {
+    const result = hub!.catalog();
+    if (mpSummary) result.sources = result.sources.map(source => source.id === "mp-snapshot" ? mpSummary.catalogEntry() : source);
+    return result;
+  };
+  router.get("/catalog", (_req, res) => { try { res.json(catalog()); } catch (e) { failure(res, e); } });
   router.post("/records", (req, res) => {
     try {
       const refs = req.body?.refs;
@@ -42,7 +54,7 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
         if (typeof ref?.id !== "string" || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/.test(ref.id) || !/^[a-f0-9]{64}$/.test(ref.revision)) throw new HubInputError("记录引用无效。");
         const record = hub!.record(dataset, ref.id, ref.revision);
         if (!record) throw new HubInputError(`本地缺少记录版本：${ref.id}；可先展示存档成果，或导入对应源数据后继续研究。`);
-        return { ...record.row, revision: record.revision };
+        return project(record.row, record.revision);
       });
       res.json({ data });
     } catch (e) { failure(res, e); }
@@ -58,11 +70,11 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
         try {
           const records = await fetchMPRecords(network, env, materialsEndpoint, query, scope.signal);
           scope.signal.throwIfAborted();
-          if (records.length) hub!.import("mp-snapshot", records, true);
+          cacheRecords(records);
           // Select exactly the freshly fetched IDs, not stale unrelated cached records.
           const latestIds = new Set(records.map(r => r.id));
           const result = hub!.select("mp-snapshot", query, latestIds);
-          const fresh = result.data.map((row, i) => ({ ...row, revision: result.revisions[i] })).filter(row => latestIds.has(row.id)).slice(0, query.limit);
+          const fresh = result.data.map((row, i) => project(row, result.revisions[i])).filter(row => latestIds.has(row.id)).slice(0, query.limit);
           const meta: HubMetadata = { requestedSource: query.source, effectiveSource: "mp-live", objective: query.objective, total: fresh.length,
             datasetVersion: result.datasetVersion, fetchedAt: result.fetchedAt, excludedMissingTarget: records.length - fresh.length, query };
           if (!res.destroyed) res.json({ data: fresh, meta });
@@ -72,10 +84,16 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
           fallbackReason = scope.timedOut() ? "TIMEOUT" : networkFailure(error).code;
         }
       }
-      const result = hub!.select(effectiveSource, query);
+      // Query the full immutable index, then retain only selected records in the versioned working cache.
+      const summaryResult = effectiveSource === "mp-snapshot" && mpSummary ? mpSummary.select(query) : undefined;
+      if (summaryResult) cacheRecords(summaryResult.records);
+      const result = hub!.select(effectiveSource, query, summaryResult ? new Set(summaryResult.records.map(row => row.id)) : undefined);
       const meta: HubMetadata = { requestedSource: query.source, effectiveSource, objective: query.objective, total: result.data.length,
-        datasetVersion: result.datasetVersion, fetchedAt: result.fetchedAt, excludedMissingTarget: result.excludedMissingTarget, fallbackReason, query };
-      if (!res.destroyed) res.json({ data: result.data.map((row, i) => ({ ...row, revision: result.revisions[i] })), meta });
+        datasetVersion: result.datasetVersion, fetchedAt: summaryResult ? mpSummary!.manifest.downloadedAt : result.fetchedAt,
+        excludedMissingTarget: summaryResult?.excludedMissingTarget ?? result.excludedMissingTarget, fallbackReason, query,
+        ...(summaryResult ? { matchedTotal: summaryResult.matchedTotal, sourceVersion: mpSummary!.manifest.version,
+          snapshotSha256: mpSummary!.manifest.sha256, sourceURL: mpSummary!.manifest.sourceURL } : {}) };
+      if (!res.destroyed) res.json({ data: result.data.map((row, i) => project(row, result.revisions[i])), meta });
     } catch (e) { failure(res, e); }
     finally { scope?.dispose(); }
   });
@@ -94,7 +112,7 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
       const dataset = storedSource(req.body?.dataset);
       if (dataset === "mp-snapshot") throw new HubInputError("MP快照由在线同步写入；请勿将手工数据标为官方MP记录。");
       const count = hub!.import(dataset, dataset === "dual-fidelity" ? req.body?.pairs : req.body?.records);
-      res.json({ imported: count, catalog: hub!.catalog(), note: "来源字段通过格式校验；观测真实性、方法可比性仍需人工复核。" });
+      res.json({ imported: count, catalog: catalog(), note: "来源字段通过格式校验；观测真实性、方法可比性仍需人工复核。" });
     } catch (e) { failure(res, e); }
   });
   router.get("/template", (req, res) => {
@@ -113,7 +131,7 @@ export function createHubRouter({ hub, network, env, materialsEndpoint, deadline
       const objective = req.body?.objective, cohort = req.body?.cohort;
       if (typeof objective !== "string" || !Object.hasOwn(OBJECTIVES, objective) || typeof cohort !== "string" || !cohort) throw new HubInputError("请选择目标和单一配对cohort。");
       const ids = req.body?.ids;
-      if (ids !== undefined && (!Array.isArray(ids) || ids.length > 500 || ids.some(id => typeof id !== "string"))) throw new HubInputError("校准ID列表无效。");
+      if (ids !== undefined && (!Array.isArray(ids) || ids.length > MAX_HUB_CANDIDATES || ids.some(id => typeof id !== "string"))) throw new HubInputError("校准ID列表无效。");
       res.json(calibratePairs(hub!.pairs().filter(p => !ids || ids.includes(p.id)), objective as keyof typeof OBJECTIVES, cohort));
     } catch (e) { failure(res, e); }
   });

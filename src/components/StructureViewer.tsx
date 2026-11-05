@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { CrystalStructure, DisplayAtom } from "../structures/types";
 import { cellEdges } from "../structures/geometry";
+import { useI18n } from "../i18n";
 
 const colors: Record<string, string> = {
   H: "#d8e5ec", C: "#52687b", N: "#477dce", O: "#eb6477", F: "#77c9a1",
@@ -24,12 +25,15 @@ interface Props {
 
 /** Rendering only: this component never guesses a structure or changes its scientific data. */
 export default function StructureViewer(props: Props) {
+  const { lang, t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const runtime = useRef<any>(null);
   const selectionCallback = useRef(props.onSelect);
   selectionCallback.current = props.onSelect;
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const instructions = t("拖动旋转 · 滚轮缩放 · 右键平移 · 点击原子选择位点", "Drag to rotate · Scroll to zoom · Right-drag to pan · Select atoms by clicking");
+  useEffect(() => { host.current?.querySelector("canvas")?.setAttribute("aria-label", instructions); }, [lang, ready]);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,7 +55,7 @@ export default function StructureViewer(props: Props) {
         });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0xeff5f8);
-        renderer.domElement.setAttribute("aria-label", "晶体结构三维视图，拖动旋转，滚轮缩放；点击原子选择位点");
+        renderer.domElement.setAttribute("aria-label", instructions);
         renderer.domElement.setAttribute("role", "img");
         container.appendChild(renderer.domElement);
         const scene = new THREE.Scene();
@@ -179,13 +183,13 @@ export default function StructureViewer(props: Props) {
 
   return <div className="structure-stage">
     <div className="structure-canvas" ref={host} />
-    {!ready && !error && <div className="structure-stage-message" role="status">正在准备 3D 查看器…</div>}
-    {error && <div className="structure-stage-message" role="alert">{error}</div>}
+    {!ready && !error && <div className="structure-stage-message" role="status">{t("正在准备 3D 查看器…", "Preparing the 3D viewer…")}</div>}
+    {error && <div className="structure-stage-message" role="alert">{t("无法创建 WebGL 3D 视图。请启用浏览器硬件加速；结构信息与原子表仍可查看。", "The 3D view could not start. Enable browser hardware acceleration; structure details and the atom table remain available.")}</div>}
     <div className="structure-stage-toolbar">
-      <button type="button" onClick={() => runtime.current?.fit()} disabled={!ready}>复位视角</button>
-      <button type="button" aria-label="放大结构" onClick={() => zoom(0.8)} disabled={!ready}>＋</button>
-      <button type="button" aria-label="缩小结构" onClick={() => zoom(1.25)} disabled={!ready}>−</button>
+      <button type="button" onClick={() => runtime.current?.fit()} disabled={!ready}>{t("复位视角", "Reset view")}</button>
+      <button type="button" aria-label={t("放大结构", "Zoom in")} onClick={() => zoom(0.8)} disabled={!ready}>＋</button>
+      <button type="button" aria-label={t("缩小结构", "Zoom out")} onClick={() => zoom(1.25)} disabled={!ready}>−</button>
     </div>
-    <div className="structure-stage-caption">拖动旋转 · 滚轮缩放 · 右键平移 · 点击原子选择位点</div>
+    <div className="structure-stage-caption">{instructions}</div>
   </div>;
 }

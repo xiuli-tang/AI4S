@@ -4,6 +4,7 @@ import type { FeaturePoint } from "./SurrogateModel";
 import type { Prediction } from "./models/regressors";
 import { createSeededRandom } from "./SeededRandom";
 import { bestTarget, type ObjectiveDirection } from "../dataHub";
+import { extendRandomComparison } from "./RandomComparison";
 
 export type StopReason = "empty-pool" | "budget-exhausted" | "candidates-exhausted";
 
@@ -21,6 +22,7 @@ export interface StepConfig {
   random?: () => number;
   signal?: AbortSignal;
   direction?: ObjectiveDirection;
+  comparisonSeed?: number;
 }
 
 export function getStopReason(pool: Material[], totalBudget: number): StopReason | null {
@@ -123,7 +125,10 @@ export async function runActiveLearningStep(
       bestValue,
       avgError: 0,
       regret: regret > 1e-6 ? regret : 0,
+      sampledCount: updated.length,
+      addedIds: updated.filter(m => !pool.find(old => old.id === m.id)?.isSampled).map(m => m.id),
     }],
+    comparison: extendRandomComparison(pool, nextPool, state.comparison, config.comparisonSeed ?? 42, direction),
   };
   return { pool: nextPool, state: nextState, advanced: true, stopReason: getStopReason(nextPool, totalBudget) };
 }

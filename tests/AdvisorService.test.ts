@@ -27,7 +27,7 @@ test("a failed paid request is sent once and raw error bodies are never displaye
   assert.ok(failure instanceof AdvisorError);
   assert.equal(hits, 1);
   assert.ok(!advisorErrorMessage(failure, "zh").includes("fake-private-key"));
-  assert.match(advisorErrorMessage(failure, "en"), /authentication/);
+  assert.match(advisorErrorMessage(failure, "en"), /site administrator/);
 });
 
 test("empty model output and invalid JSON cannot become a successful answer", async t => {

@@ -46,7 +46,17 @@ export interface ALState {
     bestValue: number;
     avgError: number;
     regret: number;
+    sampledCount?: number;
+    addedIds?: string[];
   }[];
+  comparison?: RandomComparison;
+}
+
+export interface RandomComparison {
+  schema: "uniform-label-replay-1";
+  seed: number;
+  initialIds: string[];
+  points: { sampledCount: number; bestValue: number; sampledIds: string[] }[];
 }
 
 export const AL_CONFIG = {

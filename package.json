@@ -15,6 +15,8 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "benchmark:models": "tsx scripts/benchmark-models.ts",
     "hub:capture": "tsx scripts/capture-mp-snapshot.ts",
+    "hub:download-summary": "python3 scripts/download-mp-summary.py",
+    "hub:index-summary": "python3 scripts/index-mp-summary.py",
     "verify:umlip": "tsx scripts/verify-umlip.ts",
     "benchmark:pareto": "tsx scripts/benchmark-pareto.ts",
     "setup:synthesis": "python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements-synthesis.txt"
@@ -25,6 +27,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "axios": "^1.13.6",
     "better-sqlite3": "^12.4.1",
+    "compression": "^1.8.2",
     "crystcif-parse": "0.2.9",
     "d3": "^7.9.0",
     "dotenv": "^17.2.3",
@@ -43,6 +46,7 @@
     "vite": "^6.2.0"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "@types/react": "^19.3.0",

@@ -49,7 +49,7 @@ export type SavedCandidate = Omit<Material, "trueProperty" | "objectiveValues" |
 export interface ResearchSession {
   schema: "ai4s-research-session-1"; id: string; name: string; savedAt: string;
   query: HubQuery; metadata: HubMetadata | null; candidates: SavedCandidate[];
-  state: Omit<ALState, "bestValue" | "history"> & { bestValue: number | null; history: { iteration: number; bestValue: number }[] };
+  state: Omit<ALState, "bestValue" | "history"> & { bestValue: number | null; history: { iteration: number; bestValue: number; sampledCount?: number; addedIds?: string[] }[] };
   config: { strategy: AcquisitionStrategy; batchSize: number; totalBudget: number; model: ModelConfig };
   modules: ResearchModules; selectedRecordKey: string | null;
 }
