@@ -176,7 +176,10 @@ export class MaterialsEngine {
 }
 
 export async function hydrateHubMaterials(data: HubRecord[], meta: HubMetadata): Promise<Material[]> {
-  return Promise.all(data.map(async record => {
+  const result: Material[] = [];
+  for (let index = 0; index < data.length; index++) {
+        if (index > 0 && index % 100 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+        const record = data[index];
         const value = record.values?.[meta.objective];
         if (!Number.isFinite(value) || record.units?.[meta.objective] !== OBJECTIVES[meta.objective].unit
           || !["MP-DFT", "Catalysis-Hub", "GNoME-Extrapolated", "Lab-Experiment"].includes(record.source)
@@ -191,11 +194,13 @@ export async function hydrateHubMaterials(data: HubRecord[], meta: HubMetadata):
           energyAboveHull: Number.isFinite(record.values["energy-above-hull"]) ? record.values["energy-above-hull"]! : null,
           formationEnergyPerAtom: Number.isFinite(record.values["formation-energy"]) ? record.values["formation-energy"]! : null,
           pairedDft: record.pairedDft,
-          ...(record.structure ? { structureRef: { dataset: meta.effectiveSource === "mp-live" ? "mp-snapshot" as const : meta.effectiveSource,
+          ...(record.structure || record.hasStructure ? { structureRef: { dataset: meta.effectiveSource === "mp-live" ? "mp-snapshot" as const : meta.effectiveSource,
             id: record.id, revision: record.revision! } } : {}) };
         if (record.structure) material.structureHash = await structureFingerprint(normalizeMaterialStructure({
           material_id: record.id, formula_pretty: record.formula, structure: record.structure, symmetry: record.symmetry,
         }, record.id, meta.fetchedAt ?? new Date().toISOString(), true));
-        return material;
-        }));
+        else if (record.hasStructure && /^[a-f0-9]{64}$/.test(record.structureHash ?? "")) material.structureHash = record.structureHash;
+        result.push(material);
+  }
+  return result;
 }

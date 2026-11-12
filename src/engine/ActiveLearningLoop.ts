@@ -4,6 +4,7 @@ import type { FeaturePoint } from "./SurrogateModel";
 import type { Prediction } from "./models/regressors";
 import { createSeededRandom } from "./SeededRandom";
 import { bestTarget, type ObjectiveDirection } from "../dataHub";
+import { extendRandomComparison } from "./RandomComparison";
 
 export type StopReason = "empty-pool" | "budget-exhausted" | "candidates-exhausted";
 
@@ -21,6 +22,7 @@ export interface StepConfig {
   random?: () => number;
   signal?: AbortSignal;
   direction?: ObjectiveDirection;
+  comparisonSeed?: number;
 }
 
 export function getStopReason(pool: Material[], totalBudget: number): StopReason | null {
@@ -110,6 +112,23 @@ export async function runActiveLearningStep(
 
   const updated = nextPool.filter(material => material.isSampled);
   const bestValue = bestTarget(updated.map(material => material.trueProperty), direction);
+  // Final reports use every acquired label, including the last batch.
+  if (!initializing && getStopReason(nextPool, totalBudget)) {
+    await model.train(updated);
+    config.signal?.throwIfAborted();
+    const remaining = nextPool.filter(m => !m.isSampled);
+    const finalPredictions = model.predictBatch ? await model.predictBatch(remaining.map(m => ({ features: m.features })))
+      : remaining.map(m => model.predict!({ features: m.features }));
+    config.signal?.throwIfAborted();
+    if (finalPredictions.length !== remaining.length) throw new Error("Prediction count does not match candidates");
+    const finalRandom = createSeededRandom(0x53434f52 + state.iteration);
+    remaining.forEach((m, i) => {
+      const { mean, std } = finalPredictions[i];
+      if (!Number.isFinite(mean) || !Number.isFinite(std) || std < 0) throw new Error("Invalid surrogate prediction");
+      m.predictedMean = mean; m.predictedStd = std;
+      m.acquisitionValue = AcquisitionFunction.compute(m, config.strategy, bestValue, 2, true, finalRandom, direction);
+    });
+  }
   const globalBest = bestTarget(nextPool.map(material => material.trueProperty), direction);
   const regret = direction === "min" ? bestValue - globalBest : globalBest - bestValue;
   const nextState: ALState = {
@@ -123,7 +142,10 @@ export async function runActiveLearningStep(
       bestValue,
       avgError: 0,
       regret: regret > 1e-6 ? regret : 0,
+      sampledCount: updated.length,
+      addedIds: updated.filter(m => !pool.find(old => old.id === m.id)?.isSampled).map(m => m.id),
     }],
+    comparison: extendRandomComparison(pool, nextPool, state.comparison, config.comparisonSeed ?? 42, direction),
   };
   return { pool: nextPool, state: nextState, advanced: true, stopReason: getStopReason(nextPool, totalBudget) };
 }

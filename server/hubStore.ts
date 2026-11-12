@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { createHash } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { OBJECTIVES, type FidelityPair, type HubCatalog, type HubQuery, type HubRecord, type ObjectiveId, type Provenance, type StoredHubSource } from "../src/dataHub";
+import { OBJECTIVES, DEFAULT_HUB_QUERY, MAX_HUB_CANDIDATES, type FidelityPair, type HubCatalog, type HubQuery, type HubRecord, type ObjectiveId, type Provenance, type StoredHubSource } from "../src/dataHub";
 import { getElementConstants, normalizeComposition } from "../src/engine/CompositionFeatures";
 import { normalizeMaterialStructure } from "../src/structures/materialStructure";
 
@@ -109,8 +109,8 @@ export function parseHubQuery(input: any): HubQuery {
   const match = input.match ?? "contains";
   if (!["contains", "exact"].includes(match) || (match === "exact" && !elements.length)) throw new HubInputError("精确体系需要至少一个包含元素。");
   if (source === "mp-live" && !elements.length) throw new HubInputError("实时查询请先指定至少一个元素。");
-  const limit = input.limit === undefined ? 40 : typeof input.limit === "string" && /^\d+$/.test(input.limit) ? Number(input.limit) : NaN;
-  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 500) throw new HubInputError("Data Hub 每次读取范围为1–500条。");
+  const limit = input.limit === undefined ? DEFAULT_HUB_QUERY.limit : typeof input.limit === "string" && /^\d+$/.test(input.limit) ? Number(input.limit) : NaN;
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > MAX_HUB_CANDIDATES) throw new HubInputError("Data Hub 每次读取范围为1–5000条。 / Choose 1–5000 candidates.");
   const cohort = input.cohort ?? "";
   if (typeof cohort !== "string" || cohort.length > 200) throw new HubInputError("cohort 无效。");
   return { source, objective: objective as ObjectiveId, elements: elements.join(","), excludeElements: exclude.join(","), match, cohort, limit };
@@ -158,14 +158,17 @@ export class HubStore {
   pairs(): FidelityPair[] { return this.db.prepare("SELECT payload FROM dual_fidelity_pairs ORDER BY id").all().map((r: any) => JSON.parse(r.payload)); }
   catalog(): HubCatalog {
     return { sources: (Object.keys(tables) as StoredHubSource[]).map(id => {
-      const rows = this.db.prepare(`SELECT payload,updated_at FROM ${tables[id]} ORDER BY id`).all();
-      return { id, count: rows.length, updatedAt: rows.length ? rows.map((r: any) => r.updated_at).sort().at(-1) : null,
-        cohorts: [...new Set<string>(rows.map((r: any) => JSON.parse(r.payload).cohort))].sort() };
+      const summary = this.db.prepare(`SELECT COUNT(*) AS count,MAX(updated_at) AS updatedAt FROM ${tables[id]}`).get();
+      const cohorts = this.db.prepare(`SELECT DISTINCT json_extract(payload,'$.cohort') AS cohort FROM ${tables[id]} ORDER BY cohort`).all();
+      return { id, count: summary.count, updatedAt: summary.updatedAt,
+        cohorts: cohorts.map((r: { cohort: string }) => r.cohort) };
     }) };
   }
   select(source: StoredHubSource, query: HubQuery, onlyIds?: Set<string>) {
     const include = elementList(query.elements), exclude = elementList(query.excludeElements);
-    const rows = this.db.prepare(`SELECT payload,revision FROM ${tables[source]} ORDER BY id`).all();
+    const ids = onlyIds ? [...onlyIds] : undefined;
+    const rows = ids ? (ids.length ? this.db.prepare(`SELECT payload,revision FROM ${tables[source]} WHERE id IN (${ids.map(() => "?").join(",")}) ORDER BY id`).all(...ids) : [])
+      : this.db.prepare(`SELECT payload,revision FROM ${tables[source]} ORDER BY id`).all();
     let missing = 0;
     const selected: HubRecord[] = [];
     const revisions: string[] = [];

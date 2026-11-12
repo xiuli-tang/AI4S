@@ -41,6 +41,7 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
   };
   const close = () => { cancel(); onClose(); };
   const restoredToken = useRef(0);
+  const previousRun = useRef(input.runId);
 
   useEffect(() => {
     active.current?.abort(); active.current = null;
@@ -50,7 +51,8 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
       setTurns(s.turns.map(t => t.status === "pending" ? { ...t, status: "cancelled" } : t));
       serial.current = Math.max(0, ...s.turns.map(t => t.id)); setSelectedId(s.selectedId); setDraft(s.draft); setPreview(s.preview); setCompact(s.compact);
     } else { setTurns([]); setSelectedId(null); setDraft(""); setCompact(false); }
-    handled.current = request?.requestId ?? 0;
+    if (previousRun.current !== input.runId || restored) handled.current = request?.requestId ?? 0;
+    previousRun.current = input.runId;
   }, [input.runId, restored?.token]);
   useEffect(() => { onState?.({ turns, selectedId, draft, preview, compact }); }, [turns, selectedId, draft, preview, compact]);
   useEffect(() => () => { active.current?.abort(); active.current = null; }, []);
@@ -94,10 +96,14 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
 
   useEffect(() => {
     if (!open || loading || !request || request.requestId === handled.current) return;
-    handled.current = request.requestId;
-    cancel();
-    setSelectedId(request.materialId ?? null);
-    if (request.action) void send(advisorQuestions[request.action][lang], request.materialId ?? null);
+    const timer = setTimeout(() => {
+      if (request.requestId === handled.current) return;
+      handled.current = request.requestId;
+      cancel();
+      setSelectedId(request.materialId ?? null);
+      if (request.action && !(request.action === "overview" && input.state.iteration === 0)) void send(advisorQuestions[request.action][lang], request.materialId ?? null);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [open, request, loading]);
 
   if (!open) return null;
@@ -135,14 +141,19 @@ export default function MaterialsAdvisor({ open, onClose, input, lang, loading, 
       {selected && <div className="advisor-selected-metrics"><span>µ {selected.prediction_mean_mu ?? "—"}</span><span>σ {selected.uncertainty_sigma ?? "—"}</span><span>{zh ? "成本" : "Cost"} {selected.cost.value ?? "—"}</span></div>}
       <button type="button" className="advisor-preview-toggle" onClick={() => setPreview(!preview)} aria-expanded={preview}><ChevronDown size={13} />{zh ? "查看将发送的数据摘要" : "Preview shared context"}</button>
       {preview && <div className="advisor-preview"><p>{zh ? "发送当前轮次、已采样最优材料、Top-3、选中材料的组成/特征/预测和近期收敛记录；不含未采样真实标签、密钥或结构文件。" : "Shares this round, the best sampled material, top candidates, selected composition/features/predictions and recent progress. No hidden candidate labels, keys or structure files."}</p><pre>{JSON.stringify(context, null, 2)}</pre></div>}
-      <p className="advisor-evidence-note">{context.objective.name} / {context.objective.unit}</p>
+      <p className="advisor-evidence-note">{context.objective.unit} · {input.isRealData ? (zh ? "已有标签回放" : "Existing-label replay") : (zh ? "合成数据演示" : "Synthetic-data demo")}</p>
       <MethodNote lang={lang}>{zh ? "来源、方法与保真度随快照保留；组成不能确定真实结构，成本为估计量。" : "The snapshot retains source, method and fidelity. Composition does not identify a crystal structure; costs are estimates."}</MethodNote>
       </div>
-      <div className="advisor-actions">{actions.map(({ action, label, icon: Icon }) => <button type="button" key={action} disabled={busy || loading || (action !== "overview" && !selected)} onClick={() => { if (action === "overview") setSelectedId(null); void send(advisorQuestions[action][lang], action === "overview" ? null : selectedId); }}><Icon size={14} />{label}</button>)}</div>
+      <div className="advisor-actions">{actions.map(({ action, label, icon: Icon }) => <button type="button" key={action} disabled={busy || loading || (action === "overview" && input.state.iteration === 0) || (action !== "overview" && !selected)} onClick={() => { if (action === "overview") setSelectedId(null); void send(advisorQuestions[action][lang], action === "overview" ? null : selectedId); }}><Icon size={14} />{label}</button>)}</div>
+      {input.state.iteration === 0 && <div className="advisor-first-round"><p>{zh ? "尚未运行首轮，暂时没有候选排名。可以先讨论数据与研究目标：" : "No ranking is available before the first round. Start with data and research goals:"}</p>{[
+        ["如何为当前材料选择优化目标？", "How should I choose an objective for these materials?"],
+        ["如何设置合理的采样预算和随机对照？", "How should I choose a sampling budget and random comparison?"],
+        ["这些数据库标签适合回答哪些研究问题？", "Which research questions can these database labels address?"],
+      ].map(([a,b]) => <button type="button" key={b} onClick={() => { setDraft(zh ? a : b); textarea.current?.focus(); }}>{zh ? a : b}</button>)}</div>}
     </section>
 
     <div className="advisor-conversation" aria-label={zh ? "顾问对话记录" : "Advisor conversation"}>
-      {!turns.length && <div className="advisor-welcome"><div><Sparkles size={26} /></div><h3>{zh ? "让每个候选，都有下一步" : "Give every candidate a next step"}</h3><p>{zh ? "先运行一轮学习，再选择材料。我会结合预测、探索价值与成本解释推荐，并帮你起草可验证的研究方案。" : "Run a learning step and select a material. I can explain predictions, exploration value and cost, then draft a testable research plan."}</p><p className="advisor-welcome-hint">{zh ? "也可以直接提问：当前排名更偏向性能，还是探索？" : "Or ask: does this ranking favor performance or exploration?"}</p></div>}
+      {!turns.length && <div className="advisor-welcome"><div><Sparkles size={26} /></div><h3>{zh ? "让每个候选，都有下一步" : "Give every candidate a next step"}</h3><p>{zh ? "先运行一轮学习，再选择材料。我会结合预测、探索价值与成本解释推荐，并帮你起草可验证的研究方案。" : "Run a learning step and select a material. I can explain predictions, exploration value and cost, then draft a testable research plan."}</p><p className="advisor-welcome-hint">{input.state.iteration === 0 ? (zh ? "可以先选择上面的示例问题，明确研究目标与评价预算。" : "Choose an example question above to clarify your objective and evaluation budget.") : (zh ? "也可以直接提问：当前排名更偏向性能，还是探索？" : "Or ask: does this ranking favor performance or exploration?")}</p></div>}
       {turns.map(turn => <article key={turn.id} className="advisor-turn">
         <div className="advisor-user"><p>{turn.question}</p></div>
         <div ref={turn.id === turns.at(-1)?.id ? latestReply : undefined} className="advisor-turn-meta">{turn.capturedAt} · {zh ? "第" : "Round"} {turn.context.learning.iteration} {zh ? "轮快照" : "snapshot"} · {sourceLabel(turn.context.dataset.source, lang)}{turn.context.selected_material ? ` · ${turn.context.selected_material.formula}` : ""}</div>

@@ -46,6 +46,9 @@ export interface HubRecord {
   symmetry?: unknown;
   pairedDft?: number;
   revision?: string;
+  /** Lightweight list projection; full geometry is fetched by exact revision. */
+  hasStructure?: boolean;
+  structureHash?: string;
 }
 export interface FidelityPair {
   id: string;
@@ -69,12 +72,18 @@ export interface HubQuery {
   cohort: string;
   limit: number;
 }
-export const DEFAULT_HUB_QUERY: HubQuery = { source: "mp-snapshot", objective: "band-gap", elements: "", excludeElements: "", match: "contains", cohort: "", limit: 40 };
+export const MAX_HUB_CANDIDATES = 5000;
+export const DEFAULT_HUB_QUERY: HubQuery = { source: "mp-snapshot", objective: "band-gap", elements: "", excludeElements: "", match: "contains", cohort: "", limit: 2000 };
 export interface HubMetadata {
   requestedSource: HubSource;
   effectiveSource: HubSource;
   objective: ObjectiveId;
   total: number;
+  /** Full eligible match count; total remains the number loaded into this candidate pool. */
+  matchedTotal?: number;
+  sourceVersion?: string;
+  snapshotSha256?: string;
+  sourceURL?: string;
   datasetVersion: string;
   fetchedAt: string | null;
   fallbackReason?: string;
@@ -83,7 +92,8 @@ export interface HubMetadata {
 }
 export interface HubResponse { data: HubRecord[]; meta: HubMetadata; }
 export interface HubCatalog {
-  sources: { id: StoredHubSource; count: number; updatedAt: string | null; cohorts: string[] }[];
+  sources: { id: StoredHubSource; count: number; updatedAt: string | null; cohorts: string[];
+    provider?: "mp-summary-mirror"; datasetVersion?: string; rawCount?: number; snapshotSha256?: string; sourceURL?: string }[];
 }
 export interface StructureRef { dataset: StoredHubSource; id: string; revision: string; }
 export interface CalibrationResult {

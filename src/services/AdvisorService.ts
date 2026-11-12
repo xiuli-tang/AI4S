@@ -1,14 +1,14 @@
 import type { AdvisorWireMessage, AdvisorLanguage } from "./AdvisorContext";
 
 const errors = {
-  MISSING_API_KEY: ["请先在本机 .env 中配置 DEEPSEEK_API_KEY，并重启服务。", "Configure DEEPSEEK_API_KEY in the local .env and restart the server."],
-  AUTHENTICATION_FAILED: ["模型服务认证失败，请检查 API 密钥。", "Model authentication failed. Check the API key."],
-  ACCESS_DENIED: ["模型服务拒绝访问，请检查账号权限或网络限制。", "Access denied. Check account permissions or network restrictions."],
+  MISSING_API_KEY: ["AI 顾问暂未开通，请联系网站管理员。材料筛选与分析仍可使用。", "The AI advisor is not enabled yet. Contact the site administrator; material screening and analysis remain available."],
+  AUTHENTICATION_FAILED: ["AI 顾问连接暂时异常，请稍后重试或联系网站管理员。", "The AI advisor connection is unavailable. Retry later or contact the site administrator."],
+  ACCESS_DENIED: ["AI 顾问暂时无法提供服务，请稍后重试或联系网站管理员。", "The AI advisor is temporarily unavailable. Retry later or contact the site administrator."],
   RATE_LIMITED: ["模型服务限流，请稍后再发送。", "Rate limited. Send again later."],
   TIMEOUT: ["分析超时，未自动重复请求。可以缩短问题后手动重试。", "Analysis timed out without an automatic retry. Try a shorter question."],
-  PROXY_ERROR: ["当前代理无法连接模型服务。", "The current proxy cannot reach the model service."],
-  DNS_ERROR: ["无法解析模型服务或代理地址。", "Cannot resolve the model or proxy hostname."],
-  TLS_ERROR: ["模型服务证书验证失败，请检查网络信任配置。", "Model TLS certificate validation failed."],
+  PROXY_ERROR: ["AI 顾问连接中断，请稍后重试。", "The AI advisor connection was interrupted. Retry later."],
+  DNS_ERROR: ["暂时无法连接 AI 顾问，请稍后重试。", "The AI advisor cannot be reached right now. Retry later."],
+  TLS_ERROR: ["AI 顾问的安全连接未能建立，请联系网站管理员。", "A secure advisor connection could not be established. Contact the site administrator."],
   BAD_RESPONSE: ["模型没有返回有效文字，请稍后手动重试。", "The model did not return usable text. Retry manually."],
   NETWORK_ERROR: ["连接模型服务失败，请检查网络后手动重试。", "Cannot reach the model service. Check the network and retry manually."],
   UPSTREAM_ERROR: ["模型服务暂时不可用，请稍后再试。", "The model service is temporarily unavailable."],

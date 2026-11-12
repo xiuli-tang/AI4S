@@ -1,0 +1,2800 @@
+{
+  "schema": "wending-learning-benchmark-1",
+  "objective": "band-gap",
+  "unit": "eV",
+  "direction": "max",
+  "candidateCount": 2000,
+  "budget": 50,
+  "targetValue": 5.24003,
+  "targetRule": "95th percentile, fixed before runs",
+  "seedCount": 20,
+  "ai": {
+    "successRate": 0.95,
+    "successfulSeeds": 19,
+    "evaluationsMedianAmongSuccesses": 11,
+    "bestMedian": 7.2810999999999995,
+    "bestP10P90": [
+      6.0381100000000005,
+      7.2810999999999995
+    ]
+  },
+  "random": {
+    "successRate": 0.95,
+    "successfulSeeds": 19,
+    "evaluationsMedianAmongSuccesses": 15,
+    "bestMedian": 5.94595,
+    "bestP10P90": [
+      5.315510000000001,
+      6.99454
+    ]
+  },
+  "rediscoveryIds": [],
+  "rediscoverySummary": null,
+  "rows": [
+    {
+      "seed": 101,
+      "initialIds": [
+        "mp-aaabhgxm",
+        "mp-aaaabvxt",
+        "mp-aaaaaskv",
+        "mp-aaaabmnj",
+        "mp-aaabpayp"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.1624,
+      "aiHit": 25,
+      "randomHit": 11,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.1063,
+          "random": 5.1063
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.1063,
+          "random": 5.1063
+        },
+        {
+          "evaluations": 9,
+          "ai": 5.1063,
+          "random": 5.1063
+        },
+        {
+          "evaluations": 11,
+          "ai": 5.1063,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 13,
+          "ai": 5.1063,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 15,
+          "ai": 5.1063,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 17,
+          "ai": 5.1063,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 19,
+          "ai": 5.1063,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 21,
+          "ai": 5.1063,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.1063,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 37,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 39,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 41,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 45,
+          "ai": 6.1183000000000005,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 47,
+          "ai": 6.4308,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.1624
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.1624
+        }
+      ]
+    },
+    {
+      "seed": 102,
+      "initialIds": [
+        "mp-aaabfrlv",
+        "mp-aaabetgh",
+        "mp-aaabeted",
+        "mp-aaabkrgz",
+        "mp-aaaabndb"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.728999999999999,
+      "aiHit": 5,
+      "randomHit": 5,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 9,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 11,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 13,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 15,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 17,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 19,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 21,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.728999999999999,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999
+        }
+      ]
+    },
+    {
+      "seed": 103,
+      "initialIds": [
+        "mp-aaabetcm",
+        "mp-aaabfpsw",
+        "mp-aaaaasnt",
+        "mp-aaaabmzk",
+        "mp-aaabeeyu"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.8783,
+      "aiHit": 7,
+      "randomHit": 21,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 1.6795999999999998,
+          "random": 1.6795999999999998
+        },
+        {
+          "evaluations": 7,
+          "ai": 6.1183000000000005,
+          "random": 2.7518
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 3.6757
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 3.6757
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.1183000000000005,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.8783
+        }
+      ]
+    },
+    {
+      "seed": 104,
+      "initialIds": [
+        "mp-aaabfvzr",
+        "mp-aaabefwq",
+        "mp-aaabqvet",
+        "mp-aaaabnwt",
+        "mp-aaabqveu"
+      ],
+      "budget": 50,
+      "aiBest": 5.3164,
+      "randomBest": 5.7974,
+      "aiHit": 5,
+      "randomHit": 5,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.2829,
+          "random": 5.2829
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.2829,
+          "random": 5.2829
+        },
+        {
+          "evaluations": 9,
+          "ai": 5.2829,
+          "random": 5.2829
+        },
+        {
+          "evaluations": 11,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 13,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 15,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 17,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 19,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 21,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 29,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 31,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 33,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 35,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 37,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 39,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 41,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 43,
+          "ai": 5.2829,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 45,
+          "ai": 5.3164,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 47,
+          "ai": 5.3164,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 49,
+          "ai": 5.3164,
+          "random": 5.7974
+        },
+        {
+          "evaluations": 50,
+          "ai": 5.3164,
+          "random": 5.7974
+        }
+      ]
+    },
+    {
+      "seed": 105,
+      "initialIds": [
+        "mp-aaabipcj",
+        "mp-aaaaajjo",
+        "mp-aaaabmwb",
+        "mp-aaaaaskv",
+        "mp-aaaaafla"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.072799999999999,
+      "aiHit": 23,
+      "randomHit": 23,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.7003,
+          "random": 3.7003
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 3.7495
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 3.7495
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 4.177
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 4.177
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 4.177
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.202999999999999
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.202999999999999
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.202999999999999
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.7916
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.7916
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.7916
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.072799999999999
+        }
+      ]
+    },
+    {
+      "seed": 106,
+      "initialIds": [
+        "mp-aaaabvse",
+        "mp-aaaabnrn",
+        "mp-aaabetnp",
+        "mp-aaaaahku",
+        "mp-aaaboefk"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 7.2810999999999995,
+      "aiHit": 9,
+      "randomHit": 13,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.0766,
+          "random": 5.0766
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.0766,
+          "random": 5.0766
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 5.0766
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 5.0766
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.4308,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.4308,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 7.2810999999999995
+        }
+      ]
+    },
+    {
+      "seed": 107,
+      "initialIds": [
+        "mp-aaaaazst",
+        "mp-aaaaaqfz",
+        "mp-aaabfxfv",
+        "mp-aaabfsjk",
+        "mp-aaabfllk"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.8773,
+      "aiHit": 29,
+      "randomHit": 15,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.171,
+          "random": 4.171
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.4239999999999995,
+          "random": 5.154
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.4239999999999995,
+          "random": 5.154
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.4239999999999995,
+          "random": 5.154
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.4239999999999995,
+          "random": 5.154
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.4239999999999995,
+          "random": 5.55
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.4239999999999995,
+          "random": 5.55
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.4239999999999995,
+          "random": 5.55
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.4239999999999995,
+          "random": 5.55
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.4239999999999995,
+          "random": 5.55
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.4239999999999995,
+          "random": 5.55
+        },
+        {
+          "evaluations": 27,
+          "ai": 4.8986,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.1183000000000005,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1183000000000005,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.8773
+        }
+      ]
+    },
+    {
+      "seed": 108,
+      "initialIds": [
+        "mp-aaabfqux",
+        "mp-aaabmype",
+        "mp-aaabfvoz",
+        "mp-aaabqvgc",
+        "mp-aaaabmrj"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.2544,
+      "aiHit": 25,
+      "randomHit": 27,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.6455,
+          "random": 4.6455
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.7908
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.9196
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.9251000000000005,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.9251000000000005,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 29,
+          "ai": 5.9251000000000005,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 31,
+          "ai": 5.9251000000000005,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1035,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1035,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        }
+      ]
+    },
+    {
+      "seed": 109,
+      "initialIds": [
+        "mp-aaabnpgu",
+        "mp-aaabmjjn",
+        "mp-aaabpngx",
+        "mp-aaaabxql",
+        "mp-aaabqaqb"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 4.6456,
+      "aiHit": 7,
+      "randomHit": null,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.6456,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 7,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.4308,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 4.6456
+        }
+      ]
+    },
+    {
+      "seed": 110,
+      "initialIds": [
+        "mp-aaabpaxy",
+        "mp-aaaabbvl",
+        "mp-aaaboeto",
+        "mp-aaaabmux",
+        "mp-aaaabngv"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 7.129,
+      "aiHit": 19,
+      "randomHit": 49,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.2104,
+          "random": 4.2104
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.2904
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.2904
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 4.2904
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.4308,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.4308,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.4308,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.4308,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.4308,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.4308,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.040100000000001
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 7.129
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 7.129
+        }
+      ]
+    },
+    {
+      "seed": 111,
+      "initialIds": [
+        "mp-aaabnsgt",
+        "mp-aaaabnlc",
+        "mp-aaaabnnt",
+        "mp-aaabftxo",
+        "mp-aaabmhtm"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.9796,
+      "aiHit": 23,
+      "randomHit": 7,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.319999999999999,
+          "random": 4.319999999999999
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.526400000000001,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.526400000000001,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.526400000000001,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.526400000000001,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.7916,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.7916,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.1183000000000005,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.1183000000000005,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1183000000000005,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.4308,
+          "random": 5.818099999999999
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.9796
+        }
+      ]
+    },
+    {
+      "seed": 112,
+      "initialIds": [
+        "mp-aaabetgq",
+        "mp-aaabmkvs",
+        "mp-aaaabutn",
+        "mp-aaaaajnu",
+        "mp-aaaablpv"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.3223,
+      "aiHit": 5,
+      "randomHit": 5,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.3223,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 7,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.1183000000000005,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.4308,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.3223
+        }
+      ]
+    },
+    {
+      "seed": 113,
+      "initialIds": [
+        "mp-aaabfwfr",
+        "mp-aaaabwde",
+        "mp-aaaaaewv",
+        "mp-aaaabmwj",
+        "mp-aaabnijj"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.0817,
+      "aiHit": 11,
+      "randomHit": 15,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 2.3323,
+          "random": 2.3323
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.0961
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.0961
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 4.0961
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 4.0961
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.4308,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.4308,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.4308,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.4308,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.4308,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.0817
+        }
+      ]
+    },
+    {
+      "seed": 114,
+      "initialIds": [
+        "mp-aaaabnmh",
+        "mp-aaaabmzb",
+        "mp-aaabfxch",
+        "mp-aaaabnyr",
+        "mp-aaabeelh"
+      ],
+      "budget": 50,
+      "aiBest": 6.1183000000000005,
+      "randomBest": 5.9636,
+      "aiHit": 27,
+      "randomHit": 17,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.7379000000000002,
+          "random": 3.7379000000000002
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 3.7379000000000002
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 3.7379000000000002
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 4.662000000000001
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 4.662000000000001
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.1899
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.8986,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.7916,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 29,
+          "ai": 5.7916,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 31,
+          "ai": 5.7916,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 33,
+          "ai": 5.7916,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 35,
+          "ai": 5.9251000000000005,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 37,
+          "ai": 5.9251000000000005,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 39,
+          "ai": 5.9251000000000005,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 41,
+          "ai": 5.9251000000000005,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1035,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 45,
+          "ai": 6.1035,
+          "random": 5.7440999999999995
+        },
+        {
+          "evaluations": 47,
+          "ai": 6.1035,
+          "random": 5.9636
+        },
+        {
+          "evaluations": 49,
+          "ai": 6.1035,
+          "random": 5.9636
+        },
+        {
+          "evaluations": 50,
+          "ai": 6.1183000000000005,
+          "random": 5.9636
+        }
+      ]
+    },
+    {
+      "seed": 115,
+      "initialIds": [
+        "mp-aaabftnh",
+        "mp-aaabeeno",
+        "mp-aaabqvbt",
+        "mp-aaaabobp",
+        "mp-aaabfskz"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.1115,
+      "aiHit": 11,
+      "randomHit": 25,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.1689,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.1689,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 9,
+          "ai": 5.1689,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.1183000000000005,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.1689
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.2544
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        }
+      ]
+    },
+    {
+      "seed": 116,
+      "initialIds": [
+        "mp-aaabkaey",
+        "mp-aaaabmgr",
+        "mp-aaabcscf",
+        "mp-aaabfkps",
+        "mp-aaabmhsi"
+      ],
+      "budget": 50,
+      "aiBest": 4.8986,
+      "randomBest": 5.7279,
+      "aiHit": null,
+      "randomHit": 29,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.6559,
+          "random": 4.6559
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.6559
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 27,
+          "ai": 4.8986,
+          "random": 5.1697999999999995
+        },
+        {
+          "evaluations": 29,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 31,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 33,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 35,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 37,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 39,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 41,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 43,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 45,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 47,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 49,
+          "ai": 4.8986,
+          "random": 5.7279
+        },
+        {
+          "evaluations": 50,
+          "ai": 4.8986,
+          "random": 5.7279
+        }
+      ]
+    },
+    {
+      "seed": 117,
+      "initialIds": [
+        "mp-aaabfzyy",
+        "mp-aaaabcaf",
+        "mp-aaabfwgy",
+        "mp-aaabqdta",
+        "mp-aaaablkf"
+      ],
+      "budget": 50,
+      "aiBest": 6.1183000000000005,
+      "randomBest": 6.0817,
+      "aiHit": 5,
+      "randomHit": 5,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 7,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 37,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 39,
+          "ai": 6.0817,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 41,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 45,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 47,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 49,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        },
+        {
+          "evaluations": 50,
+          "ai": 6.1183000000000005,
+          "random": 6.0817
+        }
+      ]
+    },
+    {
+      "seed": 118,
+      "initialIds": [
+        "mp-aaabozlt",
+        "mp-aaabhhuj",
+        "mp-aaaabuyj",
+        "mp-aaaablpa",
+        "mp-aaaabjsv"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.6317,
+      "aiHit": 7,
+      "randomHit": 11,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.9246000000000003,
+          "random": 3.9246000000000003
+        },
+        {
+          "evaluations": 7,
+          "ai": 6.1183000000000005,
+          "random": 3.9246000000000003
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 3.9246000000000003
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 17,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.2914
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.6317
+        }
+      ]
+    },
+    {
+      "seed": 119,
+      "initialIds": [
+        "mp-aaaabmrj",
+        "mp-aaaabcpw",
+        "mp-aaaabmll",
+        "mp-aaabfasw",
+        "mp-aaaaawms"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.1115,
+      "aiHit": 17,
+      "randomHit": 33,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.7085,
+          "random": 3.7085
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.314
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.314
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 4.314
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 4.314
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.1183000000000005,
+          "random": 4.4117999999999995
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 37,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 39,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 41,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 45,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 47,
+          "ai": 6.1183000000000005,
+          "random": 5.55
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.1115
+        }
+      ]
+    },
+    {
+      "seed": 120,
+      "initialIds": [
+        "mp-aaaabpqo",
+        "mp-aaaabnla",
+        "mp-aaaabnol",
+        "mp-aaaaaiwk",
+        "mp-aaabhhuf"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.9283,
+      "aiHit": 11,
+      "randomHit": 11,
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.0778,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.0778,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 9,
+          "ai": 5.0778,
+          "random": 5.0778
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 5.7273
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.7273
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 5.7273
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 5.7273
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.9283
+        }
+      ]
+    }
+  ],
+  "note": "Existing-label retrospective evaluation; shared five initial labels; uniform random without replacement; failures are censored at budget and never converted into invented savings. Rediscovery targets are excluded from initialization.",
+  "inputSha256": "13decfb0e80880ca6d4816372e896f773fac22dd938297c29fa384b9458d1273",
+  "sourceVersion": {
+    "requestedSource": "mp-snapshot",
+    "effectiveSource": "mp-snapshot",
+    "objective": "band-gap",
+    "total": 2000,
+    "datasetVersion": "bbee5dc615014d73",
+    "fetchedAt": "2026-10-31T17:32:31.571581+00:00",
+    "excludedMissingTarget": 0,
+    "query": {
+      "source": "mp-snapshot",
+      "objective": "band-gap",
+      "elements": "Li,O",
+      "excludeElements": "",
+      "match": "contains",
+      "cohort": "",
+      "limit": 2000
+    },
+    "matchedTotal": 17520,
+    "sourceVersion": "2026-09-28",
+    "snapshotSha256": "669e5a3bdf1644633f8c771a98b434bf449451a9aa6ce2556d0901ba1dff235b",
+    "sourceURL": "https://materialsproject-build.s3.amazonaws.com/collections/summary/version%3D2026-09-28/part-00000-2cc5f2cc-2a79-4051-b013-2f9dec6a302e-c000.zstd.parquet"
+  },
+  "generatedAt": "2026-11-12T07:14:17.786Z"
+}

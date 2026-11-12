@@ -37,13 +37,13 @@ export function DistillationPanel({ controller: c, lang }: { controller: Distill
       <div className="distillation-mark"><Atom size={26} /></div>
       <div className="distillation-heading">
         <p>WHITE-BOX DISCOVERY LAB</p>
-        <h2 id="distillation-heading">{t("白盒物理公式蒸馏引擎", "Physical formula distillation")}</h2>
+        <h2 id="distillation-heading">{t("可解释的材料规律", "Interpretable material relations")}</h2>
         <span>{t("算符组合 · L1 筛选 · L0 稀疏模型 · 组成分组验证", "Operator search · L1 screening · L0 models · composition-group validation")}</span>
       </div>
       <div className="distillation-actions">
         <button type="button" disabled={!result} onClick={download}><Download size={14} />{t("导出公式", "Export")}</button>
         {c.busy ? <button type="button" className="distillation-primary" onClick={c.cancel}><Square size={13} />{t("停止蒸馏", "Stop")}</button>
-          : <button type="button" className="distillation-primary" disabled={!c.ready} onClick={() => void c.run()}><WandSparkles size={15} />{t("蒸馏物理公式", "Distill formulas")}</button>}
+          : <button type="button" className="distillation-primary" disabled={!c.ready} onClick={() => void c.run()}><WandSparkles size={15} />{t("提取可解释规律", "Extract relations")}</button>}
       </div>
     </header>
     <div className="distillation-controls">
@@ -94,8 +94,8 @@ export function DistillationPanel({ controller: c, lang }: { controller: Distill
           <MethodNote lang={lang}>{t("本轮首次划分后固定组成归属；比较使用公式可计算的同一测试子集。", "Group membership is frozen per run; comparisons use the same formula-valid test subset.")}</MethodNote>
           {result.target === "teacher" && <p>{t("教师仅用发现组重训", "Teacher refitted on discovery groups")}: {result.teacherTrainingRecords} {t("条已采样标签", "sampled labels")} · {result.pseudoRecords} {t("条伪目标", "pseudo targets")}<br />{t("教师忠实度 RMSE", "Fidelity RMSE")}: {number(result.fidelity?.rmse)}</p>}
         </div>
-        <table><thead><tr><th>{t("模型", "Model")}</th><th>MAE</th><th>RMSE</th><th>R²</th><th>{t("条/组", "N/G")}</th></tr></thead>
-          <tbody>{metricRows.map(row => <tr key={row.label}><th>{row.label}</th><td>{number(row.value?.mae)}</td><td>{number(row.value?.rmse)}</td><td>{number(row.value?.r2)}</td><td>{row.value?.count}/{row.value?.groups}</td></tr>)}</tbody></table>
+        <div className="table-scroll"><table><thead><tr><th>{t("模型", "Model")}</th><th>MAE</th><th>RMSE</th><th>R²</th><th>{t("条/组", "N/G")}</th></tr></thead>
+          <tbody>{metricRows.map(row => <tr key={row.label}><th>{row.label}</th><td>{number(row.value?.mae)}</td><td>{number(row.value?.rmse)}</td><td>{number(row.value?.r2)}</td><td>{row.value?.count}/{row.value?.groups}</td></tr>)}</tbody></table></div>
       </div>
       {result.metrics.invalid > 0 && <p className="distillation-evidence">{result.metrics.invalid + t(" 条测试记录超出公式定义域。", " test records fall outside the expression domain.")}</p>}
       <MethodNote lang={lang}>{t("这是当前样本支持的候选解析关系；小样本与主动采样偏差仍需前瞻性材料验证。描述符图展示特征投影，不给出热力学相边界。", "A candidate analytic relation supported by this snapshot. Small samples and adaptive sampling require prospective validation; the descriptor map does not establish thermodynamic phase boundaries.")}
@@ -113,14 +113,14 @@ export function DistillationPanel({ controller: c, lang }: { controller: Distill
       <p className="distillation-small">{t("算符：+ − × ÷ |·| exp √。加减检查量纲，exp 要求无量纲；无定义、近零分母与溢出直接排除。既有容忍因子和缺值标志不进入搜索。", "Operators: + − × ÷ abs exp sqrt. Units and domains are checked. Existing tolerance factors and missing-data flags are excluded.")}</p>
       <label htmlFor="distillation-supplements">{t("补充物理量 JSON（按材料 ID）", "Supplemental physics JSON by material ID")}</label>
       <textarea id="distillation-supplements" rows={4} spellCheck={false} value={supplementText} onChange={event => setSupplementText(event.target.value)} disabled={c.busy}
-        placeholder={'{"mp-...":{"bond_energy_mo":{"value":4.1,"unit":"eV","source":"数据来源","reference":"键解离能定义与参考态"}}}'} />
+        placeholder={'{"mp-...":{"bond_energy_mo":{"value":4.1,"unit":"eV","source":"source citation","reference":"bond definition and reference state"}}}'} />
       <div className="distillation-supplement-actions"><button type="button" disabled={c.busy} onClick={() => {
         try { c.setSupplements(parseSupplements(supplementText, c.materialIds)); setSupplementError(null); }
         catch (error) { setSupplementError(error instanceof Error ? error.message : "Invalid JSON"); }
       }}>{t("应用补充数据", "Apply supplements")}</button><span>{Object.keys(c.supplements).length} {t("个材料已关联补充数据", "materials with supplements")}</span></div>
       {supplementError && <p role="alert" className="distillation-input-error">{supplementError}</p>}
       <p className="distillation-small">bond_energy_mo: eV · octahedral_distortion: 1 · volume_change_per_atom: Å³/atom · chi_A / chi_B: 1<br />{t("每项均需 value、unit、source、reference。几何量可来自 uMLIP/DFT 后处理；此模块不会自动执行 uMLIP。", "Each value requires unit, source and reference. Geometry may come from uMLIP/DFT postprocessing; this module does not run uMLIP.")}</p>
-      {result && <div className="distillation-small">{t("未参与搜索的特征", "Excluded inputs")}: {result.excludedFeatures.map(feature => feature.id + " (" + feature.reason + ")").join("；")}</div>}
+      {result && <div className="distillation-small">{t("未参与搜索的特征", "Excluded inputs")}: {result.excludedFeatures.map(feature => feature.id + " (" + (lang === "zh" ? feature.reason : feature.reason.includes("缺值") ? "Missing discovery values; no zero imputation" : "Excluded by the feature or domain checks") + ")").join("；")}</div>}
     </details>
   </section>;
 }

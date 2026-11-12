@@ -1,3 +1,4 @@
+import { userError } from "../i18n";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { displayAtoms } from "../structures/geometry";
 import { MAX_STRUCTURE_BYTES, type CrystalStructure } from "../structures/types";
@@ -228,7 +229,7 @@ export default function UmlipPanel({ open, onClose, lang, enqueue, restored, onS
       <button type="button" onClick={onClose} aria-label={t("关闭 uMLIP 面板", "Close uMLIP panel")}>✕</button></header>
     <div className="umlip-content">
       <MethodNote lang={lang}>{t("仅已收敛计算参与 GPR 训练；第一条收敛结果固定为相对能参考。结果属于 MLIP 势函数能量，与 DFT 带隙/形成能分别记录。", "Only converged calculations train GPR. The first converged result fixes the reference; MLIP energies are tracked separately from DFT properties.")}</MethodNote>
-      {error && <p role="alert" className="umlip-error">{error}</p>}
+      {error && <p role="alert" className="umlip-error">{userError(error, lang)}</p>}
       <section className="umlip-settings" aria-label={t("uMLIP 计算设置", "uMLIP settings")}>
         <div className="umlip-toolbar">
           <label className="umlip-file">{t("导入多个 CIF / POSCAR / CONTCAR", "Import CIF / POSCAR / CONTCAR files")}<input type="file" multiple disabled={editing} onChange={e => { void importFiles(e.target.files); e.target.value = ""; }} /></label>
@@ -241,10 +242,10 @@ export default function UmlipPanel({ open, onClose, lang, enqueue, restored, onS
         </div>
         <p className="umlip-small">{parsing ? t("正在解析结构…", "Parsing structures…") : t("同元素计数、原子顺序与运动约束 · 满占位有序晶胞 · 最多 32 构型 / 128 原子", "Same atom counts, element order and constraints · ordered full occupancy · up to 32 configurations / 128 atoms")}</p>
         <div className="umlip-fields">
-          <label>{t("计算次数预算", "Evaluation budget")}<input aria-label="uMLIP 计算次数预算" type="number" min={1} max={candidates.length || 32} value={budget} disabled={busy} onChange={e => setBudget(Number(e.target.value))} /></label>
-          <label>{t("每轮构型数", "Batch size")}<input aria-label="uMLIP 每轮构型数" type="number" min={1} max={4} value={batchSize} disabled={busy} onChange={e => setBatchSize(Number(e.target.value))} /></label>
-          <label>fmax / eV·Å⁻¹<input aria-label="uMLIP 力收敛阈值" type="number" min={0.005} max={1} step={0.005} value={fmax} disabled={busy} onChange={e => setFmax(Number(e.target.value))} /></label>
-          <label>{t("最大离子步数", "Maximum ionic steps")}<input aria-label="uMLIP 最大离子步数" type="number" min={1} max={200} value={maxSteps} disabled={busy} onChange={e => setMaxSteps(Number(e.target.value))} /></label>
+          <label>{t("计算次数预算", "Evaluation budget")}<input aria-label={t("uMLIP 计算次数预算", "uMLIP evaluation budget")} type="number" min={1} max={candidates.length || 32} value={budget} disabled={busy} onChange={e => setBudget(Number(e.target.value))} /></label>
+          <label>{t("每轮构型数", "Batch size")}<input aria-label={t("uMLIP 每轮构型数", "uMLIP batch size")} type="number" min={1} max={4} value={batchSize} disabled={busy} onChange={e => setBatchSize(Number(e.target.value))} /></label>
+          <label>fmax / eV·Å⁻¹<input aria-label={t("uMLIP 力收敛阈值", "uMLIP force convergence threshold")} type="number" min={0.005} max={1} step={0.005} value={fmax} disabled={busy} onChange={e => setFmax(Number(e.target.value))} /></label>
+          <label>{t("最大离子步数", "Maximum ionic steps")}<input aria-label={t("uMLIP 最大离子步数", "uMLIP maximum ionic steps")} type="number" min={1} max={200} value={maxSteps} disabled={busy} onChange={e => setMaxSteps(Number(e.target.value))} /></label>
         </div>
         <div className="umlip-toolbar">
           <button type="button" className="umlip-primary" onClick={() => void start()} disabled={editing || candidates.length < 2 || !capabilities?.configured}>{t("开始真实 uMLIP 闭环", "Start real uMLIP loop")}</button>
@@ -252,18 +253,18 @@ export default function UmlipPanel({ open, onClose, lang, enqueue, restored, onS
           <span className="umlip-small">{capabilities?.modelLabel ?? t("正在检查服务…", "Checking service…")}</span>
           <button type="button" disabled={checking} onClick={() => { setError(null); setCheckVersion(v => v + 1); }}>{t("重新检查服务", "Recheck service")}</button>
         </div>
-        {capabilities && <p className="umlip-small">{capabilities.message}</p>}
+        {capabilities && <p className="umlip-small">{zh ? capabilities.message : capabilities.configured ? "Model weights are available. Dependencies are verified when a calculation starts." : "Calculation service is not ready. Contact the site administrator."}</p>}
         {history.length > 0 && <label className="umlip-history">{t("恢复已保存运行", "Open saved run")}<select value="" disabled={editing} onChange={e => void restore(e.target.value)}><option value="">{restoring ? t("正在恢复…", "Restoring…") : t("选择运行记录…", "Select a saved run…")}</option>{history.slice(0, 30).map(h => <option key={h.id} value={h.id}>{new Date(h.createdAt).toLocaleString()} · {h.status} · {h.converged} converged · {h.id.slice(0, 8)}</option>)}</select></label>}
       </section>
 
       {run && <section className="umlip-summary" aria-live="polite">
-        <div><span>{t("运行状态", "Run status")}</span><strong>{({ running: "计算中", completed: "已完成", cancelled: "已取消", failed: "失败" })[run.status]}</strong></div>
+        <div><span>{t("运行状态", "Run status")}</span><strong>{zh ? ({ running: "计算中", completed: "已完成", cancelled: "已取消", failed: "失败" })[run.status] : run.status}</strong></div>
         <div><span>{t("已尝试 / 预算", "Attempted / budget")}</span><strong>{attempted} / {run.settings.budget}</strong></div>
         <div><span>{t("有效收敛标签", "Converged labels")}</span><strong>{converged}</strong></div>
         <div><span>{t("最佳 ΔE / eV·atom⁻¹", "Best ΔE / eV·atom⁻¹")}</span><strong>{number(run.bestRelativeEvPerAtom)}</strong></div>
         <div><span>{t("端到端耗时 / s", "Wall time / s")}</span><strong>{number(run.wallSeconds, 5)}</strong></div>
         <div><span>{t("模型加载 / s", "Model load / s")}</span><strong>{number(run.modelLoadSeconds, 5)}</strong></div>
-        {run.error && <p className="umlip-error">{run.error}</p>}
+        {run.error && <p className="umlip-error">{userError(run.error, lang)}</p>}
       </section>}
       {run?.reference && <p className="umlip-small">{t("固定参考", "Fixed reference")}: {run.reference.id} · Eref = {number(run.reference.energyEv, 10)} eV · {run.atomCount} atoms · ΔE = E − Eref</p>}
 
@@ -284,7 +285,7 @@ export default function UmlipPanel({ open, onClose, lang, enqueue, restored, onS
       {viewStructure && <section className="umlip-preview">
         <div className="umlip-toolbar"><h3>{selected?.name}</h3><label><input type="checkbox" checked={showInitial} onChange={e => setShowInitial(e.target.checked)} />{t("查看初始坐标", "Show initial coordinates")}</label>
           <span className="umlip-small">{showInitial ? t("初始模型输入", "Initial model input") : observed?.status === "running" ? t("最新离子步坐标", "Latest ionic-step coordinates") : t("模型弛豫／输入结构", "MLIP relaxed / input structure")}</span>
-          {onUseStructure && <><button type="button" disabled={busy} onClick={() => useStructure("xrd")}>当前结构 → XRD</button><button type="button" disabled={busy} onClick={() => useStructure("geometry")}>几何量 → 白盒公式</button></>}</div>
+          {onUseStructure && <><button type="button" disabled={busy} onClick={() => useStructure("xrd")}>{t("当前结构 → XRD", "Current structure → XRD")}</button><button type="button" disabled={busy} onClick={() => useStructure("geometry")}>{t("几何量 → 白盒公式", "Geometry → white-box formulas")}</button></>}</div>
         <StructureViewer structure={viewStructure} atoms={atoms} repeats={1} showCell showNeighbors={false} cutoff={2.5} selected={selectedAtoms} active={open}
           onSelect={index => setSelectedAtoms(previous => previous.includes(index) ? previous.filter(i => i !== index) : [...previous.slice(-1), index])} />
       </section>}

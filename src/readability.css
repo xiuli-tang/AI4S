@@ -1,0 +1,268 @@
+/* Minimum readable size across the research and scientific workspaces. */
+.method-note{font-size:12px!important}
+.method-note>summary{font-size:12px!important}
+.method-note-content{font-size:12px!important}
+.ai4s-app-shell footer .method-note-content{font-size:12px!important}
+.ai4s-navigation button{font-size:12px!important}
+.advisor-badges .advisor-details-toggle{font-size:12px!important}
+.advisor-compact-selection{font-size:12px!important}
+.advisor-heading p{font-size:12px!important}
+.advisor-badges span{font-size:12px!important}
+.advisor-select-label{font-size:12px!important}
+.advisor-selected-metrics{font-size:12px!important}
+.advisor-actions button{font-size:12px!important}
+.advisor-preview-toggle{font-size:12px!important}
+.advisor-preview{font-size:12px!important}
+.advisor-preview pre{font-size:12px!important}
+.advisor-evidence-note{font-size:12px!important}
+.advisor-welcome .advisor-welcome-hint{font-size:12px!important}
+.advisor-turn-meta{font-size:12px!important}
+.advisor-muted{font-size:12px!important}
+.advisor-error button{font-size:12px!important}
+.advisor-response-meta{font-size:12px!important}
+.advisor-markdown table{font-size:12px!important}
+.advisor-markdown pre{font-size:12px!important}
+.advisor-markdown code{font-size:12px!important}
+.advisor-composer-bottom>span{font-size:12px!important}
+.advisor-clear{font-size:12px!important}
+.advisor-send{font-size:12px!important}
+.advisor-composer>p{font-size:12px!important}
+.advisor-context select{font-size:12px!important}
+.distillation-heading>p{font-size:12px!important}
+.distillation-heading>span{font-size:12px!important}
+.distillation-lab button{font-size:12px!important}
+.distillation-controls>label{font-size:12px!important}
+.distillation-lab select,.distillation-advanced input[type=number]{font-size:12px!important}
+.distillation-controls .distillation-auto{font-size:12px!important}
+.distillation-count>span{font-size:12px!important}
+.distillation-status{font-size:12px!important}
+.distillation-waiting p{font-size:12px!important}
+.distillation-small{font-size:12px!important}
+.distillation-result-meta{font-size:12px!important}
+.distillation-formula-label>span:last-child{font-size:12px!important}
+.distillation-term-meta{font-size:12px!important}
+.distillation-readout small{font-size:12px!important}
+.distillation-validation p{font-size:12px!important}
+.distillation-validation table{font-size:12px!important}
+.distillation-evidence{font-size:12px!important}
+.distillation-advanced{font-size:12px!important}
+.distillation-advanced-grid label{font-size:12px!important}
+.distillation-advanced>label{font-size:12px!important}
+.distillation-advanced textarea{font-size:12px!important}
+.distillation-supplement-actions span{font-size:12px!important}
+.distillation-input-error{font-size:12px!important}
+.descriptor-map header span{font-size:12px!important}
+.descriptor-map header button{font-size:12px!important}
+.descriptor-map-canvas>svg text{font-size:12px!important}
+.descriptor-map-canvas>svg .descriptor-axis-title{font-size:12px!important}
+.descriptor-map>footer{font-size:12px!important}
+.descriptor-map-note{font-size:12px!important}
+.descriptor-tooltip{font-size:12px!important}
+.descriptor-tooltip span:nth-child(2){font-size:12px!important}
+.distillation-lab .method-note-content{font-size:12px!important}
+.pareto-eyebrow{font-size:12px!important}
+.pareto-source-switch button{font-size:12px!important}
+.pareto-tags{font-size:12px!important}
+.pareto-actions button{font-size:12px!important}
+.pareto-metrics span{font-size:12px!important}
+.pareto-metrics small{font-size:12px!important}
+.pareto-chart-title p{font-size:12px!important}
+.pareto-state{font-size:12px!important}
+.pareto-chart-footer{font-size:12px!important}
+.pareto-chart-footer strong{font-size:12px!important}
+.pareto-timeline{font-size:12px!important}
+.pareto-preferences>p{font-size:12px!important}
+.pareto-presets button{font-size:12px!important}
+.pareto-weight>span{font-size:12px!important}
+.pareto-weight b{font-size:12px!important}
+.pareto-pick-eyebrow{font-size:12px!important}
+.pareto-pick-id{font-size:12px!important}
+.pareto-pick-values div{font-size:12px!important}
+.pareto-pick-values b{font-size:12px!important}
+.pareto-pick-values small{font-size:12px!important}
+.pareto-pick-footer{font-size:12px!important}
+.pareto-settings{font-size:12px!important}
+.pareto-settings-grid label{font-size:12px!important}
+.pareto-settings-grid textarea{font-size:12px!important}
+.pareto-settings-grid button{font-size:12px!important}
+.pareto-settings-grid p{font-size:12px!important}
+.pareto-error{font-size:12px!important}
+.pareto-version{font-size:12px!important}
+.pareto-title-row p{font-size:12px!important}
+.presentation-shell button{font-size:12px!important}
+.presentation-brand div>span{font-size:12px!important}
+.presentation-badge{font-size:12px!important}
+.presentation-nav>span{font-size:12px!important}
+.presentation-page-heading p,.presentation-eyebrow{font-size:12px!important}
+.presentation-page-heading>div:last-child span{font-size:12px!important}
+.presentation-page-heading small{font-size:12px!important}
+.presentation-kpis article>span{font-size:12px!important}
+.presentation-kpis strong small{font-size:12px!important}
+.presentation-kpis p{font-size:12px!important}
+.presentation-card-heading>div>span{font-size:12px!important}
+.presentation-card-heading>button{font-size:12px!important}
+.presentation-chart-dark>div:not(.recharts-responsive-container){font-size:12px!important}
+.presentation-chart-dark>div>span{font-size:12px!important}
+.presentation-equation small{font-size:12px!important}
+.presentation-descriptor-tags{font-size:12px!important}
+.presentation-front-plot text{font-size:12px!important}
+.presentation-pick{font-size:12px!important}
+.presentation-pick>span{font-size:12px!important}
+.presentation-pick>b{font-size:12px!important}
+.presentation-success{font-size:12px!important}
+.presentation-mini-structure p{font-size:12px!important}
+.presentation-overview .xrd-legend{font-size:12px!important}
+.presentation-inline-stats{font-size:12px!important}
+.presentation-advisor-steps span{font-size:12px!important}
+.presentation-advisor-steps i{font-size:12px!important}
+.presentation-formula-terms small{font-size:12px!important}
+.presentation-records table{font-size:12px!important}
+.presentation-records th{font-size:12px!important}
+.presentation-records td small{font-size:12px!important}
+.presentation-preference>p{font-size:12px!important}
+.presentation-preference-presets button{font-size:12px!important}
+.presentation-weight{font-size:12px!important}
+.presentation-selected>span{font-size:12px!important}
+.presentation-selected>p{font-size:12px!important}
+.presentation-selected dl>div{font-size:12px!important}
+.presentation-replay{font-size:12px!important}
+.presentation-structure-switch button span{font-size:12px!important}
+.presentation-structure-view .structure-stage-caption{font-size:12px!important}
+.presentation-xrd-metrics span{font-size:12px!important}
+.presentation-xrd-metrics small{font-size:12px!important}
+.presentation-match p{font-size:12px!important}
+.presentation-markdown code{font-size:12px!important}
+.presentation-brief ul{font-size:12px!important}
+.presentation-footer{font-size:12px!important}
+.presentation-overview .presentation-descriptor-tags{font-size:12px!important}
+.presentation-header-actions button{font-size:12px!important}
+.presentation-header-actions .method-note{font-size:12px!important}
+.presentation-nav button{font-size:12px!important}
+.presentation-structure-switch button{font-size:12px!important}
+.presentation-formula-terms b{font-size:12px!important}
+.presentation-two-column .descriptor-map-canvas>svg text{font-size:12px!important}
+.research-controls>div:first-child>span{font-size:12px!important}
+.research-controls button,.research-dialog button,.research-primary,.research-multi-controls button{font-size:12px!important}
+.research-controls details{font-size:12px!important}
+.research-controls>p{font-size:12px!important}
+.research-session-list small{font-size:12px!important}
+.research-dialog header small{font-size:12px!important}
+.research-dialog pre{font-size:12px!important}
+.research-detail-metrics span{font-size:12px!important}
+.research-form-grid label{font-size:12px!important}
+.research-muted{font-size:12px!important}
+.research-multi-controls{font-size:12px!important}
+.research-snapshot-structure .structure-stage-caption{font-size:12px!important}
+.research-calibration-toggle{font-size:12px!important}
+.research-controls button{font-size:12px!important}
+.research-linkbar{font-size:12px!important}
+.structure-kicker{font-size:12px!important}
+.structure-importbar>span,.structure-example-buttons>span{font-size:12px!important}
+.structure-muted{font-size:12px!important}
+.structure-view-heading p{font-size:12px!important}
+.structure-unlabelled{font-size:12px!important}
+.structure-controls{font-size:12px!important}
+.structure-controls select{font-size:12px!important}
+.structure-stage-toolbar button{font-size:12px!important}
+.structure-stage-caption{font-size:12px!important}
+.structure-info dt{font-size:12px!important}
+.structure-legend span{font-size:12px!important}
+.structure-selection{font-size:12px!important}
+.structure-selection button{font-size:12px!important}
+.structure-warnings{font-size:12px!important}
+.structure-sites-heading input{font-size:12px!important}
+.structure-table-wrap table{font-size:12px!important}
+.structure-table-wrap td button{font-size:12px!important}
+.structure-footer{font-size:12px!important}
+.synthesis-kicker,.synthesis-eyebrow{font-size:12px!important}
+.synthesis-header p{font-size:12px!important}
+.synthesis-steps{font-size:12px!important}
+.synthesis-steps>div>span{font-size:12px!important}
+.synthesis-selection small{font-size:12px!important}
+.synthesis-selection label{font-size:12px!important}
+.synthesis-selection select{font-size:12px!important}
+.synthesis-source>span{font-size:12px!important}
+.synthesis-card-title>span{font-size:12px!important}
+.synthesis-grade-main p{font-size:12px!important}
+.synthesis-energy{font-size:12px!important}
+.synthesis-energy small{font-size:12px!important}
+.synthesis-factor>div{font-size:12px!important}
+.synthesis-competitors{font-size:12px!important}
+.synthesis-recipe label{font-size:12px!important}
+.synthesis-recipe select{font-size:12px!important}
+.synthesis-recipe p{font-size:12px!important}
+.synthesis-xrd-controls label{font-size:12px!important}
+.synthesis-xrd-controls select,.synthesis-xrd-controls input{font-size:12px!important}
+.xrd-plot text{font-size:12px!important}
+.xrd-legend{font-size:12px!important}
+.synthesis-alignment{font-size:12px!important}
+.synthesis-upload p{font-size:12px!important}
+.synthesis-demo-actions>span{font-size:12px!important}
+.synthesis-demo-actions>button{font-size:12px!important}
+.synthesis-result-heading>div>span{font-size:12px!important}
+.synthesis-fit-label{font-size:12px!important}
+.synthesis-metrics>div>span{font-size:12px!important}
+.synthesis-metrics small{font-size:12px!important}
+.synthesis-phases{font-size:12px!important}
+.synthesis-phases b{font-size:12px!important}
+.synthesis-extra-peaks{font-size:12px!important}
+.synthesis-feedback-controls label{font-size:12px!important}
+.synthesis-feedback-controls input{font-size:12px!important}
+.synthesis-awaiting p{font-size:12px!important}
+.synthesis-records>p{font-size:12px!important}
+.synthesis-record>span{font-size:12px!important}
+.synthesis-record b{font-size:12px!important}
+.synthesis-record small{font-size:12px!important}
+.synthesis-footer{font-size:12px!important}
+.synthesis-busy{font-size:12px!important}
+.inline-xrd-heading small{font-size:12px!important}
+.inline-xrd-heading button{font-size:12px!important}
+.inline-xrd-status{font-size:12px!important}
+.synthesis-entry{font-size:12px!important}
+.synthesis-feedback-banner{font-size:12px!important}
+.synthesis-feedback-banner button{font-size:12px!important}
+.synthesis-candidate-status{font-size:12px!important}
+.synthesis-kicker{font-size:12px!important}
+.synthesis-header-actions button:first-child{font-size:12px!important}
+.synthesis-grade-main strong{font-size:12px!important}
+.umlip-small{font-size:12px!important}
+.umlip-fields label{font-size:12px!important}
+.umlip-summary span{font-size:12px!important}
+.umlip-table th{font-size:12px!important}
+.umlip-table td small{font-size:12px!important}
+.umlip-table a{font-size:12px!important}
+.umlip-status{font-size:12px!important}
+.umlip-provenance pre{font-size:12px!important}
+[class*="text-[8px]"],[class*="text-[9px]"],[class*="text-[10px]"],[class*="text-[11px]"]{font-size:12px!important}
+body{min-width:320px}button,input,select,textarea{font-size:14px}button,summary,a,input,select,textarea{touch-action:manipulation}button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid #0f766e;outline-offset:3px}
+.ai4s-app-shell{font-size:14px}.ai4s-app-shell .ai4s-header{align-items:center}.ai4s-header h1{font-family:system-ui,sans-serif;font-style:normal;font-size:clamp(24px,2.2vw,34px)}
+.ai4s-app-shell [class*="opacity-40"]:not(:disabled):not(button),.ai4s-app-shell [class*="opacity-60"]:not(:disabled):not(button){opacity:1}
+.ai4s-app-shell [class*="text-[#7"],.ai4s-app-shell [class*="text-[#8"],.ai4s-app-shell [class*="text-[#9"]{color:#475569}
+html body :is(.distillation-lab,.descriptor-map,.research-dialog,.research-controls,.pareto-preferences,.pareto-metrics,.pareto-settings,.pareto-title-row,.pareto-tags,.research-linkbar){color:#294535}
+html body :is(.distillation-lab,.descriptor-map,.research-dialog,.research-controls,.pareto-preferences,.pareto-metrics,.pareto-settings,.pareto-title-row,.pareto-tags,.research-linkbar) :where(p,small,span,summary,label,th,td){color:inherit}
+html body .method-note,html body .method-note-content{color:#425a46;font-size:12px}.method-note-content{line-height:1.8}.method-note summary{padding:6px 0}
+.research-tools{position:relative}.research-tools>summary{cursor:pointer;border:1px solid #9eafa5;border-radius:9px;padding:10px 13px;font-size:14px;background:white}.research-tools-menu{position:absolute;right:0;top:100%;padding:14px;z-index:45;background:#fff;border:1px solid #b6c8bd;box-shadow:0 10px 35px #143b2320;border-radius:12px;width:min(430px,90vw);display:flex;gap:10px;flex-wrap:wrap}.research-tools:not([open])>.research-tools-menu{display:none}
+.research-guide{max-width:1740px;margin:0 auto 20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.research-guide a{display:flex;align-items:center;gap:12px;padding:16px;background:white;border:1px solid #bfd3ca;border-radius:14px;color:#234b3e;text-decoration:none}.research-guide b{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;background:#0f766e;color:white;border-radius:50%}.research-guide span{font-size:16px;font-weight:600}.research-guide small{font-size:12px;font-weight:400;display:block;margin-top:4px;color:#475569}
+.research-provenance{max-width:1740px;margin:0 auto 20px;border:1px solid #9ab7ad;border-left:5px solid #0f766e;border-radius:12px;padding:16px 20px;background:#edf6f2;color:#214b3d}.research-provenance.synthetic{background:#fff7e8;border-color:#a16207;color:#713f12}.research-provenance>strong{font-size:16px}.research-provenance p{font-size:13px;line-height:1.7;margin:7px 0}.provenance-facts{display:flex;flex-wrap:wrap;gap:9px 20px;font-size:13px}.provenance-facts a,.research-provenance a{text-decoration:underline;color:#075e54}.research-provenance details{font-size:12px;margin-top:8px}.research-provenance code{overflow-wrap:anywhere;word-break:break-all}.research-provenance summary{cursor:pointer}
+.research-secondary{max-width:1740px;margin:20px auto;padding:15px;background:#fff;border:1px solid #cbd5e1;border-radius:14px;min-width:0}.research-secondary>summary{font-size:15px;font-weight:600;color:#254c3e;cursor:pointer;padding:3px 0}.research-secondary[open]>summary{margin-bottom:15px}.research-secondary .research-controls{margin:0}.research-storage-note{padding:10px;border-radius:8px;background:#fff;border:1px solid #9ab7ad;color:#294535!important;line-height:1.7}.research-controls>p{font-size:13px!important}.research-controls button,.research-dialog button{font-size:13px!important;white-space:normal}.research-linkbar input{border:1px solid #acbfb3;padding:8px;border-radius:8px;min-width:0}.research-linkbar label{min-width:0;flex-wrap:wrap}.research-linkbar select{min-width:0;max-width:100%}
+.learning-comparison{background:white;border:1px solid #cbd5e1;border-radius:24px;padding:22px;min-width:0}.learning-comparison h3{font-size:16px;font-weight:650;color:#183f36}.learning-comparison p{font-size:13px;line-height:1.7;color:#475569;margin:8px 0}.comparison-chart{width:100%;min-width:0}.comparison-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px}.comparison-legend span:first-child{color:#0f766e}.comparison-legend span:nth-child(2){color:#92400e}.learning-comparison .comparison-result{background:#eef7f2;border-radius:8px;padding:10px;color:#234b3e}.learning-comparison details{font-size:12px}.learning-comparison summary{cursor:pointer}.module-placeholder{padding:30px;background:#f0f5f2;border-radius:14px;color:#475569;min-height:100px}.deferred-section{min-width:0}
+.pareto-source-notice{border:1px solid #a6bdb1;border-radius:8px;background:#eef6f0;padding:10px;font-size:13px;color:#294535}.pareto-ranking{margin-top:20px;padding:18px;background:white;border:1px solid #cbd5e1;border-radius:12px}.pareto-ranking h3{font-size:16px;font-weight:650}.pareto-ranking p{font-size:13px;line-height:1.7;color:#475569;margin:8px 0}.pareto-ranking table{width:100%;border-collapse:collapse;font-size:13px}.pareto-ranking td,.pareto-ranking th{padding:10px;text-align:left;border-bottom:1px solid #dbe5df}.pareto-ranking small{display:block;font-size:12px;color:#475569}.pareto-ranking button{border:1px solid #9cbaaa;border-radius:6px;padding:6px 10px}.table-scroll{overflow-x:auto;max-width:100%}
+.advisor-first-round{padding:12px;border:1px solid #a6bdb1;border-radius:8px;background:#f1f7ef}.advisor-first-round p{font-size:13px;color:#344a39}.advisor-first-round button{display:block;text-align:left;margin-top:8px;padding:8px;border:1px solid #acbfa4;border-radius:7px;font-size:13px;color:#344a39;background:white;width:100%}
+.distillation-validation{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}.distillation-validation>div{min-width:0}.distillation-validation table{min-width:360px}.research-dialog-content section,.research-geometry-result{overflow-x:auto}.distillation-validation{overflow-x:auto}.descriptor-map-canvas{min-width:0}.ai4s-app-shell main>div{min-width:0}
+@media(max-width:720px){.research-guide{grid-template-columns:1fr;gap:8px}.research-guide a{padding:11px 14px}.research-provenance{padding:13px}.research-tools-menu{left:0;right:auto;width:min(360px,85vw)}.research-guide span{font-size:14px}.ai4s-navigation{gap:8px}.ai4s-navigation button{font-size:13px!important;padding:10px 12px}.research-secondary{padding:12px}.research-linkbar label{width:100%}.research-linkbar select,.research-linkbar input{width:100%}.research-controls>input{min-width:0}.research-controls>div:first-child{min-width:0}.distillation-validation{display:block}.distillation-validation table{margin-top:16px}.learning-comparison{padding:16px}.pareto-title-row h2{font-size:26px}.pareto-shell{padding:16px!important}.research-detail-metrics{grid-template-columns:1fr}.provenance-facts{gap:6px 12px}}
+
+.research-best{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 22px;background:#e8f4ee;border:1px solid #8bb7a1;border-radius:16px;color:#214b3d}.research-best span{font-size:13px}.research-best h3{font-size:24px;font-weight:650;margin:5px 0}.research-best p{font-size:12px}.research-best button{padding:9px 13px;background:#0f766e;color:white;border-radius:8px;font-size:14px}
+html body .distillation-small{font-size:12px!important;color:#425a46!important}
+@media(max-width:720px){.descriptor-map-canvas{overflow-x:auto}.descriptor-map-canvas svg{min-width:520px}.pareto-chart-area{overflow-x:auto}.pareto-chart{min-width:600px}.xrd-plot{overflow-x:auto}.xrd-plot svg{min-width:600px}.distillation-formulas{grid-template-columns:minmax(0,1fr)}.distillation-header{padding:18px}.distillation-heading h2{white-space:normal}.distillation-controls{padding:16px}.distillation-controls>label{min-width:0;max-width:100%}.distillation-advanced-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+html body :is(.distillation-lab,.descriptor-map,.research-dialog,.research-controls,.pareto-preferences,.pareto-metrics,.pareto-settings,.pareto-title-row,.pareto-tags,.research-linkbar) :where(p,small,span,summary,label,th,td,sub){color:#294535}
+html body .research-status,html body .distillation-status,html body .distillation-advanced,html body .research-multi-controls{color:#294535}
+html body .descriptor-map header span,html body .descriptor-map footer,html body .descriptor-map button{color:#294535}
+html body .descriptor-map text{fill:#425a46!important}.ai4s-app-shell .text-blue-500{color:#1d4ed8}.ai4s-app-shell .text-gray-500{color:#475569}.pareto-metrics .pareto-green{color:#356428}
+@media(max-width:720px){.pareto-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.pareto-metrics>div{border:0}.pareto-metrics span{line-height:1.6}.pareto-metrics strong{font-size:25px}.pareto-metrics small{display:block}}
+
+@media(max-width:720px){.advisor-launch-label{display:none}.ai4s-app-shell .advisor-launch{padding:13px;right:12px;bottom:12px}}
+html body .advisor-details-toggle,html body .advisor-preview-toggle,html body .advisor-evidence-note,html body .advisor-welcome p,html body .advisor-composer-bottom>span,html body .advisor-composer>p{color:#425a46}
+
+html body sub,html body sup{font-size:max(12px,.75em)!important}
+
+html body .distillation-result-meta>span:first-child,html body .distillation-formula-label>span,html body .distillation-validation th:first-child,html body .research-controls>div:first-child>span{color:#294535!important}

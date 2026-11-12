@@ -4,6 +4,7 @@ import { FEATURE_DEFINITIONS, FEATURE_SCHEMA_VERSION } from "../engine/Compositi
 import { MODEL_CATALOG, type ModelConfig } from "../engine/models/config";
 import { OBJECTIVES, type HubMetadata, type HubQuery } from "../dataHub";
 import { canApplySynthesisFeedback } from "../synthesis/feedback";
+import { materialRecordKey } from "../materialContext";
 
 export type AdvisorAction = "overview" | "mechanism" | "synthesis" | "dft" | "integrated";
 export type AdvisorLanguage = "zh" | "en";
@@ -39,7 +40,7 @@ function describeMaterial(material: Material, isRealData: boolean) {
   const knownSchema = material.descriptors?.schemaVersion === FEATURE_SCHEMA_VERSION
     && material.features.length === FEATURE_DEFINITIONS.length;
   return {
-    id: text(material.id), formula: text(material.formula),
+    id: text(material.id), formula: text(material.formula), record_key: materialRecordKey(material),
     source: material.source ?? (real ? "materials-project" : "mock"),
     dataset_source: material.datasetSource ?? null,
     fidelity: material.fidelity ?? null,

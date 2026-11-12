@@ -10,6 +10,7 @@ import { mpFilterParams, MP_FIELDS } from "./mpProvider";
 import { umlipRouter } from "./umlip/routes";
 import type { UmlipService } from "./umlip/service";
 import { createSynthesisRouter } from "./synthesis";
+import type { MPSummaryStore } from "./mpSummaryStore";
 
 interface ApiDependencies {
   network: NetworkClient;
@@ -21,6 +22,7 @@ interface ApiDependencies {
   chatDeadlineMs?: number;
   hub?: HubStore;
   umlip?: UmlipService;
+  mpSummary?: MPSummaryStore;
 }
 
 function configuredKey(value: string | undefined) {
@@ -55,9 +57,9 @@ function sendFailure(res: Response, error: unknown, service: "materials" | "chat
   });
 }
 
-export function createApiApp({ network, env = process.env, materialsEndpoint = "https://api.materialsproject.org/materials/summary/", chatBaseURL, materialsDeadlineMs = 60_000, chatDeadlineMs = 45_000, hub, umlip }: ApiDependencies) {
+export function createApiApp({ network, env = process.env, materialsEndpoint = "https://api.materialsproject.org/materials/summary/", chatBaseURL, materialsDeadlineMs = 60_000, chatDeadlineMs = 45_000, hub, umlip, mpSummary }: ApiDependencies) {
   const app = express();
-  app.use("/api/hub", createHubRouter({ hub, network, env, materialsEndpoint, deadline: materialsDeadlineMs, requestScope }));
+  app.use("/api/hub", createHubRouter({ hub, network, env, materialsEndpoint, deadline: materialsDeadlineMs, requestScope, mpSummary }));
   if (umlip) app.use("/api/umlip", umlipRouter(umlip, hub));
   app.use("/api/synthesis", createSynthesisRouter({ network, env, materialsEndpoint, hub }));
   app.use(express.json({ limit: "100kb" }));

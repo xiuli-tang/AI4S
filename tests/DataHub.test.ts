@@ -37,7 +37,7 @@ const request = (url: string, options = {}) => axios.request({ url, proxy: false
 
 test("query contracts distinguish included/excluded elements, exact systems and invalid input", () => {
   assert.equal(parseHubQuery({ elements: "Pr,Ba,Co,O", match: "exact" }).elements, "Ba,Co,O,Pr");
-  for (const invalid of [{ elements: "Xx" }, { elements: "Li,O", exclude_elements: "O" }, { elements: ["Li", "O"] }, { match: "exact" }, { source: "mp-live" }, { objective: "toString" }, { objective: "__proto__" }, { limit: "501" }, { limit: "0" }, { limit: ["1", "2"] }]) assert.throws(() => parseHubQuery(invalid));
+  for (const invalid of [{ elements: "Xx" }, { elements: "Li,O", exclude_elements: "O" }, { elements: ["Li", "O"] }, { match: "exact" }, { source: "mp-live" }, { objective: "toString" }, { objective: "__proto__" }, { limit: "5001" }, { limit: "0" }, { limit: ["1", "2"] }]) assert.throws(() => parseHubQuery(invalid));
 });
 
 test("observation import rejects missing units/provenance, placeholders, incompatible labels and bad structures", () => {

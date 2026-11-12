@@ -37,7 +37,8 @@ export function feasibilityPrior(feedback?: SynthesisFeedback, material?: Materi
   return !feedback || material && !canApplySynthesisFeedback(material, feedback) || !Number.isFinite(feedback.prior)
     ? 1 : Math.max(.05, Math.min(1, feedback.prior));
 }
-export function feedbackLabel(feedback: SynthesisFeedback): string {
+export function feedbackLabel(feedback: SynthesisFeedback, lang: "zh" | "en" = "zh"): string {
+  if (lang === "en") return `${feedback.demo ? "Synthetic" : "Uploaded"} spectrum · ${feedback.status === "pass" ? "match passed" : "insufficient match"}`;
   return `${feedback.demo ? "演示谱" : "上传谱"}${feedback.status === "pass" ? "匹配通过" : "匹配不足"}`;
 }
 export function constrainAcquisition(score: number, prior: number): number {

@@ -9,7 +9,11 @@ coverage/
 /data/*.db
 /data/*.db-*
 /data/*.sqlite*
+/data/mp-summary/
+.venv-mp-summary/
 umlip-results/
 .venv-umlip/
 .venv/
 __pycache__/
+
+.playwright-mcp/
