@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "wending-materials-engine",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -19,7 +19,8 @@
     "hub:index-summary": "python3 scripts/index-mp-summary.py",
     "verify:umlip": "tsx scripts/verify-umlip.ts",
     "benchmark:pareto": "tsx scripts/benchmark-pareto.ts",
-    "setup:synthesis": "python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements-synthesis.txt"
+    "setup:synthesis": "python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements-synthesis.txt",
+    "benchmark:learning": "node --import tsx scripts/benchmark-learning.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",

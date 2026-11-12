@@ -33,7 +33,7 @@ export default function ResearchControls({ capture, onRestore, onPresent, busy }
     <div><span>RESEARCH WORKSPACE</span><h2>{tr("把本次研究完整带走")}</h2></div>
     <p className="research-storage-note">{lang === "zh" ? "保存位置：当前设备的当前浏览器。清除浏览器数据可能删除存档；换设备前请导出 JSON 文件。" : "Saved on this device in this browser. Clearing browser data can delete archives; export JSON before switching devices."}</p>
     <input aria-label={tr("研究名称")} placeholder={tr("我的材料研究")} value={name} onChange={e => setName(e.target.value)} maxLength={100} />
-    <div className="research-action-row"><button disabled={busy || working} onClick={() => void action("save")}>{tr("保存研究")}</button><button disabled={busy || working} onClick={() => void action("export")}>{tr("导出研究存档")}</button><button disabled={busy || working} onClick={() => void action("present")}>{tr("展示本次研究")}</button><button disabled={working} onClick={() => file.current?.click()}>{tr("导入存档")}</button></div>
+    <div className="research-action-row"><button disabled={busy || working} onClick={() => void action("save")}>{tr("保存研究")}</button><button disabled={busy || working} onClick={() => void action("export")}>{tr("导出研究存档")}</button><button disabled={busy || working} onClick={() => void action("present")}>{lang === "zh" ? "打开研究报告" : "Open research report"}</button><button disabled={working} onClick={() => file.current?.click()}>{tr("导入存档")}</button></div>
     <input ref={file} type="file" accept=".json,application/json" hidden onChange={async e => {
       const selected = e.target.files?.[0]; if (!selected) return;
       setWorking(true); try {
@@ -42,7 +42,7 @@ export default function ResearchControls({ capture, onRestore, onPresent, busy }
       } catch (e) { setMessage((e as Error).message); } finally { setWorking(false); }
       e.target.value = "";
     }} />
-    <details><summary>{tr("研究存档（")}{history.length}{lang === "zh" ? "）" : ")"}</summary><div className="research-session-list">{history.map(s => <article key={s.id}><div><b>{s.name}</b><small>{new Date(s.savedAt).toLocaleString()} · {s.state.sampledCount}{tr("条观测 · 第")}{s.state.iteration}{tr("轮")}</small></div><button disabled={working || busy} onClick={() => void restore(s)}>{tr("恢复研究")}</button><button disabled={working || busy} onClick={() => onPresent(s)}>{tr("成果路演")}</button><button onClick={() => downloadResearch(s)}>{tr("导出JSON")}</button></article>)}</div></details>
+    <details><summary>{tr("研究存档（")}{history.length}{lang === "zh" ? "）" : ")"}</summary><div className="research-session-list">{history.map(s => <article key={s.id}><div><b>{s.name}</b><small>{new Date(s.savedAt).toLocaleString()} · {s.state.sampledCount}{tr("条观测 · 第")}{s.state.iteration}{tr("轮")}</small></div><button disabled={working || busy} onClick={() => void restore(s)}>{tr("恢复研究")}</button><button disabled={working || busy} onClick={() => onPresent(s)}>{lang === "zh" ? "打开报告" : "Open report"}</button><button onClick={() => downloadResearch(s)}>{tr("导出JSON")}</button></article>)}</div></details>
     {(working || message) && <p role="status">{working ? tr("正在整理研究记录…") : userError(tr(message), lang)}</p>}
   </section>;
 }

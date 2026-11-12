@@ -29,6 +29,7 @@ export interface FormulaArchive {
   draftText?: string;
 }
 export interface ParetoArchive {
+  workflowShared?: boolean;
   mode: "demo" | "materials-project"; weights: Weights; budget: number; seed: number; strategy: "ParEGO" | "Random";
   prices: PriceOverrides; externalStability: StabilityInput[]; secondary: string; problem?: ParetoProblem;
   pool: ParetoCandidate[]; state: ParetoState; replay: number | null;
@@ -45,6 +46,7 @@ export const emptyResearchModules = (): ResearchModules => ({ formula: null, par
   experiments: [], structures: [], geometry: [], calibration: null, calibrationEnabled: false, stability: [] });
 export type SavedCandidate = Omit<Material, "trueProperty" | "objectiveValues" | "energyAboveHull" | "formationEnergyPerAtom" | "pairedDft"> & {
   recordKey: string; ref?: StructureRef; observedValue?: number;
+  observedProperties?: Material["objectiveValues"];
 };
 export interface ResearchSession {
   schema: "ai4s-research-session-1"; id: string; name: string; savedAt: string;

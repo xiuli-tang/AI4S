@@ -112,6 +112,23 @@ export async function runActiveLearningStep(
 
   const updated = nextPool.filter(material => material.isSampled);
   const bestValue = bestTarget(updated.map(material => material.trueProperty), direction);
+  // Final reports use every acquired label, including the last batch.
+  if (!initializing && getStopReason(nextPool, totalBudget)) {
+    await model.train(updated);
+    config.signal?.throwIfAborted();
+    const remaining = nextPool.filter(m => !m.isSampled);
+    const finalPredictions = model.predictBatch ? await model.predictBatch(remaining.map(m => ({ features: m.features })))
+      : remaining.map(m => model.predict!({ features: m.features }));
+    config.signal?.throwIfAborted();
+    if (finalPredictions.length !== remaining.length) throw new Error("Prediction count does not match candidates");
+    const finalRandom = createSeededRandom(0x53434f52 + state.iteration);
+    remaining.forEach((m, i) => {
+      const { mean, std } = finalPredictions[i];
+      if (!Number.isFinite(mean) || !Number.isFinite(std) || std < 0) throw new Error("Invalid surrogate prediction");
+      m.predictedMean = mean; m.predictedStd = std;
+      m.acquisitionValue = AcquisitionFunction.compute(m, config.strategy, bestValue, 2, true, finalRandom, direction);
+    });
+  }
   const globalBest = bestTarget(nextPool.map(material => material.trueProperty), direction);
   const regret = direction === "min" ? bestValue - globalBest : globalBest - bestValue;
   const nextState: ALState = {

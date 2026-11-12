@@ -37,13 +37,13 @@ export function DistillationPanel({ controller: c, lang }: { controller: Distill
       <div className="distillation-mark"><Atom size={26} /></div>
       <div className="distillation-heading">
         <p>WHITE-BOX DISCOVERY LAB</p>
-        <h2 id="distillation-heading">{t("白盒物理公式蒸馏引擎", "Physical formula distillation")}</h2>
+        <h2 id="distillation-heading">{t("可解释的材料规律", "Interpretable material relations")}</h2>
         <span>{t("算符组合 · L1 筛选 · L0 稀疏模型 · 组成分组验证", "Operator search · L1 screening · L0 models · composition-group validation")}</span>
       </div>
       <div className="distillation-actions">
         <button type="button" disabled={!result} onClick={download}><Download size={14} />{t("导出公式", "Export")}</button>
         {c.busy ? <button type="button" className="distillation-primary" onClick={c.cancel}><Square size={13} />{t("停止蒸馏", "Stop")}</button>
-          : <button type="button" className="distillation-primary" disabled={!c.ready} onClick={() => void c.run()}><WandSparkles size={15} />{t("蒸馏物理公式", "Distill formulas")}</button>}
+          : <button type="button" className="distillation-primary" disabled={!c.ready} onClick={() => void c.run()}><WandSparkles size={15} />{t("提取可解释规律", "Extract relations")}</button>}
       </div>
     </header>
     <div className="distillation-controls">

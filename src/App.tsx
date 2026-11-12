@@ -4,25 +4,6 @@ import { LanguageContext, userError } from "./i18n";
 import { samplingBudgetLimit, normalizeSamplingBudget } from "./engine/RandomComparison";
 import ConvergenceChart from "./components/ConvergenceChart";
 import DeferredSection from "./components/DeferredSection";
-import { 
-  Beaker, 
-  Database, 
-  Cpu, 
-  Play, 
-  RotateCcw, 
-  ChevronRight, 
-  AlertCircle,
-  TrendingUp,
-  Layers,
-  Search,
-  FileText,
-  X,
-  Palette,
-  Zap,
-  BarChart3,
-  Sparkles
-} from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
 import { MaterialsEngine } from "./engine/MaterialsEngine";
 import { ModelWorkerClient } from "./engine/ModelWorkerClient";
 import type { ModelDiagnostics } from "./engine/SurrogateModel";
@@ -32,8 +13,8 @@ import { ModelControls } from "./components/ModelControls";
 import type { AcquisitionStrategy } from "./engine/AcquisitionFunction";
 import { getStopReason, runActiveLearningStep } from "./engine/ActiveLearningLoop";
 import { Material, ALState, AL_CONFIG } from "./types";
-const BenchmarkSimulator = React.lazy(() => import("./components/BenchmarkSimulator").then(m => ({ default: m.BenchmarkSimulator })));
-import { networkMessage, type NetworkIssueCode } from "./services/NetworkStatus";
+
+import { type NetworkIssueCode } from "./services/NetworkStatus";
 import type { AdvisorRequest } from "./components/MaterialsAdvisor";
 const MaterialsAdvisor = React.lazy(() => import("./components/MaterialsAdvisor"));
 import { advisorCandidates, type AdvisorAction } from "./services/AdvisorContext";
@@ -43,7 +24,6 @@ import { canViewMaterialStructure, type MaterialStructureRequest } from "./struc
 
 const UmlipPanel = React.lazy(() => import("./components/UmlipPanel"));
 const CompositionDescriptorPanel = React.lazy(() => import("./components/CompositionDescriptorPanel").then(m => ({ default: m.CompositionDescriptorPanel })));
-import { hashString } from "./engine/SeededRandom";
 import DataHubPanel from "./components/DataHubPanel";
 import { DEFAULT_HUB_QUERY, OBJECTIVES, sourceLabel, type HubMetadata, type HubQuery, type ObjectiveDirection } from "./dataHub";
 import { useDistillation } from "./engine/distillation/useDistillation";
@@ -59,6 +39,11 @@ import { materialForStructure } from "./synthesis/reference";
 import MethodNote from "./components/MethodNote";
 import ResearchControls from "./components/ResearchControls";
 import CandidateDetails from "./components/CandidateDetails";
+import { DEFAULT_SCENE_QUERY, RESEARCH_SCENES, sceneForQuery } from "./research/scenes";
+import { reportCandidates, sessionReport } from "./research/report";
+import { downloadReport } from "./research/reportHtml";
+import { sharedDecisionArchive } from "./research/decision";
+import "./components/workflow.css";
 import GeometryPanel from "./components/GeometryPanel";
 import { emptyResearchModules, type ResearchSession, type Restore, type ResearchModules, type StructureDraft, type StructureArtifact, type GeometryResult, type FormulaArchive, type ParetoArchive, type AdvisorArchive, type UmlipArchive } from "./research/types";
 import { captureSession, restoreCandidatePool, parseSession } from "./research/session";
@@ -86,94 +71,14 @@ function initialState(budget: number, direction: ObjectiveDirection = "max"): AL
 
 const translations = {
   en: {
-    title: "AMI-AL Research Framework",
-    subtitle: "Choose data · Learn with a small budget · Review results",
-    reset: "Reset",
-    runLoop: "Start learning",
-    stop: "Stop",
-    systemConfig: "System Config",
-    acquisitionStrategy: "Acquisition Strategy",
-    batchSize: "Batch Size",
-    budget: "Budget",
-    liveMetrics: "Live Metrics",
-    iteration: "Iteration",
-    sampledTotal: "Sampled / Total",
-    bestConductivity: "Best Observed Target",
-    regretCurve: "Optimization Regret Curve",
-    searchSpace: "Search Space Exploration",
-    recommendations: "Recent Experimental Recommendations",
-    formula: "Formula",
-    status: "Status",
-    predMean: "Pred. Mean",
-    uncertainty: "Uncertainty",
-    acquisition: "Acquisition",
-    trueValue: "Observed label",
-    cost: "Cost proxy",
-    similarityMap: "Composition Descriptor Projection",
-    methodology: "Methodology",
-    representation: "Representation",
-    objective: "Objective",
-    sampled: "Sampled",
-    candidate: "Candidate",
-    pending: "Pending",
-    iter: "Iter",
     methodologyDesc: "Choose an RBF Gaussian process, tree ensembles, kNN or a linear baseline. Models train on sampled labels in a background Worker. GP posterior standard deviation and ensemble disagreement have different meanings; neither guarantees convergence or accuracy on new materials.",
     representationDesc: "A shared 22-dimensional composition representation uses offline element constants: weighted means, population variances, ranges and coverage for five properties, plus a conditional ABO3 tolerance factor and validity flag. Identical compositions have identical descriptors; crystal polymorphs require additional structural data.",
-    objectiveDesc: "Choose the objective and its explicit units/direction in Data Hub. Sources, methods and observation conditions remain traceable.",
-    langToggle: "中文",
-    docs: "Documentation",
-    docsTitle: "System Documentation & Technical Specifications",
-    benchmark: "Strategy demo",
-    benchmarkTitle: "Active-learning strategy evolution",
-    close: "Close",
-    themeClassic: "Classic",
-    themeScience: "Scientific Blue",
-    perfMode: "Display sampling"
+    langToggle: "中文"
   },
   zh: {
-    title: "AMI-AL 科研加速框架",
-    subtitle: "选数据 · 小预算学习 · 查看研究结果",
-    reset: "重置",
-    runLoop: "开始学习",
-    stop: "停止",
-    systemConfig: "系统配置",
-    acquisitionStrategy: "获取函数策略",
-    batchSize: "批次大小",
-    budget: "采样预算",
-    liveMetrics: "实时指标",
-    iteration: "迭代轮次",
-    sampledTotal: "已采样 / 总计",
-    bestConductivity: "最佳已观察目标值",
-    regretCurve: "优化收敛曲线 (Regret)",
-    searchSpace: "搜索空间探索",
-    recommendations: "近期实验推荐",
-    formula: "化学式",
-    status: "状态",
-    predMean: "预测均值",
-    uncertainty: "不确定性",
-    acquisition: "获取函数值",
-    trueValue: "已观测标签",
-    cost: "代价代理",
-    similarityMap: "组成描述符投影",
-    methodology: "研究方法",
-    representation: "特征表示",
-    objective: "优化目标",
-    sampled: "已采样",
-    candidate: "候选",
-    pending: "待定",
-    iter: "轮次",
     methodologyDesc: "可选择 RBF 高斯过程、树集成、kNN 或线性基线，在后台 Worker 中使用已采样标签训练。GP 后验标准差与集成预测分歧含义不同；模型切换不保证全局收敛或对新材料的预测精度。",
     representationDesc: "所有数据源共用22维组成表示：5类元素属性的加权均值、总体方差、极差与覆盖率，加上有条件的ABO₃容忍因子和有效位。相同组成具有相同描述符；区分同质异构体仍需真实结构数据。",
-    objectiveDesc: "通过Data Hub选择目标、单位与优化方向；来源、方法、条件和数据版本均保持可追溯。",
-    langToggle: "English",
-    docs: "系统文档",
-    docsTitle: "系统文档与技术规范",
-    benchmark: "策略演示",
-    benchmarkTitle: "主动学习策略演进",
-    close: "关闭",
-    themeClassic: "经典模式",
-    themeScience: "科研蓝",
-    perfMode: "性能模式"
+    langToggle: "English"
   }
 };
 
@@ -212,7 +117,7 @@ export default function App() {
   const tx = (zh: string, en: string) => lang === "zh" ? zh : en;
   useEffect(() => {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    document.title = lang === "zh" ? "AI4S · 材料研究工作台" : "AI4S · Materials Research Workspace";
+    document.title = lang === "zh" ? "问鼎·材料引擎 | 问鼎储能" : "Wending Materials Engine | Wending Energy";
     try { localStorage.setItem("ai4s-language", lang); } catch {}
   }, [lang]);
   const [paretoOpened, setParetoOpened] = useState(false), [paretoVisible, setParetoVisible] = useState(false);
@@ -231,7 +136,7 @@ export default function App() {
   // Dynamic Configs
   const [batchSize, setBatchSize] = useState(AL_CONFIG.BATCH_SIZE);
   const [totalBudget, setTotalBudget] = useState(AL_CONFIG.TOTAL_BUDGET);
-  const [hubQuery, setHubQuery] = useState<HubQuery>({ ...DEFAULT_HUB_QUERY });
+  const [hubQuery, setHubQuery] = useState<HubQuery>({ ...DEFAULT_SCENE_QUERY });
   const [hubMetadata, setHubMetadata] = useState<HubMetadata | null>(null);
   const objectiveSpec = OBJECTIVES[hubMetadata?.objective ?? hubQuery.objective];
   const [modelSettings, setModelSettings] = useState<ModelConfig>({ ...DEFAULT_MODEL_CONFIG });
@@ -242,7 +147,9 @@ export default function App() {
   const [isRealData, setIsRealData] = useState(false);
   const [dataIssue, setDataIssue] = useState<NetworkIssueCode | null>(null);
   const [showDocs, setShowDocs] = useState(false);
-  const [showBenchmark, setShowBenchmark] = useState(false);
+  const [expert, setExpert] = useState(false);
+  const [showFormulaTools, setShowFormulaTools] = useState(false);
+  const [catalogCount, setCatalogCount] = useState<number | null>(null);
   const [showAdvisor, setShowAdvisor] = useState(false);
   const [advisorRunId, setAdvisorRunId] = useState(0);
   const [advisorRequest, setAdvisorRequest] = useState<AdvisorRequest | null>(null);
@@ -270,7 +177,6 @@ export default function App() {
       structureRef: chosen?.structureRef, structure, referenceBinding });
     setShowStructure(false); setShowLab(true);
   };
-  const [theme, setTheme] = useState<'classic' | 'science'>('classic');
   const [isIterating, setIsIterating] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
   const loadRequest = useRef(0);
@@ -310,7 +216,7 @@ export default function App() {
       restored={experimentRestore} onRecord={onExperiment} stability={modules.stability} />
   </React.Suspense>;
 
-  const loadData = async (query: HubQuery) => {
+  const loadData = async (query: HubQuery, requestedBudget = totalBudget) => {
     setAdvisorRequest(null); setShowAdvisor(false);
     restoreRequest.current?.abort(); hydrating.current = false; setRestoringSession(false);
     setModules(m => ({ ...m, formula: null, pareto: null, advisor: null, calibration: null, calibrationEnabled: false })); setSessionRestore(null); setSelectedRecordKey(null); setShowCandidate(false); setShowGeometry(false);
@@ -332,7 +238,7 @@ export default function App() {
       const connected = await restoreValidatedFeedback(engine.getPool(), synthesisFeedbackRef.current);
       if (request !== loadRequest.current) return;
       setPool(connected.pool);
-      const boundedBudget = normalizeSamplingBudget(totalBudget, connected.pool.length);
+      const boundedBudget = normalizeSamplingBudget(requestedBudget, connected.pool.length);
       setTotalBudget(boundedBudget);
       if (connected.unavailable) setResearchStatus(`${connected.unavailable}份构型验证记录需重新关联本机运行历史，其余数据已载入。`);
       setHubMetadata(metadata);
@@ -414,6 +320,7 @@ export default function App() {
     }));
     
     setPool(resetPool);
+    setModules(m => ({ ...m, pareto: sharedDecisionArchive(resetPool, hubMetadata?.objective ?? hubQuery.objective, modelSettings.seed, m.pareto) }));
     const boundedBudget = normalizeSamplingBudget(totalBudget, resetPool.length);
     setTotalBudget(boundedBudget);
     setState(initialState(boundedBudget, objectiveSpec.direction));
@@ -494,11 +401,12 @@ export default function App() {
     setResearchStatus("几何补充量已发送到白盒公式，来源与结构版本已一并保存。");
     document.getElementById("distillation-heading")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
-  async function candidateAction(action: "structure" | "queue" | "xrd" | "advisor" | "formula", material: Material) {
+  async function candidateAction(action: "structure" | "queue" | "xrd" | "advisor" | "formula" | "decision", material: Material) {
     setShowCandidate(false);
     if (action === "structure") { openMaterialStructure(material); return; }
     if (action === "advisor") { openAdvisor(material.id, "integrated"); return; }
-    if (action === "formula") { setFormulaMap(!!distillation.result); document.getElementById("distillation-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    if (action === "formula") { setShowFormulaTools(true); setFormulaMap(!!distillation.result); requestAnimationFrame(() => document.getElementById("distillation-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" })); return; }
+    if (action === "decision") { setParetoOpened(true); setParetoVisible(true); requestAnimationFrame(() => document.getElementById("decision-workspace")?.scrollIntoView({ behavior: "smooth" })); return; }
     if (action === "xrd") { openSynthesisLab(material); return; }
     try { const artifact = await getStructure(material); await useStructure(artifact, "queue"); } catch (e) { setResearchStatus((e as Error).message); }
   }
@@ -610,625 +518,83 @@ export default function App() {
     {personalPresentation ? <ResearchPresentation session={personalPresentation} onExit={closePresentation} /> : <PresentationWorkspace onExit={closePresentation} />}
   </React.Suspense>;
 
-  if (!isLoaded) {
-    return (
-      <LanguageContext.Provider value={lang}>{presentationView}<div hidden={presentation} style={presentation ? { display: "none" } : undefined} className="min-h-screen bg-[#F5F5F0] flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-[#141414] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm font-bold uppercase tracking-widest opacity-60">{tx("正在加载 Data Hub 数据目录…", "Loading the materials collection…")}</p>
-          <button type="button" onClick={openPresentation} className="presentation-entry">{tx("✦ 一键路演 · 完整成果快照", "✦ View complete demonstration snapshot")}</button>
-          <button type="button" onClick={openStructure} className="px-4 py-2 border rounded-lg">
-            {lang === "zh" ? "先导入结构 / 3D 查看" : "Import structure / 3D viewer"}
-          </button>
-          <button type="button" onClick={openUmlip} className="block mx-auto mt-3 px-4 py-2 border rounded-lg">{tx("uMLIP 同成分构型计算", "uMLIP same-composition calculations")}</button>
-        </div>
-        {hasOpenedStructure && <React.Fragment key="structure-workspace"><StructurePanel key={`structure-${sessionRestore?.token ?? 0}`} restored={structureRestore} onStructure={rememberStructure} onUseStructure={(structure, action) => void useStructure({ structure, stage: structure.source.recordRef ? "database" : "imported" }, action)} open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} /></React.Fragment>}
-        {hasOpenedUmlip && <React.Suspense key="umlip-workspace" fallback={<p role="status">{tx("正在加载 uMLIP 工作流…", "Loading uMLIP workspace…")}</p>}><UmlipPanel key={`umlip-${sessionRestore?.token ?? 0}`} enqueue={queueRequest} restored={restoredUmlip} onState={onUmlipState} onUseStructure={(draft, action) => void useStructure(draft, action)} open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
-        {labPanel}
-      </div></LanguageContext.Provider>
-    );
-  }
 
-  return (
-    <LanguageContext.Provider value={lang}>{presentationView}<div hidden={presentation} style={presentation ? { display: "none" } : undefined} className={`ai4s-app-shell min-h-screen ${theme === 'classic' ? 'bg-[#F5F5F0] text-[#141414]' : 'bg-[#F0F4F8] text-[#1A365D]'} font-sans transition-colors duration-500 p-6`}>
-      {/* Header */}
-      <header className={`ai4s-header max-w-7xl mx-auto mb-8 flex flex-wrap gap-5 justify-between items-end border-b ${theme === 'classic' ? 'border-[#141414]/10' : 'border-[#2B6CB0]/20'} pb-4`}>
-        <div>
-          <h1 className="text-4xl font-serif italic font-medium tracking-tight">
-            {t.title}
-          </h1>
-          <p className="text-sm opacity-60 uppercase tracking-widest mt-2">
-            {t.subtitle}
-          </p>
-        </div>
-        <div className="ai4s-navigation flex flex-wrap gap-2">
-          <details className="research-tools"><summary>{tx("研究工具与展示", "Research tools & presentation")}</summary><div className="research-tools-menu">
-          <button type="button" onClick={openPresentation} className="presentation-entry"><Sparkles size={14} />{tx("查看路演快照", "View showcase snapshot")}</button>
-          <button type="button" onClick={openUmlip} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#486c51] bg-[#e6edde] text-[#34523d] text-xs font-bold">
-            <Cpu size={14} /> {lang === "zh" ? "uMLIP 构型寻优" : "uMLIP configuration search"}
-          </button>
-          <button type="button" onClick={() => document.getElementById("distillation-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#a7bc95] bg-[#eaf2e2] text-[#456c44] text-xs font-bold">
-            <Sparkles size={14} /> {lang === "zh" ? "白盒公式" : "White-box formulas"}
-          </button>
-          <button type="button" onClick={() => openSynthesisLab()} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#66928b] bg-[#e9f4ef] text-[#2c6b59] text-xs font-bold">
-            <Beaker size={14} />{lang === "zh" ? "合成预审 · XRD" : "Synthesis · XRD"}
-          </button>
-          <button type="button" onClick={() => openAdvisor()} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#b5a36d] bg-[#f3ecd7] text-[#514522] text-xs font-bold">
-            <Sparkles size={14} /> {lang === "zh" ? "AI 首席材料顾问" : "AI Materials Advisor"}
-          </button>
-          <button type="button" onClick={openStructure} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-teal-700 bg-teal-700 text-white text-xs font-bold">
-            <Layers size={14} /> {lang === "zh" ? "结构导入 / 3D" : "Structure / 3D"}
-          </button>
-          <button 
-            onClick={() => setTheme(theme === 'classic' ? 'science' : 'classic')}
-            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
-          >
-            <Palette size={14} /> {theme === 'classic' ? t.themeScience : t.themeClassic}
-          </button>
-          <button 
-            onClick={() => setShowBenchmark(true)}
-            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
-          >
-            <BarChart3 size={14} /> {t.benchmark}
-          </button>
-          <button 
-            onClick={() => setShowDocs(true)}
-            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
-          >
-            <FileText size={14} /> {t.docs}
-          </button>
-          </div></details>
-          <button 
-            onClick={() => setLang(lang === "en" ? "zh" : "en")}
-            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414]/20 hover:bg-[#141414]/5' : 'border-[#2B6CB0]/30 hover:bg-[#2B6CB0]/5 text-[#2B6CB0]'} transition-colors text-xs uppercase font-bold tracking-tighter rounded-lg`}
-          >
-            {t.langToggle}
-          </button>
-          <button 
-            onClick={reset}
-            disabled={isLoadingData || isIterating}
-            className={`flex items-center gap-2 px-4 py-2 border ${theme === 'classic' ? 'border-[#141414] hover:bg-[#141414] hover:text-[#F5F5F0]' : 'border-[#2B6CB0] text-[#2B6CB0] hover:bg-[#2B6CB0] hover:text-white'} transition-colors text-xs uppercase font-bold tracking-tighter`}
-          >
-            <RotateCcw size={14} /> {t.reset}
-          </button>
-          <button id="run-learning"
-            onClick={() => {
-              if (isAutoRunning) cancelComputation();
-              setIsAutoRunning(!isAutoRunning);
-            }}
-            disabled={!isAutoRunning && (isLoadingData || isIterating || stopReason !== null || runError !== null || budgetLimit < 1)}
-            className={`flex items-center gap-2 px-6 py-2 ${isAutoRunning ? 'bg-red-700 text-white border-red-700' : (theme === 'classic' ? 'bg-[#141414] text-[#F5F5F0]' : 'bg-[#2B6CB0] text-white')} border border-transparent transition-colors text-xs uppercase font-bold tracking-tighter disabled:opacity-30`}
-          >
-            {isAutoRunning ? <><AlertCircle size={14} /> {t.stop}</> : <><Play size={14} /> {t.runLoop}</>}
-          </button>
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/hub/catalog", { signal: controller.signal }).then(r => r.json()).then(c => {
+      const entry = c.sources?.find((x: { id: string }) => x.id === "mp-snapshot"); setCatalogCount(entry?.count ?? null);
+    }).catch(() => {});
+    return () => controller.abort();
+  }, [hubMetadata?.datasetVersion]);
+  useEffect(() => {
+    if (!pool.length || isLoadingData || restoringSession) return;
+    setModules(m => m.pareto && !m.pareto.workflowShared ? m : { ...m, pareto: sharedDecisionArchive(pool, hubMetadata?.objective ?? hubQuery.objective, modelSettings.seed, m.pareto) });
+  }, [pool, isLoadingData, restoringSession, hubMetadata?.objective, modelSettings.seed]);
+  const liveSession = useMemo(() => captureSession({ id: sessionId.current, name: tx("材料筛选研究报告", "Materials screening report"),
+    query: hubMetadata?.query ?? hubQuery, metadata: hubMetadata, pool, state,
+    config: { strategy, batchSize, totalBudget, model: modelSettings }, modules, selectedRecordKey }),
+    [pool, state, modules, hubMetadata, hubQuery, strategy, batchSize, totalBudget, modelSettings, selectedRecordKey, lang]);
+  const liveReport = useMemo(() => sessionReport(liveSession), [liveSession]);
+  const shortlist = useMemo(() => reportCandidates(liveReport.candidates, hubMetadata?.objective ?? hubQuery.objective), [liveReport]);
+  const sceneId = sceneForQuery(hubMetadata?.query ?? hubQuery);
+  const openCurrentReport = () => { void captureResearch(tx("材料筛选研究报告", "Materials screening report")).then(presentResearch).catch(e => setResearchStatus(userError(e, lang))); };
+  const disabled = isLoadingData || isIterating || restoringSession;
+  return <LanguageContext.Provider value={lang}>{presentationView}
+    <div hidden={presentation} style={presentation ? { display: "none" } : undefined} className={"workflow-shell ai4s-app-shell" + (expert ? " expert-active" : "")}>
+      <header className="workflow-header">
+        <div><span className="workflow-eyebrow">{tx("问鼎储能", "Wending Energy")}</span><h1>{tx("问鼎·材料引擎", "Wending · Materials Engine")}</h1></div>
+        <div className="workflow-actions">
+          <button aria-pressed={expert} onClick={() => setExpert(!expert)}>{tx("专家模式", "Expert mode")}</button>
+          <button onClick={openPresentation}>{tx("示例报告", "Example report")}</button>
+          <button onClick={() => setLang(lang === "zh" ? "en" : "zh")}>{t.langToggle}</button>
         </div>
       </header>
-
-      {isLoaded && !isLoadingData && (runError || stopReason) && (
-        <p role={runError ? "alert" : "status"} className="max-w-7xl mx-auto mb-6 p-3 rounded-lg bg-amber-50 text-amber-900">
-          {runError || (stopReason === "empty-pool"
-            ? (lang === "zh" ? "没有候选材料，请同步数据后再运行。" : "No candidate materials. Sync data before running.")
-            : stopReason === "budget-exhausted"
-              ? (lang === "zh" ? "已达到采样预算。" : "Sampling budget reached.")
-              : (lang === "zh" ? "候选材料已全部采样。" : "All candidate materials have been sampled."))}
-        </p>
-      )}
-
-      <nav className="research-guide" aria-label={tx("首次研究引导", "Research quick start")}>
-        <a href="#data-hub"><b>1</b><span>{tx("选数据", "Choose data")}<small>{tx("设置材料范围和目标", "Set materials and objective")}</small></span></a>
-        <a href="#run-learning"><b>2</b><span>{tx("开始学习", "Start learning")}<small>{tx(`用 ${totalBudget} 次评价探索 ${pool.length} 个候选`, `Explore ${pool.length} candidates with ${totalBudget} evaluations`)}</small></span></a>
-        <a href="#learning-results"><b>3</b><span>{tx("看结果", "Review results")}<small>{tx("对比随机基线，查看最优材料", "Compare random sampling and best materials")}</small></span></a>
+      <section className="workflow-intro"><h2>{tx("从海量材料，到值得验证的三个候选", "From a materials collection to three candidates worth testing")}</h2><p>{tx("为每个候选回答：表现如何、为什么值得关注、成本怎样、结构如何、怎么验证。", "A research answer for each candidate: performance, interpretable trends, cost, structure and verification.")}</p></section>
+      <nav className="workflow-steps" aria-label={tx("研究流程", "Research workflow")}>
+        <a href="#scene-selection"><b>1</b>{tx("选场景", "Choose a scenario")}</a>
+        <a href="#screening-workspace"><b>2</b>{tx("AI 筛选", "AI screening")}</a>
+        <a href="#candidate-reports"><b>3</b>{tx("候选报告", "Candidate reports")}</a>
       </nav>
-      <section className={`research-provenance ${!isRealData && pool.length ? "synthetic" : ""}`} aria-label={tx("数据来源与评价方式", "Data provenance and evaluation mode")}>
-        <strong>{pool.some(m => m.source === "mock") ? tx("合成数据 · 模拟演示", "Synthetic data · simulation") : tx("已有标签回放 · 材料筛选研究", "Existing-label replay · materials screening")}</strong>
-        <p>{tx("每次采样揭示数据库中已有的性质标签，用于评估选材策略；MACE 与 XRD 在各自工作台执行计算。", "Each sample reveals an existing database label to evaluate selection strategies. MACE and XRD run calculations in their respective workspaces.")}</p>
-        <div className="provenance-facts"><span>{sourceLabel(hubMetadata?.effectiveSource, lang)}</span><span>{tx("数据版本", "Data version")}: {hubMetadata?.sourceVersion ?? sourceRecord?.provenance?.datasetVersion ?? "—"}</span><span>{tx("许可", "License")}: {sourceRecord?.provenance?.license ?? "—"}</span>
-          {sourceRecord?.provenance && <a href={sourceRecord.provenance.url} target="_blank" rel="noopener noreferrer">{tx("原始来源 / DOI ↗", "Original source / DOI ↗")}</a>}</div>
-        <details><summary>{tx("查看快照指纹与引用", "Snapshot fingerprint & citation")}</summary><p>{sourceRecord?.provenance?.reference}</p><p>SHA256: <code>{hubMetadata?.snapshotSha256 ?? tx("该来源未提供整库指纹；记录版本见候选详情", "No full-collection digest; see candidate record revisions")}</code></p><p>{tx("候选集版本", "Candidate set")}: {hubMetadata?.datasetVersion}</p>
-          {hubMetadata?.sourceURL && <a href={hubMetadata.sourceURL} target="_blank" rel="noopener noreferrer">{tx("官方快照来源 ↗", "Official snapshot source ↗")}</a>}</details>
+      <section id="scene-selection" className="workflow-card workflow-scenes"><div><span className="workflow-eyebrow">01 · {tx("选场景", "SCENARIO")}</span><h2>{tx("这次要解决什么材料问题？", "Which materials problem are you solving?")}</h2></div>
+        <div className="workflow-scene-grid">{RESEARCH_SCENES.map(scene => <button key={scene.id} disabled={!scene.available || disabled || isAutoRunning} aria-pressed={sceneId === scene.id} onClick={() => { if (scene.query) { setStrategy("UCB"); setModelSettings({ ...DEFAULT_MODEL_CONFIG }); modelClient.current?.dispose(); modelClient.current = null; void loadData({ ...scene.query }, 50); } }}><b>{scene[lang]}</b><span>{lang === "zh" ? scene.descriptionZh : scene.descriptionEn}</span></button>)}</div>
+        <div className="workflow-source-line"><span className="workflow-badge">{tx("数据可追溯", "Traceable data")}</span><span>{sourceLabel(hubMetadata?.effectiveSource ?? hubQuery.source, lang)} · {hubMetadata?.sourceVersion ?? hubMetadata?.datasetVersion ?? tx("正在读取目录", "Reading catalog")}</span><details><summary>{tx("来源与快照", "Source & snapshot")}</summary><p>{sourceRecord?.provenance?.reference} · {sourceRecord?.provenance?.license}</p><p className="report-identity">SHA256 {hubMetadata?.snapshotSha256 ?? "—"}</p>{sourceRecord?.provenance?.url && <a href={sourceRecord.provenance.url} target="_blank" rel="noreferrer">{tx("原始来源 / DOI", "Original source / DOI")} ↗</a>}</details></div>
       </section>
-      <details className="research-secondary"><summary>{tx("查找材料与关联证据", "Find materials & linked evidence")}</summary><div className="research-linkbar">
-        <label>{tx("搜索候选", "Search candidates")}<input value={materialSearch} onChange={e => setMaterialSearch(e.target.value)} placeholder={tx("化学式或材料 ID", "Formula or material ID")} /></label>
-        <label>{tx("材料联动", "Linked material")}<select aria-label={tx("当前研究材料", "Current research material")} value={selectedRecordKey ?? ""} disabled={isLoadingData || restoringSession} onChange={e => { setSelectedRecordKey(e.target.value || null); if (e.target.value) setShowCandidate(true); }}><option value="">{tx("选择候选材料", "Select a candidate")}</option>{pool.filter(m => `${m.formula} ${m.id}`.toLowerCase().includes(materialSearch.toLowerCase())).slice(0,50).map(m => <option key={materialRecordKey(m)} value={materialRecordKey(m)}>{m.formula} · {m.id}</option>)}</select></label><button disabled={!selectedMaterial} onClick={() => setShowCandidate(true)}>{tx("候选详情", "Candidate details")}</button><span>{tx("显示前50个匹配项；输入名称可缩小范围", "Showing the first 50 matches; type to narrow results")}</span></div></details>
-      {researchStatus && <p className="research-status" role="status">{userError(translateUI(researchStatus, lang), lang)}</p>}
-
-
-      <main className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Sidebar: Config & Stats */}
-        <div className="lg:col-span-3 min-w-0 space-y-6">
-          <DataHubPanel query={hubQuery} metadata={hubMetadata} count={pool.length} loading={isLoadingData || restoringSession}
-            lang={lang} onChange={setHubQuery} onLoad={query => void loadData(query)} recordIds={pool.map(m => m.id)} onCalibration={useCalibration} providedCalibration={modules.calibration} calibrationEnabled={modules.calibrationEnabled} />
-
-          <section className={`${theme === 'classic' ? 'bg-white' : 'bg-white/80'} p-6 rounded-3xl shadow-sm border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'}`}>
-            <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
-              <Layers size={14} /> {t.systemConfig}
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-[10px] uppercase font-bold opacity-60">{t.acquisitionStrategy}</label>
-                <select 
-                  value={strategy}
-                  onChange={(e) => setStrategy(e.target.value as AcquisitionStrategy)}
-                  disabled={isLoadingData || isAutoRunning || isIterating || state.iteration > 0}
-                  title={lang === "zh" ? "运行后需先重置再切换策略，以保持分数与策略一致。" : "Reset before changing strategy after a run so stored scores match the strategy."}
-                  className={`w-full mt-1 ${theme === 'classic' ? 'bg-[#F5F5F0]' : 'bg-blue-50'} border-none rounded-lg p-2 text-sm font-medium focus:ring-1 ${theme === 'classic' ? 'focus:ring-[#141414]' : 'focus:ring-[#2B6CB0]'}`}
-                >
-                  <option value="UCB">{lang === 'en' ? 'Upper Confidence Bound (UCB)' : '上置信界 (UCB)'}</option>
-                  <option value="EI">{lang === 'en' ? 'Expected Improvement (EI)' : '期望改进 (EI)'}</option>
-                  <option value="Uncertainty">{lang === 'en' ? 'Uncertainty Sampling' : '不确定性采样'}</option>
-                  <option value="Random">{lang === 'en' ? 'Cost-aware random' : '成本加权随机策略'}</option>
-                </select>
-              </div>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <div className="flex justify-between">
-                    <label className="text-[10px] uppercase font-bold opacity-60">{t.batchSize}</label>
-                    <span className="text-[10px] font-mono font-bold">{batchSize}</span>
-                  </div>
-                  <input 
-                    type="range" min="1" max="20" step="1"
-                    value={batchSize}
-                    onChange={(e) => setBatchSize(parseInt(e.target.value))}
-                    disabled={state.iteration > 0 || isLoadingData || isIterating}
-                    className={`w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer ${theme === 'classic' ? 'accent-[#141414]' : 'accent-[#2B6CB0]'} mt-2`}
-                  />
-                </div>
-                <div>
-                  <div className="flex justify-between">
-                    <label className="text-[10px] uppercase font-bold opacity-60">{t.budget}</label>
-                    <span className="text-[10px] font-mono font-bold">{totalBudget} / {pool.length}</span>
-                  </div>
-                  <input 
-                    type="range" min="1" max={Math.max(1, budgetLimit)} step="1"
-                    value={totalBudget}
-                    onChange={(e) => setTotalBudget(Math.min(budgetLimit, parseInt(e.target.value)))}
-                    disabled={state.iteration > 0 || isLoadingData || isIterating}
-                    className={`w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer ${theme === 'classic' ? 'accent-[#141414]' : 'accent-[#2B6CB0]'} mt-2`}
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <ModelControls config={modelSettings} lang={lang} busy={isIterating} diagnostics={modelDiagnostics}
-            locked={isLoadingData || isAutoRunning || isIterating || state.iteration > 0}
-            onChange={config => {
-              cancelComputation();
-              modelClient.current?.dispose();
-              modelClient.current = null;
-              setModelSettings(config);
-              setModelDiagnostics(undefined);
-            }} />
-
-          <section className={`${theme === 'classic' ? 'bg-[#141414] text-[#F5F5F0]' : 'bg-[#1A365D] text-white'} p-6 rounded-3xl shadow-xl`}>
-            <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
-              <TrendingUp size={14} /> {t.liveMetrics}
-            </h3>
-            <div className="space-y-6">
-              <div>
-                <p className="text-[10px] uppercase font-bold opacity-40">{t.iteration}</p>
-                <p className="text-4xl font-serif italic">{state.iteration}</p>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase font-bold opacity-40">{t.sampledTotal}</p>
-                <div className="flex items-end gap-2">
-                  <p className="text-3xl font-serif italic">{state.sampledCount}</p>
-                  <p className="text-sm opacity-40 mb-1">/ {totalBudget}</p>
-                </div>
-                <div className="w-full bg-white/10 h-1 mt-2 rounded-full overflow-hidden">
-                  <motion.div 
-                    className={theme === 'classic' ? "bg-emerald-400 h-full" : "bg-teal-400 h-full"}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(state.sampledCount / totalBudget) * 100}%` }}
-                  />
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] uppercase font-bold opacity-40">{t.bestConductivity}</p>
-                <p className={`text-3xl font-serif italic ${theme === 'classic' ? 'text-emerald-400' : 'text-teal-300'}`}>
-                  {!Number.isFinite(state.bestValue) ? "N/A" : state.bestValue.toFixed(4)}
-                </p>
-                <p className="mt-2 text-xs opacity-60">{objectiveSpec[lang]} / {objectiveSpec.unit} · {objectiveSpec.direction === "min" ? "↓ min" : "↑ max"}</p>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        {/* Main Content: Visualization */}
-        <div id="distillation-workspace" className="lg:col-span-9 min-w-0 space-y-8">
-          <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-teal-100 bg-teal-50 p-4"><div><p className="text-[10px] font-bold tracking-widest text-teal-700">{sourceLabel(hubMetadata?.effectiveSource ?? hubQuery.source, lang)} · {pool.length} {lang === "zh" ? "条记录" : "records"}</p><h2 className="mt-1 text-lg font-semibold text-teal-950">{objectiveSpec[lang]} <span className="text-sm font-normal">/ {objectiveSpec.unit}</span></h2></div><span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-teal-800">{objectiveSpec.direction === "min" ? "↓ Minimize" : "↑ Maximize"}</span></section>
-          {bestMaterial && <section className="research-best"><div><span>{tx("已观测最优材料", "Best observed material")}</span><h3>{bestMaterial.formula} · {bestMaterial.trueProperty.toFixed(4)} {objectiveSpec.unit}</h3><p>{bestMaterial.id} · {sourceLabel(bestMaterial.source,lang)}</p></div><button onClick={() => chooseCandidate(materialRecordKey(bestMaterial))}>{tx("查看材料与证据", "View material & evidence")} ↗</button></section>}
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {!presentation && <ConvergenceChart state={state} strategy={strategy} direction={objectiveSpec.direction} unit={objectiveSpec.unit} lang={lang} />}
-
-            {!presentation && <React.Suspense fallback={<p>{tx("载入描述符视图…", "Loading descriptor view…")}</p>}><DeferredSection label={tx("组成描述符", "Composition descriptors")}><DescriptorMap key={advisorRunId} pool={pool} result={distillation.result} lang={lang}
-              enabled={formulaMap} highlightedId={selectedMaterial?.id} onToggle={() => setFormulaMap(value => !value)} objective={hubMetadata?.objective ?? hubQuery.objective} /></DeferredSection></React.Suspense>}
-          </div>
-
-          <React.Suspense fallback={<p>{tx("载入白盒公式…", "Loading formulas…")}</p>}><DeferredSection label={tx("白盒公式 · 采样后分析", "White-box formulas · after sampling")} force={!!distillation.result}><DistillationPanel controller={distillation} lang={lang} /></DeferredSection></React.Suspense>
-
-          {pool.some(m => m.synthesisFeedback) && <div className="synthesis-feedback-banner"><span><b>{tx("谱图匹配反馈已接入", "Spectrum feedback connected")}</b> · {pool.filter(m => m.synthesisFeedback).length} {tx("个候选已更新合成先验，下一轮将使用新的约束排序。", "candidates have updated synthesis priors for the next round.")}</span><button type="button" onClick={() => openSynthesisLab()}>{tx("查看实验记录 ↗", "View experiment records ↗")}</button></div>}
-          <section className="rounded-3xl border border-[#d6dfce] bg-[#f5f6ec] p-5" aria-label={lang === "zh" ? "AI 优先候选" : "AI candidate shortlist"}>
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div><h3 className="flex items-center gap-2 text-sm font-semibold text-[#35523c]"><Sparkles size={16} />{lang === "zh" ? "让推荐走向研究方案" : "From ranking to a research plan"}</h3><p className="text-[10px] text-[#7b8971] mt-1">{lang === "zh" ? `第 ${state.iteration} 轮 · 最近一次预测的 Top-3 · 下一轮重训可能改变排序` : `Round ${state.iteration} · Top 3 from the last prediction pass · Retraining may change the order`}</p></div>
-              <button type="button" disabled={isLoadingData || isIterating || state.iteration === 0} onClick={() => openAdvisor(undefined, "overview")} className="text-xs font-semibold text-[#456447] px-3 py-2 rounded-lg border border-[#c4d1bb] bg-white disabled:opacity-40">{lang === "zh" ? "AI 复盘本轮" : "Review this round"}</button>
-            </div>
-            {topAdvisorCandidates.length ? <div className="grid grid-cols-1 md:grid-cols-3 gap-3">{topAdvisorCandidates.map((m, index) => <div key={m.id} className="bg-white/85 rounded-xl border border-[#e0e5d7] p-4">
-              <div className="flex justify-between items-start gap-2"><span className="font-serif text-lg italic">{m.formula}</span><span className="text-[10px] text-[#9a8a50]">0{index + 1}</span></div>
-              <p className="text-[9px] text-[#8d9782] font-mono truncate mt-1">{m.id}</p>
-              {m.synthesisFeedback && <span className={`synthesis-candidate-status ${m.synthesisFeedback.status}`}>{feedbackLabel(m.synthesisFeedback, lang)} · {tx("先验", "prior")} {m.synthesisFeedback.prior.toFixed(2)}</span>}
-              <div className="text-[10px] flex flex-wrap gap-x-3 gap-y-1 text-[#5e7157] font-mono my-3"><span>µ {m.predictedMean?.toFixed(3)}</span><span>σ {m.predictedStd?.toFixed(3)}</span><span>{lang === "zh" ? "成本" : "Cost"} {m.cost.toFixed(2)}</span></div>
-              <div className="flex flex-wrap gap-2"><button type="button" onClick={() => openSynthesisLab(m)} className="synthesis-entry">⚗ {lang === "zh" ? "合成 / XRD" : "Synthesis / XRD"}</button><button type="button" disabled={isLoadingData || isIterating} onClick={() => openAdvisor(m.id, "mechanism")} className="text-[10px] text-[#7a6230] px-2 py-1.5 rounded-md bg-[#f5efdc] disabled:opacity-40">✨ {lang === "zh" ? "AI 机理解析" : "Explain selection"}</button><button type="button" disabled={isLoadingData || isIterating} onClick={() => openAdvisor(m.id, "dft")} className="text-[10px] text-[#41644b] px-2 py-1.5 rounded-md bg-[#ecf2e7] disabled:opacity-40">{lang === "zh" ? "DFT 方案" : "DFT plan"}</button></div>
-            </div>)}</div> : <p className="text-xs leading-relaxed text-[#829077]">{lang === "zh" ? "运行一轮主动学习后，这里会展示可解析的候选。也可以打开顾问，先讨论当前材料与研究目标。" : "Run a learning step to populate this shortlist, or open the advisor to discuss your materials and research objective."}</p>}
-          </section>
-
-          {/* Data Table / Material List */}
-          <div className={`${theme === 'classic' ? 'bg-white' : 'bg-white/90'} rounded-3xl border ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'} overflow-hidden`}>
-            <div className={`p-6 border-b ${theme === 'classic' ? 'border-[#141414]/5' : 'border-[#2B6CB0]/10'} flex justify-between items-center`}>
-              <h3 className={`text-xs font-bold uppercase tracking-widest opacity-40 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>{t.recommendations}</h3>
-              <div className="flex gap-2">
-                <span className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 ${theme === 'classic' ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700'} rounded-full`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${theme === 'classic' ? 'bg-emerald-500' : 'bg-teal-500'} animate-pulse`} /> {t.sampled}
-                </span>
-                <span className="flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
-                  {t.candidate}
-                </span>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className={theme === 'classic' ? "bg-[#F5F5F0]/50" : "bg-blue-50/50"}>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">ID</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.formula}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.cost}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.predMean}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.uncertainty}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.acquisition}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{t.trueValue}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{lang === "zh" ? "谱图匹配反馈" : "Synthesis"}</th>
-                    <th className="p-4 text-[10px] uppercase font-bold opacity-40">{lang === "zh" ? "AI 顾问" : "AI Advisor"}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence mode="popLayout">
-                    {pool
-                      .filter(m => m.isSampled || Number.isFinite(m.acquisitionValue))
-                      .sort((a, b) => {
-                        if (a.isSampled && !b.isSampled) return -1;
-                        if (!a.isSampled && b.isSampled) return 1;
-                        return (b.acquisitionValue || 0) - (a.acquisitionValue || 0);
-                      })
-                      .slice(0, 8)
-                      .map((m) => (
-                        <motion.tr 
-                          layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          key={m.id} 
-                          onClick={() => chooseCandidate(materialRecordKey(m))}
-                          className={`cursor-pointer border-b border-[#141414]/5 hover:bg-[#F5F5F0]/30 transition-colors ${m.isSampled ? (theme === 'classic' ? 'bg-emerald-50/30' : 'bg-teal-50/30') : ''}`}
-                        >
-                          <td className="p-4 font-mono text-[10px] opacity-40">{m.id}</td>
-                          <td className="p-4 font-serif italic text-lg">
-                            <button type="button" onClick={event => { event.stopPropagation(); chooseCandidate(materialRecordKey(m)); }}
-                              className="text-left hover:underline focus-visible:outline-2 focus-visible:outline-teal-600"
-                              aria-label={lang === "zh" ? `查看 ${m.formula}（${m.id}）的候选详情` : `View candidate ${m.formula} (${m.id})`}>
-                              {m.formula}<span className="ml-2 text-[10px] font-sans not-italic text-teal-700">{canViewMaterialStructure(m) ? (lang === "zh" ? "候选详情" : "Candidate details") : (lang === "zh" ? "暂无结构" : "No structure")}</span>
-                            </button>
-                            <p className="mt-1 text-[9px] font-sans not-italic text-slate-500" title={m.methodMeta}>{sourceLabel(m.source, lang)} · {m.fidelity ?? "—"}</p>
-                            {m.provenance && <a href={m.provenance.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-[9px] font-sans not-italic text-teal-700 underline" title={`${m.provenance.reference} · ${m.provenance.datasetVersion}`}>{lang === "zh" ? "来源 / 方法" : "Provenance"}</a>}
-                            {m.isSampled && (
-                              <span className={`ml-2 text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${theme === 'classic' ? 'bg-emerald-100 text-emerald-700' : 'bg-teal-100 text-teal-700'}`}>
-                                Iter {m.iteration}
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-4 font-mono text-xs text-blue-500 font-bold">{m.cost.toFixed(2)}</td>
-                          <td className="p-4 font-mono text-xs">{m.predictedMean?.toFixed(3) || "—"}</td>
-                          <td className="p-4 font-mono text-xs">{m.predictedStd?.toFixed(3) || "—"}</td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-12 ${theme === 'classic' ? 'bg-gray-100' : 'bg-blue-100'} h-1.5 rounded-full overflow-hidden`}>
-                                <div 
-                                  className={`${theme === 'classic' ? 'bg-[#141414]' : 'bg-[#2B6CB0]'} h-full`} 
-                                  style={{ width: `${Number.isFinite(m.acquisitionValue) ? 100 / (1 + Math.exp(-Math.max(-30, Math.min(30, m.acquisitionValue!)))) : 0}%` }}
-                                />
-                              </div>
-                              <span className="font-mono text-[10px]">{m.acquisitionValue?.toFixed(2) || "0.00"}</span>
-                            </div>
-                          </td>
-                          <td className="p-4 font-mono text-xs font-bold">
-                            {m.isSampled ? `${m.trueProperty.toFixed(4)} ${objectiveSpec.unit}` : "???"}
-                          </td>
-                          <td className="p-3 text-[10px]"><button type="button" onClick={event => { event.stopPropagation(); openSynthesisLab(m); }} className="synthesis-entry">{m.synthesisFeedback ? (feedbackLabel(m.synthesisFeedback, lang)) : tx("合成 / XRD", "Synthesis / XRD")}</button></td>
-                          <td className="p-3 text-[10px] min-w-28"><button type="button" disabled={isLoadingData || isIterating} onClick={event => { event.stopPropagation(); openAdvisor(m.id, "mechanism"); }} className="block text-[#8b6d29] hover:underline disabled:opacity-40">✨ {lang === "zh" ? "AI 机理解析" : "Explain selection"}</button><button type="button" disabled={isLoadingData || isIterating} onClick={event => { event.stopPropagation(); openAdvisor(m.id); }} className="block mt-2 text-[#51774e] hover:underline disabled:opacity-40">{lang === "zh" ? "合成 / 计算方案" : "Research plan"}</button></td>
-                        </motion.tr>
-                      ))}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </main>
-      <details className="research-secondary pareto-disclosure" onToggle={event => { const open = event.currentTarget.open; setParetoVisible(open); if (open) setParetoOpened(true); }}>
-        <summary>{tx("进阶研究：多目标帕累托寻优", "Advanced research: multi-objective Pareto search")}</summary>
-        {(paretoOpened || restoredPareto) && <React.Suspense fallback={<p>{tx("载入多目标工作台…", "Loading multi-objective workspace…")}</p>}><ParetoExplorer key={`pareto-${sessionRestore?.token ?? 0}`} materials={pool} lang={lang} suspended={presentation || !paretoVisible || restoringSession || isLoadingData} restored={restoredPareto} onState={onParetoState} onSelect={chooseCandidate} onObserve={syncObservations} /></React.Suspense>}
-      </details>
-      <details className="research-secondary"><summary>{tx("保存、导出与展示本次研究", "Save, export & present this research")}</summary>
-        <ResearchControls capture={captureResearch} onRestore={restoreResearch} onPresent={presentResearch} busy={isLoadingData || restoringSession} />
-      </details>
-
-      <button type="button" onClick={() => openAdvisor()} className="advisor-launch fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full bg-[#1e5542] text-[#f8f4df] border border-[#b9ac73] shadow-xl text-xs font-semibold" aria-label={lang === "zh" ? "打开 AI 首席材料顾问" : "Open AI materials advisor"}><Sparkles size={17} /><span className="advisor-launch-label">{lang === "zh" ? "问问材料顾问" : "Ask the advisor"}</span></button>
-      {(advisorOpened || restoredAdvisor) && <React.Suspense fallback={null}><MaterialsAdvisor open={showAdvisor} onClose={() => setShowAdvisor(false)} input={{ pool, state, strategy, batchSize, totalBudget, isRealData, runId: advisorRunId, modelConfig: modelSettings, moduleEvidence, hubMetadata, hubQuery: hubMetadata?.query ?? hubQuery, hubLoadState: isLoadingData ? "loading" : runError && !hubMetadata ? "error" : "ready" }} lang={lang} loading={isLoadingData || isIterating} request={advisorRequest} restored={restoredAdvisor} onState={onAdvisorState} onSelect={id => { const m = pool.find(m => m.id === id); setSelectedRecordKey(m ? materialRecordKey(m) : null); }} /></React.Suspense>}
-      <CandidateDetails material={selectedMaterial} modules={modules} open={showCandidate} onClose={() => setShowCandidate(false)} onAction={(action, material) => void candidateAction(action, material)} />
+      {expert && <section className="workflow-card workflow-expert" aria-label={tx("专家设置", "Expert settings")}><h2>{tx("专家模式 · 自定义研究", "Expert mode · custom research")}</h2><p>{tx("自定义数据、目标、模型与采样参数；切换数据会开始新的研究。", "Customize sources, objectives, models and sampling settings. Changing datasets starts a new study.")}</p>
+        <div className="workflow-expert-grid"><DataHubPanel query={hubQuery} metadata={hubMetadata} count={pool.length} loading={isLoadingData || restoringSession} lang={lang} onChange={setHubQuery} onLoad={q => void loadData(q)} recordIds={pool.map(m => m.id)} onCalibration={useCalibration} providedCalibration={modules.calibration} calibrationEnabled={modules.calibrationEnabled} />
+          <div><section className="workflow-settings"><h3>{tx("采样设置", "Sampling settings")}</h3><label>{tx("下一候选选择策略", "Next-candidate strategy")}<select value={strategy} disabled={disabled || isAutoRunning || state.iteration > 0} onChange={e => setStrategy(e.target.value as AcquisitionStrategy)}><option value="UCB">UCB</option><option value="EI">EI</option><option value="Uncertainty">{tx("不确定性采样", "Uncertainty")}</option><option value="Random">{tx("成本加权随机", "Cost-aware random")}</option></select></label><label>{tx("每批评价数", "Batch size")}<input type="number" min="1" max="20" value={batchSize} disabled={disabled || state.iteration > 0} onChange={e => { const n = Number(e.target.value); if (Number.isInteger(n) && n >= 1 && n <= 20) setBatchSize(n); }} /></label><label>{tx("本轮评价预算", "Evaluation budget")}<input type="number" min="1" max={Math.max(1, budgetLimit)} value={totalBudget} disabled={disabled || state.iteration > 0} onChange={e => { const n = Number(e.target.value); if (Number.isInteger(n) && n >= 1 && n <= budgetLimit) setTotalBudget(n); }} /></label></section>
+          <ModelControls config={modelSettings} lang={lang} busy={isIterating} diagnostics={modelDiagnostics} locked={disabled || isAutoRunning || state.iteration > 0} onChange={config => { cancelComputation(); modelClient.current?.dispose(); modelClient.current = null; setModelSettings(config); setModelDiagnostics(undefined); }} />
+          <div className="workflow-actions"><button onClick={openStructure}>{tx("导入结构 / 3D", "Import structure / 3D")}</button><button onClick={openUmlip}>{tx("构型计算", "Configuration calculations")}</button><button onClick={() => openSynthesisLab()}>{tx("合成 / XRD", "Synthesis / XRD")}</button><button onClick={() => setShowDocs(true)}>{tx("方法说明", "Methods")}</button></div></div></div>
+      </section>}
+      <section id="screening-workspace" className="workflow-card">
+        <div className="workflow-section-header"><div><span className="workflow-eyebrow">02 · {tx("AI 筛选", "AI SCREENING")}</span><h2>{tx("用有限评价，找到值得继续研究的材料", "Find promising materials within an evaluation budget")}</h2></div><div className="workflow-actions"><button disabled={disabled || isAutoRunning || !pool.length} onClick={reset}>{tx("重新筛选", "Reset screening")}</button><button id="run-learning" className="workflow-primary" disabled={!isAutoRunning && (disabled || !isLoaded || !!stopReason || !!runError || budgetLimit < 1)} onClick={() => { if (isAutoRunning) cancelComputation(); setIsAutoRunning(!isAutoRunning); }}>{isAutoRunning ? tx("暂停筛选", "Pause screening") : (stopReason === "budget-exhausted" ? tx("筛选完成", "Screening complete") : tx("开始 AI 筛选", "Start AI screening"))}</button></div></div>
+        <div className="workflow-funnel" aria-label={tx("材料筛选漏斗", "Materials screening funnel")}>{[
+          [catalogCount?.toLocaleString() ?? "—", tx("材料数据底座", "Materials collection")],
+          [(hubMetadata?.matchedTotal ?? pool.length).toLocaleString(), tx("匹配场景条件", "Matching scenario")],
+          [pool.length.toLocaleString(), tx("本轮候选池", "Study candidate pool")],
+          [String(state.sampledCount) + " / " + totalBudget, tx("已评价 / 预算", "Evaluated / budget")],
+          [shortlist.length ? "Top " + shortlist.length : "Top 3", tx("候选研究报告", "Candidate reports")]
+        ].map(([value, label], i) => <div key={label}><span>{label}</span><strong>{value}</strong><i style={{ width: (100 - i * 12) + "%" }} /></div>)}</div>
+        <div className="workflow-evaluation-line"><span className="workflow-badge">{tx("已有计算数据 · 回溯验证", "Computed-data retrospective validation")}</span><span>{objectiveSpec[lang]} {objectiveSpec.direction === "min" ? "↓" : "↑"} · {sceneId === "solid-electrolyte" ? tx("联合查看热力学稳定性", "With thermodynamic stability") : tx("自定义研究", "Custom research")}</span><MethodNote lang={lang}>{tx("每次评价揭示本轮候选池已有的数据库标签，以相同预算和初始样本对照随机选材。漏斗区分数据底座、条件匹配和实际载入的候选。", "Each evaluation reveals an existing label in this pool. Random sampling uses the same budget and initial observations. The funnel separates collection size, matched records and the loaded study pool.")}</MethodNote></div>
+        {isLoadingData && <p role="status">{tx("正在加载场景数据…", "Loading scenario data…")}</p>}
+        {(runError || stopReason || researchStatus) && <p className="workflow-status" role={runError ? "alert" : "status"}>{runError || (stopReason === "budget-exhausted" ? tx("本轮筛选完成，请查看候选报告。", "Screening complete. Review candidate reports.") : stopReason === "empty-pool" ? tx("当前条件没有可用材料，可在专家模式调整数据，或先查看示例报告。", "No materials match. Adjust the dataset in expert mode or open an example report.") : stopReason === "candidates-exhausted" ? tx("本轮候选已全部评价。", "All study candidates have been evaluated.") : userError(translateUI(researchStatus, lang), lang))}</p>}
+        {!presentation && <ConvergenceChart compact state={state} strategy={strategy} direction={objectiveSpec.direction} unit={objectiveSpec.unit} lang={lang} />}
+      </section>
+      <section id="candidate-reports" className="workflow-card"><div className="workflow-section-header"><div><span className="workflow-eyebrow">03 · {tx("候选报告", "CANDIDATE REPORTS")}</span><h2>{tx("每一次选材，都有完整的研究答案", "A complete research answer for every material choice")}</h2><p>{tx("已评价优选 · 表现、规律、取舍、结构与验证", "Evaluated shortlist · performance, trends, trade-offs, structure and verification")}</p></div><div className="workflow-actions"><button disabled={disabled || !state.sampledCount} onClick={openCurrentReport}>{tx("打开完整研究报告", "Open complete report")}</button><button disabled={disabled || !state.sampledCount} onClick={() => downloadReport(liveReport, lang)}>{tx("导出网页 / PDF", "Export HTML / PDF")}</button></div></div>
+        {shortlist.length ? <div className="workflow-shortlist">{shortlist.map((m, i) => <article key={m.recordKey}><span className="workflow-eyebrow">TOP 0{i + 1}</span><h3>{m.formula}</h3><strong>{m.observedValue?.toPrecision(6)} <small>{objectiveSpec.unit}</small></strong><p>{m.id}</p><button onClick={() => chooseCandidate(m.recordKey)}>{tx("查看五项研究答案", "View five research answers")} ↗</button></article>)}</div> : <div className="workflow-empty"><p>{tx("选择场景并开始 AI 筛选，优选候选将在这里生成报告。", "Choose a scenario and start screening to create candidate reports.")}</p><button onClick={openPresentation}>{tx("先看一份完整示例报告", "Explore an example report")}</button></div>}
+        {expert && !!topAdvisorCandidates.length && <details className="workflow-next"><summary>{tx("下一步值得验证的候选", "Candidates for the next evaluation")}</summary><div className="workflow-actions">{topAdvisorCandidates.map(m => <button key={m.id} onClick={() => chooseCandidate(materialRecordKey(m))}>{m.formula} · μ {m.predictedMean?.toFixed(3)}</button>)}</div></details>}
+      </section>
+      <details id="distillation-workspace" className="workflow-card" open={showFormulaTools} onToggle={e => setShowFormulaTools(e.currentTarget.open)}><summary>{tx("候选报告 · 可解释规律与组成分析", "Report tools · interpretable relations & composition")}</summary>{showFormulaTools && <React.Suspense fallback={<p>{tx("正在打开规律分析…", "Loading relation analysis…")}</p>}><DistillationPanel controller={distillation} lang={lang} /><DescriptorMap pool={pool} result={distillation.result} lang={lang} enabled={formulaMap} highlightedId={selectedMaterial?.id} onToggle={() => setFormulaMap(v => !v)} objective={hubMetadata?.objective ?? hubQuery.objective} /></React.Suspense>}</details>
+      <details id="decision-workspace" className="workflow-card" open={paretoVisible} onToggle={e => { setParetoVisible(e.currentTarget.open); if (e.currentTarget.open) setParetoOpened(true); }}><summary>{tx("候选报告 · 性能、稳定性与成本取舍", "Report tools · performance, stability & cost")}</summary>{(paretoOpened || restoredPareto) && <React.Suspense fallback={<p>{tx("正在打开决策工具…", "Loading decision tools…")}</p>}><ParetoExplorer key={"pareto-" + (sessionRestore?.token ?? 0) + "-" + advisorRunId} materials={pool} lang={lang} suspended={presentation || !paretoVisible || restoringSession || isLoadingData} restored={modules.pareto?.workflowShared ? { token: advisorRunId + 1000, value: modules.pareto } : restoredPareto} onState={onParetoState} onSelect={chooseCandidate} onObserve={syncObservations} /></React.Suspense>}</details>
+      <details className="workflow-card"><summary>{tx("我的研究 · 保存、导出与恢复", "My research · save, export & restore")}</summary><ResearchControls capture={captureResearch} onRestore={restoreResearch} onPresent={presentResearch} busy={isLoadingData || restoringSession} /></details>
+      {expert && <section className="workflow-card"><label>{tx("查找材料", "Find a material")}<input value={materialSearch} onChange={e => setMaterialSearch(e.target.value)} placeholder={tx("化学式或材料 ID", "Formula or material ID")} /></label><div className="workflow-actions">{pool.filter(m => (m.formula + " " + m.id).toLowerCase().includes(materialSearch.toLowerCase())).slice(0, 30).map(m => <button key={m.id} onClick={() => chooseCandidate(materialRecordKey(m))}>{m.formula} · {m.id}</button>)}</div><React.Suspense fallback={null}><DeferredSection label={tx("元素常数", "Element constants")}><CompositionDescriptorPanel materials={pool} lang={lang} /></DeferredSection></React.Suspense></section>}
+      <CandidateDetails material={selectedMaterial} modules={modules} report={liveReport} open={showCandidate} onClose={() => setShowCandidate(false)} onAction={(action, material) => void candidateAction(action, material)} />
       <GeometryPanel artifact={geometryArtifact} materials={pool} references={modules.structures} open={showGeometry} onClose={() => setShowGeometry(false)} onApply={applyGeometry} />
-      <React.Suspense fallback={null}><DeferredSection label={tx("元素常数与组成描述符", "Element constants & composition descriptors")}><CompositionDescriptorPanel key={`${isRealData}:${pool[0]?.id ?? "empty"}`} materials={pool} lang={lang} /></DeferredSection></React.Suspense>
+      {(advisorOpened || restoredAdvisor) && <React.Suspense fallback={null}><MaterialsAdvisor open={showAdvisor} onClose={() => setShowAdvisor(false)} input={{ pool, state, strategy, batchSize, totalBudget, isRealData, runId: advisorRunId, modelConfig: modelSettings, moduleEvidence, hubMetadata, hubQuery: hubMetadata?.query ?? hubQuery, hubLoadState: isLoadingData ? "loading" : runError && !hubMetadata ? "error" : "ready" }} lang={lang} loading={isLoadingData || isIterating} request={advisorRequest} restored={restoredAdvisor} onState={onAdvisorState} onSelect={id => { const m = pool.find(m => m.id === id); setSelectedRecordKey(m ? materialRecordKey(m) : null); }} /></React.Suspense>}
+      {hasOpenedStructure && <StructurePanel key={"structure-" + (sessionRestore?.token ?? 0)} restored={structureRestore} onStructure={rememberStructure} onUseStructure={(structure, action) => void useStructure({ structure, stage: structure.source.recordRef ? "database" : "imported" }, action)} open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} />}
+      {hasOpenedUmlip && <React.Suspense fallback={<p role="status">{tx("正在打开构型计算…", "Loading configuration calculations…")}</p>}><UmlipPanel key={"umlip-" + (sessionRestore?.token ?? 0)} enqueue={queueRequest} restored={restoredUmlip} onState={onUmlipState} onUseStructure={(draft, action) => void useStructure(draft, action)} open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
       {labPanel}
-
-      {/* Research Methodology Modal / Info */}
-      <footer className={`max-w-7xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 border-t ${theme === 'classic' ? 'border-[#141414]/10' : 'border-[#2B6CB0]/20'} pt-8 pb-12`}>
-        <div className="space-y-2">
-          <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
-            <Beaker size={14} /> {t.methodology}
-          </h4>
-          <div className="text-xs opacity-60 leading-relaxed">
-            <MethodNote lang={lang}>{t.methodologyDesc}</MethodNote>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
-            <Cpu size={14} /> {t.representation}
-          </h4>
-          <div className="text-xs opacity-60 leading-relaxed">
-            <MethodNote lang={lang}>{t.representationDesc}</MethodNote>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h4 className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${theme === 'science' ? 'text-[#2B6CB0]' : ''}`}>
-            <Zap size={14} /> {t.objective}
-          </h4>
-          <p className="text-xs opacity-60 leading-relaxed">
-            {objectiveSpec[lang]} / {objectiveSpec.unit} · {objectiveSpec.direction === "min" ? (lang === "zh" ? "最小化" : "Minimize") : (lang === "zh" ? "最大化" : "Maximize")}
-          </p>
-          <MethodNote lang={lang}>{lang === "zh" ? "目标值按来源、方法与条件保留；主工作台采用已有观测的离线回放。" : "Targets retain source, method and conditions; the main workspace replays existing observations."}</MethodNote>
-        </div>
-      </footer>
-
-      {/* Documentation Modal */}
-      <AnimatePresence>
-        {showDocs && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#141414]/40 backdrop-blur-sm p-6"
-            onClick={() => setShowDocs(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white w-full max-w-4xl max-h-[85vh] rounded-[32px] shadow-2xl overflow-hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-8 border-b border-gray-100 flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-serif italic font-medium">{t.docsTitle}</h2>
-                  <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">Version 2.0.0 • Materials Active Learning Framework</p>
-                </div>
-                <button 
-                  onClick={() => setShowDocs(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto p-8 space-y-10">
-                {lang === 'en' ? (
-                  <>
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">01. System Overview</h3>
-                      <p className="text-sm leading-relaxed opacity-70">
-                        The AMI-AL (Accelerated Materials Innovation - Active Learning) framework is an industrial-grade closed-loop optimization system. It accelerates the discovery of high-performance materials (e.g., solid-state electrolytes, high-voltage insulators) by integrating real-world data from the Materials Project with advanced Bayesian Optimization. The system is designed to minimize expensive DFT "experiments" while maximizing computational cost-effectiveness.
-                      </p>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">02. Mathematical Logic & BO Loop</h3>
-                      <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
-                        <p className="text-xs font-mono opacity-80">
-                          Objective: {objectiveSpec.direction === "min" ? "argmin" : "argmax"} f(x), {objectiveSpec.en} / {objectiveSpec.unit}.
-                        </p>
-                        <p className="text-xs leading-relaxed opacity-70">
-                          The system follows a rigorous 4-step cycle:
-                          <br/>1. <strong>Surrogate Modeling:</strong> Choose a GP posterior or ensemble-based regressor to estimate μ(x) and σ(x).
-                          <br/>2. <strong>Acquisition Optimization:</strong> x* = argmax α(x; P), where α is UCB, EI, or Cost-Aware variants.
-                          <br/>3. <strong>Oracle Evaluation:</strong> Reveal the existing database label f(x*) (offline evaluation; no new DFT job).
-                          <br/>4. <strong>Data Augmentation:</strong> D = D ∪ {"{x*, f(x*)}"}, updating the knowledge base.
-                        </p>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">03. Technical Architecture</h3>
-                      <div className="grid grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">Surrogate Model</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            Select RBF GPR (default), Random Forest, Extra Trees, Gradient Boosted Trees, kNN, Ridge, or the linear SGD baseline. Training-only feature/target standardization and seeded fitting run in a Worker. GP σ is a latent posterior standard deviation; other models expose ensemble disagreement. These quantities require validation on held-out materials.
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">Cost-Aware Acquisition</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            The system implements <strong>cost-aware acquisition</strong>. Scores are divided by a heuristic formula-size cost based on atom counts. This proxy does not measure DFT hours or structural complexity.
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">04. Feature Engineering & Polymorphs</h3>
-                      <div className="grid grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">Descriptor Vector</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            The offline JSON table provides Pauling electronegativity, covalent and reference ionic radii, a declared valence-electron convention and atomic hardness. Weighted mean/variance/range/coverage for each property plus conditional ABO3 t/validity yield 22 scaled model inputs. Raw physical units remain visible in the descriptor panel.
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">Polymorph Differentiation</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            Composition alone cannot distinguish polymorphs. Equal compositions share identical descriptors. Actual lattice, coordination or distortion information must be supplied separately rather than generated from a random number.
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">05. Benchmarking & AMI Alignment</h3>
-                      <p className="text-sm leading-relaxed opacity-70">
-                        The research chart compares fitted-model selection against uniform random replay with shared initial samples. The separate strategy animation is illustrative. The model benchmark script and browser Worker validation page measure synthetic fit/predict times and held-out error. Real-material accuracy, uncertainty calibration and discovery speedup require separate controlled experiments.
-                      </p>
-                    </section>
-                  </>
-                ) : (
-                  <>
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">01. 系统概述</h3>
-                      <p className="text-sm leading-relaxed opacity-70">
-                        AMI-AL（加速材料创新 - 主动学习）框架是一个工业级的闭环优化系统。它通过将 Materials Project 的真实数据与先进的贝叶斯优化相结合，加速高性能材料（如固态电解质、高压绝缘体）的发现。该系统旨在最小化昂贵的 DFT “实验”次数，同时最大化计算性价比。
-                      </p>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">02. 数学逻辑与 BO 闭环</h3>
-                      <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
-                        <p className="text-xs font-mono opacity-80">
-                          目标函数: {objectiveSpec.direction === "min" ? "argmin" : "argmax"} f(x)，{objectiveSpec.zh} / {objectiveSpec.unit}。
-                        </p>
-                        <p className="text-xs leading-relaxed opacity-70">
-                          系统遵循严密的 4 步循环逻辑：
-                          <br/>1. <strong>代理建模:</strong> 选择 GP 后验或集成回归模型，估计 μ(x) 和 σ(x)。
-                          <br/>2. <strong>获取函数优化:</strong> x* = argmax α(x; P)，其中 α 为 UCB、EI 或代价敏感变体。
-                          <br/>3. <strong>实验评估:</strong> 读取候选已有的数据库标签 f(x*)，进行离线评价。
-                          <br/>4. <strong>数据增强:</strong> D = D ∪ {"{x*, f(x*)}"}，更新知识库并重新训练。
-                        </p>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">03. 技术架构</h3>
-                      <div className="grid grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">代理模型 (Surrogate Model)</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            支持 RBF GPR（默认）、随机森林、Extra Trees、梯度提升树、kNN、岭回归和线性 SGD 基线。特征与目标只按训练样本标准化，在 Worker 中按固定种子拟合。GP σ 为潜在函数后验标准差，其它模型输出集成分歧；需要独立留出材料验证，不能直接视为已校准置信区间。
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">代价敏感优化 (Cost-Aware BO)</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            系统实现了<strong>代价感知获取函数</strong>。分数按化学式原子计数的启发式成本归一化；该估计不代表实测 DFT 耗时或真实结构复杂度。
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">04. 特征工程与同质异构体</h3>
-                      <div className="grid grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">描述符向量</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            内置JSON提供鲍林电负性、共价/参考离子半径、约定价电子数和原子化学硬度。每类属性的加权均值、总体方差、极差和覆盖率，加上有条件ABO₃容忍因子及有效位，共22维缩放模型输入；面板保留原始物理单位。
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-bold uppercase">同质异构体区分</h4>
-                          <p className="text-xs opacity-60 leading-relaxed">
-                            仅凭组成不能区分同质异构体，相同组成必须得到相同描述符。真实晶格、近邻配位和畸变信息需要额外结构输入，不能以随机数代替。
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="space-y-4">
-                      <h3 className="text-sm font-bold uppercase tracking-widest text-emerald-600">05. AMI 对标与基准测试</h3>
-                      <p className="text-sm leading-relaxed opacity-70">
-                        研究曲线使用共享初始样本，对照模型选材和均匀随机的标签回放；独立的策略动画用于说明方法。模型基准脚本和浏览器 Worker 验证页提供合成数据上的真实拟合、预测耗时与留出误差。真实材料精度、不确定性校准和发现加速比仍需单独的受控实验。
-                      </p>
-                    </section>
-                  </>
-                )}
-              </div>
-
-              <div className="p-8 bg-gray-50 border-t border-gray-100 flex justify-end">
-                <button 
-                  onClick={() => setShowDocs(false)}
-                  className="px-8 py-3 bg-[#141414] text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-black transition-colors"
-                >
-                  {t.close}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {/* Benchmark Simulator Modal */}
-      <AnimatePresence>
-        {showBenchmark && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#141414]/40 backdrop-blur-sm p-6"
-            onClick={() => setShowBenchmark(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-[#F5F5F0] w-full max-w-6xl max-h-[90vh] rounded-[40px] shadow-2xl overflow-hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-8 border-b border-[#141414]/5 flex justify-between items-center bg-white">
-                <div>
-                  <h2 className="text-2xl font-serif italic font-medium">{t.benchmarkTitle}</h2>
-                  <p className="text-[10px] uppercase tracking-widest opacity-40 mt-1">AMI-AL Performance Verification Module • v2.0</p>
-                </div>
-                <button 
-                  onClick={() => setShowBenchmark(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto p-10">
-                <React.Suspense fallback={<p>{tx("载入策略示意…", "Loading strategy illustration…")}</p>}><BenchmarkSimulator lang={lang} /></React.Suspense>
-              </div>
-
-              <div className="p-6 bg-white border-t border-[#141414]/5 flex justify-end">
-                <button 
-                  onClick={() => setShowBenchmark(false)}
-                  className="px-8 py-2 bg-[#141414] text-white text-xs font-bold uppercase tracking-widest rounded-xl"
-                >
-                  {t.close}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      {hasOpenedStructure && <React.Fragment key="structure-workspace"><StructurePanel key={`structure-${sessionRestore?.token ?? 0}`} restored={structureRestore} onStructure={rememberStructure} onUseStructure={(structure, action) => void useStructure({ structure, stage: structure.source.recordRef ? "database" : "imported" }, action)} open={showStructure} onClose={() => setShowStructure(false)} lang={lang} materialRequest={structureMaterial} onImportMode={openStructure} onOpenLab={structure => openSynthesisLab(undefined, structure)} /></React.Fragment>}
-      {hasOpenedUmlip && <React.Suspense key="umlip-workspace" fallback={<p role="status">{tx("正在加载 uMLIP 工作流…", "Loading uMLIP workspace…")}</p>}><UmlipPanel key={`umlip-${sessionRestore?.token ?? 0}`} enqueue={queueRequest} restored={restoredUmlip} onState={onUmlipState} onUseStructure={(draft, action) => void useStructure(draft, action)} open={showUmlip} onClose={() => setShowUmlip(false)} lang={lang} /></React.Suspense>}
-    </div></LanguageContext.Provider>
-  );
+      {showDocs && <div className="workflow-modal" role="dialog" aria-modal="true" aria-label={tx("研究方法", "Methods")}><article className="workflow-card"><button onClick={() => setShowDocs(false)}>{tx("关闭", "Close")}</button><h2>{tx("研究方法与路线图", "Methods & roadmap")}</h2><h3>{tx("选择、解释、决策、验证", "Select, interpret, decide, verify")}</h3><p>{t.methodologyDesc}</p><p>{t.representationDesc}</p><h3>{tx("验证计划", "Validation plan")}</h3><p>{tx("多种子回溯对照 → 已知体系重发现 → 合作课题组试用 → 推荐候选合成、XRD 与性质验证。", "Multi-seed retrospective comparisons → known-material rediscovery → partner trials → candidate synthesis, XRD and property validation.")}</p><h3>{tx("场景路线图", "Scenario roadmap")}</h3><p>{tx("固态电解质：带隙与稳定性初筛，下一阶段接入离子迁移与界面评价。PCEC/SOFC：建立氧空位与电极性质数据。催化：建立反应条件一致的活性数据。", "Solid electrolytes: band-gap/stability screening, followed by ion migration and interfaces. PCEC/SOFC: vacancy and electrode datasets. Catalysis: activity data under comparable conditions.")}</p></article></div>}
+      <footer className="workflow-footer">{tx("问鼎储能 · 数据 → 智能筛选 → 候选报告 → 计算与实验验证", "Wending Energy · Data → AI screening → Candidate reports → Computational & experimental validation")}</footer>
+    </div>
+  </LanguageContext.Provider>;
 }

@@ -15,6 +15,7 @@ import { OBJECTIVES, type ObjectiveId } from "../dataHub";
 import type { Restore, ParetoArchive } from "../research/types";
 import { feasibilityPrior, canApplySynthesisFeedback } from "../synthesis/feedback";
 import { hypervolume, utilities, type ParetoProblem, type ObjectiveScales } from "../engine/pareto/ParetoEngine";
+import { synchronizeDecisionObservations } from "../research/decision";
 
 const number = (n: number, digits = 2) => n.toLocaleString("en-US", { maximumFractionDigits: digits });
 const presets: { id: string; zh: string; en: string; weights: Weights }[] = [
@@ -30,6 +31,7 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
   const zh = lang === "zh";
   const t = (a: string, b: string) => zh ? a : b;
   const [mode, setMode] = useState<"demo" | "materials-project">("materials-project");
+  const [sharedMode, setSharedMode] = useState(!!restored?.value.workflowShared);
   const [weights, setWeights] = useState<Weights>([50, 25, 25]);
   const [budget, setBudget] = useState(50);
   const [seed, setSeed] = useState(42);
@@ -55,6 +57,7 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
   // Parent predictions and sampled flags change each round; only raw dataset changes reset this engine.
   const materialSignature = useMemo(() => JSON.stringify(materials.map(m => [materialRecordKey(m), m.targetKind, m.trueProperty, m.objectiveValues, m.objectiveUnits])), [materials]);
   const feedbackSignature = JSON.stringify(materials.map(m => [m.synthesisFeedback, m.validationStructure]));
+  const observationSignature = JSON.stringify(materials.filter(m => m.isSampled).map(m => [materialRecordKey(m), m.iteration]));
   const primary = (materials[0]?.targetKind && materials[0].targetKind !== "synthetic-score" ? materials[0].targetKind : "band-gap") as ObjectiveId;
   const availableSecondary = (Object.keys(OBJECTIVES) as ObjectiveId[]).filter(id => id !== primary && materials.some(m => Number.isFinite(m.objectiveValues?.[id])));
   const chosenSecondary = secondary === "none" ? null : secondary === "auto" ? (availableSecondary.includes("energy-above-hull") ? "energy-above-hull" : availableSecondary[0] ?? null) : secondary as ObjectiveId;
@@ -70,11 +73,11 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
     controller.current?.abort(); controller.current = null;
     client.current?.cancel(); busyRef.current = false; setBusy(false);
   };
-  const reset = () => {
+  const reset = (retainShared = sharedMode) => {
     const fresh = mode === "demo" ? dataset.candidates : hubParetoCandidates(materials, primary, chosenSecondary, prices, externalStability).candidates;
     poolIdentity.current = datasetIdentity;
     setBudget(value => Math.min(value, Math.max(1, samplingBudgetLimit(fresh.length))));
-    stopWork(); setPool(fresh.map(c => ({ ...c, observed: false, observedAt: undefined })));
+    stopWork(); setSharedMode(retainShared); setPool(fresh.map(c => ({ ...c, observed: false, observedAt: undefined })));
     setState(INITIAL_PARETO_STATE()); setPhase("idle"); setError(""); setReplay(null); setHoveredId(null);
   };
   const restoreToken = useRef(0), restoredIdentity = useRef("");
@@ -82,6 +85,7 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
   useEffect(() => {
     if (restored && restoreToken.current !== restored.token) {
       const s = restored.value; restoreToken.current = restored.token; stopWork();
+      setSharedMode(!!s.workflowShared);
       const secondaryId = s.secondary === "auto" ? chosenSecondary : s.secondary === "none" ? null : s.secondary as ObjectiveId;
       const source = s.mode === "demo" ? demoCandidates(s.prices) : hubParetoCandidates(materials, primary, secondaryId, s.prices, s.externalStability).candidates;
       const known = new Map(s.pool.filter(c => c.observed).map(c => [c.lineage?.recordKey ?? c.id, c]));
@@ -91,12 +95,16 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
       setState(s.state); setReplay(s.replay); setPhase(s.pool.filter(c => c.observed).length >= Math.min(s.budget, Math.max(1, samplingBudgetLimit(source.length))) ? "done" : "paused"); setError("");
       restoredIdentity.current = JSON.stringify([s.mode, s.mode === "demo" ? "demo" : materialSignature, s.prices, s.externalStability, s.secondary]);
       poolIdentity.current = restoredIdentity.current;
-    } else if (restoredIdentity.current === datasetIdentity) { restoredIdentity.current = ""; }
+    } else if (restoredIdentity.current) {
+      // A restore may change secondary/price state over two renders, including StrictMode setup.
+      if (restoredIdentity.current === datasetIdentity) restoredIdentity.current = "";
+      return;
+    }
     else reset();
-  }, [dataset, restored?.token]);
-  useEffect(() => { onState?.({ mode, weights, budget, seed, strategy, prices, externalStability, secondary, problem, pool: currentPool,
+  }, [dataset, datasetIdentity, restored?.token]);
+  useEffect(() => { if (!currentDataset) return; onState?.({ workflowShared: sharedMode, mode, weights, budget, seed, strategy, prices, externalStability, secondary, problem, pool: currentPool,
     state: currentDataset ? state : INITIAL_PARETO_STATE(), replay: currentDataset ? replay : null, priceText, stabilityText }); },
-    [mode, weights, budget, seed, strategy, prices, externalStability, secondary, problem, pool, state, replay, priceText, stabilityText]);
+    [sharedMode, mode, weights, budget, seed, strategy, prices, externalStability, secondary, problem, pool, state, replay, priceText, stabilityText]);
   useEffect(() => {
     if (mode === "demo") return;
     stopWork(); setPhase(p => p === "running" || p === "done" ? "paused" : p);
@@ -137,6 +145,13 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
 
   const currentDataset = poolIdentity.current === datasetIdentity;
   const currentPool = currentDataset ? pool : [];
+  useEffect(() => {
+    if (!sharedMode || !currentDataset) return;
+    stopWork();
+    const synchronized = synchronizeDecisionObservations(pool, materials, weights, scales, problem);
+    setPool(synchronized.pool); setState(synchronized.state); setReplay(null);
+    setPhase(synchronized.pool.some(c => c.observed) ? "paused" : "idle");
+  }, [sharedMode, currentDataset, observationSignature, datasetIdentity]);
   const viewPool = replay === null ? currentPool : currentPool.map(c => ({ ...c, observed: c.observed && (c.observedAt ?? Infinity) <= replay }));
   const observed = viewPool.filter(c => c.observed);
   const front = paretoFront(viewPool, problem);
@@ -186,10 +201,10 @@ export default function ParetoExplorer({ materials, lang, suspended = false, res
     {!hasMP && <p className="pareto-error">{t("请先在 Data Hub 载入材料数据。", "Load material records in Data Hub first.")}</p>}
     <div className="pareto-toolbar">
       <div className="pareto-tags"><span><FlaskConical size={13} />{mode === "demo" ? (zh ? "演示组合 · Al / Co / Ni / Cu / Ge / Sc" : "Demo alloys · six metals") : `${OBJECTIVES[primary][lang]} · ${perfUnit} · ${OBJECTIVES[primary].direction}`}</span><span>{dataset.candidates.length} {zh ? "候选" : "candidates"}</span><span>2025e {zh ? "价格快照 / 企业情景" : "price references / scenarios"}</span></div>
-      <div className="pareto-actions"><button onClick={exportFront} disabled={!observed.length} aria-label={zh ? "导出帕累托前沿" : "Export Pareto frontier"}><Download size={15}/><span>{zh ? "导出" : "Export"}</span></button><button onClick={reset} aria-label={zh ? "重置多目标寻优" : "Reset multi-objective search"}><RotateCcw size={15}/><span>{zh ? "重置" : "Reset"}</span></button><button className="pareto-run" disabled={!pool.length || phase === "done"} onClick={() => { if (phase === "running") { stopWork(); setPhase("paused"); } else { setError(""); setReplay(null); setPhase("running"); } }}>{phase === "running" ? <Pause size={15}/> : <Play size={15}/>}<span>{phase === "running" ? (zh ? "暂停寻优" : "Pause search") : phase === "done" ? (zh ? "本轮寻优完成" : "Search complete") : phase === "paused" || phase === "error" ? (zh ? "继续寻优" : "Resume search") : (zh ? "开始多目标学习" : "Start multi-objective learning")}</span></button></div>
+      <div className="pareto-actions"><button onClick={exportFront} disabled={!observed.length} aria-label={zh ? "导出帕累托前沿" : "Export Pareto frontier"}><Download size={15}/><span>{zh ? "导出" : "Export"}</span></button><button onClick={() => reset(false)} aria-label={zh ? "重置多目标寻优" : "Reset multi-objective search"}><RotateCcw size={15}/><span>{zh ? "重置" : "Reset"}</span></button><button className="pareto-run" disabled={!pool.length || phase === "done"} onClick={() => { if (phase === "running") { stopWork(); setPhase("paused"); } else { setSharedMode(false); setError(""); setReplay(null); setPhase("running"); } }}>{phase === "running" ? <Pause size={15}/> : <Play size={15}/>}<span>{phase === "running" ? (zh ? "暂停寻优" : "Pause search") : phase === "done" ? (zh ? "本轮寻优完成" : "Search complete") : phase === "paused" || phase === "error" ? (zh ? "继续寻优" : "Resume search") : (zh ? "开始多目标学习" : "Start multi-objective learning")}</span></button></div>
     </div>
     {mode !== "demo" && <div className="research-multi-controls"><label>{t("第二性质", "Second property")}<select aria-label={t("多目标第二性质", "Second multi-objective property")} value={secondary} onChange={e => setSecondary(e.target.value)}><option value="auto">{t("自动选择", "Automatic")}</option><option value="none">{t("仅性能 + 采购价", "Performance + price")}</option>{(Object.keys(OBJECTIVES) as ObjectiveId[]).filter(id => id !== primary).map(id => <option key={id} value={id}>{OBJECTIVES[id][lang]} / {OBJECTIVES[id].unit}</option>)}</select></label><button type="button" onClick={importObserved}>{t("带入单目标已观测", "Import observed samples")}</button><button type="button" disabled={!observed.length} onClick={() => onObserve?.(observed.flatMap(c => c.lineage ? [c.lineage.recordKey] : []))}>{t("同步观测到单目标", "Share observations with single-objective learning")}</button><span>{t("XRD可行性反馈", "XRD feasibility feedback")}: {pool.filter(c => c.synthesisStatus).length}</span></div>}
-    <div className="pareto-metrics"><div><span>{zh ? "已评价候选" : "Evaluated candidates"}</span><strong>{observed.length}<small> / {Math.min(budget, Math.max(1, samplingBudgetLimit(pool.length)))}</small></strong></div><div><span>{zh ? "非支配前沿" : "Nondominated frontier"}</span><strong>{front.length}<small> {zh ? "个方案" : "designs"}</small></strong></div><div><span>{zh ? "最优功能表现" : "Best performance"}</span><strong>{observed.length ? number(topPerformance, 3) : "—"}<small> {perfUnit}</small></strong></div><div><span>{zh ? "超体积增长" : "Hypervolume growth"}</span><strong className="pareto-green">{currentRecord ? `${gain >= 0 ? "+" : ""}${number(gain, 1)}%` : "—"}<small> HV {number(currentRecord?.hypervolume ?? 0, 3)}</small></strong></div></div>
+    <div className="pareto-metrics"><div><span>{zh ? "已评价候选" : "Evaluated candidates"}</span><strong>{observed.length}<small> / {Math.min(budget, Math.max(1, samplingBudgetLimit(pool.length)))}</small></strong></div><div><span>{zh ? "非支配前沿" : "Nondominated frontier"}</span><strong>{front.length}<small> {zh ? "个方案" : "designs"}</small></strong></div><div><span>{zh ? "最优功能表现" : "Best performance"}</span><strong>{observed.length ? number(topPerformance, 3) : "—"}<small> {perfUnit}</small></strong></div><div><span>{sharedMode ? t("当前方案覆盖度", "Current coverage") : (zh ? "超体积增长" : "Hypervolume growth")}</span><strong className="pareto-green">{currentRecord ? sharedMode ? number(currentRecord.hypervolume, 3) : `${gain >= 0 ? "+" : ""}${number(gain, 1)}%` : "—"}<small> HV {number(currentRecord?.hypervolume ?? 0, 3)}</small></strong></div></div>
     <div className="pareto-workspace"><div className="pareto-chart-area"><div className="pareto-chart-title"><div><h3><TrendingUp size={17}/>{zh ? "动态帕累托前沿" : "Evolving Pareto frontier"}</h3><p>{zh ? (problem ? `${problem.axes[0].zh} · ${problem.axes[0].direction === "min" ? "↓ 最小化" : "↑ 最大化"}；越向上采购价越低。` : "越向右性能越强；越向上原料成本越低。") : "Objective direction and units are explicit; higher positions have lower procurement cost."}</p></div><span className={`pareto-state ${phase === "running" ? "is-running" : ""}`}>{busy ? (zh ? "模型计算中" : "Computing") : phase === "running" ? (zh ? "前沿生长中" : "Frontier growing") : `${zh ? "第" : "Round"} ${replay ?? state.round} ${zh ? "轮" : ""}`}</span></div>
       <svg className="pareto-chart" viewBox="0 0 940 410" role="img" aria-label={zh ? "已观测三目标帕累托前沿投影" : "Observed three-objective Pareto frontier projection"}>
         <defs><linearGradient id="pareto-chart-bg" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#142d2a"/><stop offset="1" stopColor="#10201f"/></linearGradient><filter id="pareto-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>

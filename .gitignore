@@ -15,3 +15,5 @@ umlip-results/
 .venv-umlip/
 .venv/
 __pycache__/
+
+.playwright-mcp/

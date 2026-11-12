@@ -22,7 +22,7 @@ export function researchEvidence(modules: ResearchModules, recordKey?: string | 
         record_key: c.lineage?.recordKey, price_quality: c.priceQuality, stability_source: c.stabilitySource, synthesis_prior: c.synthesisPrior })),
       latest_hypervolume: p.state.history.filter(h => h.round <= (p.replay ?? p.state.round)).at(-1)?.hypervolume } : null,
     umlip: run ? { run_id: run.id, status: run.status, model: run.model ? { label: run.model.label, sha256: run.model.sha256, device: run.model.device } : null,
-      reference: run.reference, converged: run.candidates.filter(c => c.status === "converged").slice(0, 12).map(c => ({ id: c.id, name: c.name, origin: c.origin,
+      reference: run.reference, converged: run.candidates.filter(c => c.status === "converged" && (!recordKey || c.origin?.recordKey === recordKey)).slice(0, 12).map(c => ({ id: c.id, name: c.name, origin: c.origin,
         structure_hash: modules.structures.find(a => a.stage === "relaxed" && a.runId === run.id && a.candidateId === c.id)?.structureHash ?? null,
         energy_eV_atom: c.result?.energyPerAtomEv, delta_eV_atom: c.relativeEnergyPerAtomEv, max_force_eV_A: c.result?.maxForceEvAngstrom, steps: c.result?.steps })) } : null,
     xrd: modules.experiments.filter(r => !recordKey || r.reference.binding?.recordKey === recordKey).slice(0, 6).map(r => ({ id: r.id, material_id: r.materialId, formula: r.formula, record_key: r.reference.binding?.recordKey,

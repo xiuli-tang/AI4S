@@ -1,30 +1,17 @@
-import { useI18n, userError } from "../i18n";
-import { translateUI } from "../uiTranslations";
 import { useEffect, useRef } from "react";
+import { useI18n } from "../i18n";
 import type { Material } from "../types";
 import type { ResearchModules } from "../research/types";
-import { materialRecordKey, targetSpec } from "../materialContext";
-import { canViewMaterialStructure } from "../structures/materialStructure";
-
-export default function CandidateDetails({ material, modules, open, onClose, onAction }: {
-  material: Material | null; modules: ResearchModules; open: boolean; onClose(): void;
-  onAction(action: "structure" | "queue" | "xrd" | "advisor" | "formula", material: Material): void;
+import { safeReportMaterial, type MaterialReport } from "../research/report";
+import { CandidateReportBody, type ReportAction } from "./ResearchReport";
+export default function CandidateDetails({ material, modules, report, open, onClose, onAction }: {
+  material: Material | null; modules: ResearchModules; report: MaterialReport; open: boolean; onClose(): void;
+  onAction(action: ReportAction, material: Material): void;
 }) {
-  const { lang } = useI18n(); const tr = (text: string) => translateUI(text, lang);
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => { if (open) dialog.current?.showModal(); else dialog.current?.close(); }, [open]);
-  const key = material ? materialRecordKey(material) : "";
-  const structures = modules.structures.filter(a => a.recordKey === key), records = modules.experiments.filter(r => r.reference.binding?.recordKey === key);
-  const formula = modules.formula?.result, point = formula?.sourceSnapshot.queries.some(q => q.lineage?.recordKey === key) ? formula.points.find(p => p.id === material?.id) : undefined;
-  const target = targetSpec(material?.targetKind ?? "band-gap");
-  return <dialog ref={dialog} className="research-dialog" onCancel={e => { e.preventDefault(); onClose(); }}><header><div><small>CONNECTED MATERIAL RECORD</small><h2>{material?.formula ?? tr("候选详情")}</h2></div><button onClick={onClose}>{tr("关闭")}</button></header><div className="research-dialog-content">{material && <>
-    <p>{material.id} · {material.source} · {material.fidelity} · {material.recordRevision?.slice(0, 12)}</p>
-    <div className="research-detail-metrics"><div><span>{target[lang]} / {target.unit}</span><b>{material.isSampled ? material.trueProperty.toFixed(4) : tr("待评价")}</b></div><div><span>{tr("模型 μ / σ")}</span><b>{material.predictedMean?.toFixed(3) ?? "—"} / {material.predictedStd?.toFixed(3) ?? "—"}</b></div><div><span>{tr("关联结构 / XRD")}</span><b>{structures.length} / {records.length}</b></div></div>
-    <div className="research-action-row">{([["structure", tr("查看 3D 结构")], ["queue", tr("加入 uMLIP 队列")], ["xrd", tr("合成 / XRD")], ["formula", tr("定位公式与描述符")], ["advisor", tr("AI 综合解析")]] as const).map(([action, label]) => <button key={action} disabled={(action === "structure" || action === "queue") && !canViewMaterialStructure(material)} onClick={() => onAction(action, material)}>{label}</button>)}</div>
-    {point && <section><h3>{tr("白盒解释")}</h3><p>Φ₁ {point.x.toPrecision(5)} · Φ₂ {point.y.toPrecision(5)}{tr("· 解析预测")}{point.prediction.toPrecision(5)} {target.unit}</p></section>}
-    <section><h3>{tr("当前目标与辅助性质")}</h3><table><tbody>{Object.entries(material.objectiveValues ?? {}).map(([id, value]) => <tr key={id}><th>{id}</th><td>{material.isSampled ? `${value} ${material.objectiveUnits?.[id] ?? ""}` : tr("评价后可见")}</td></tr>)}</tbody></table></section>
-    {structures.length > 0 && <section><h3>{tr("结构与计算链")}</h3>{structures.map(a => <p key={a.id}>{a.stage} · {a.structure.name} · {a.structureHash.slice(0, 12)} {a.runId ? `· run ${a.runId.slice(0, 8)}` : ""}</p>)}</section>}
-    {records.length > 0 && <section><h3>{tr("谱图记录")}</h3>{records.map(r => <p key={r.id}>{r.filename} · {r.comparison.score}{tr("/100 · 主相拟合")}{r.comparison.mainFraction}%</p>)}</section>}
-    <details><summary>{tr("来源与材料身份")}</summary><p>{material.provenance?.reference}</p><p>{material.methodMeta} · {material.cohort}</p><pre>{key}</pre></details>
-  </>}</div></dialog>;
+  const { lang } = useI18n(), dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => { if (open && !dialog.current?.open) dialog.current?.showModal(); else if (!open) dialog.current?.close(); }, [open]);
+  return <dialog ref={dialog} className="research-dialog candidate-report-dialog" onCancel={e => { e.preventDefault(); onClose(); }}>
+    <header><div><small>{lang === "zh" ? "问鼎·材料引擎 · 候选研究报告" : "WENDING · CANDIDATE REPORT"}</small><h2>{material?.formula ?? (lang === "zh" ? "候选报告" : "Candidate report")}</h2></div><button onClick={onClose}>{lang === "zh" ? "关闭" : "Close"}</button></header>
+    {material && <div className="research-dialog-content"><p>{material.id} · {material.isSampled ? (lang === "zh" ? "已评价" : "Evaluated") : (lang === "zh" ? "下一步验证候选" : "Next evaluation candidate")}</p><CandidateReportBody material={safeReportMaterial(material)} report={{ ...report, modules }} onAction={action => onAction(action, material)} /></div>}
+  </dialog>;
 }

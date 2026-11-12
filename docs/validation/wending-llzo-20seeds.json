@@ -1,0 +1,3862 @@
+{
+  "schema": "wending-learning-benchmark-1",
+  "objective": "band-gap",
+  "unit": "eV",
+  "direction": "max",
+  "candidateCount": 2003,
+  "budget": 50,
+  "targetValue": 5.2394799999999995,
+  "targetRule": "95th percentile, fixed before runs",
+  "seedCount": 20,
+  "ai": {
+    "successRate": 0.95,
+    "successfulSeeds": 19,
+    "evaluationsMedianAmongSuccesses": 17,
+    "bestMedian": 7.2810999999999995,
+    "bestP10P90": [
+      6.085660000000001,
+      7.2810999999999995
+    ]
+  },
+  "random": {
+    "successRate": 0.8,
+    "successfulSeeds": 16,
+    "evaluationsMedianAmongSuccesses": 21,
+    "bestMedian": 5.87115,
+    "bestP10P90": [
+      5.14638,
+      6.213250000000002
+    ]
+  },
+  "rediscoveryIds": [
+    "mp-aaacbqoz"
+  ],
+  "rediscoverySummary": {
+    "ai": {
+      "successes": 0,
+      "successRate": 0,
+      "evaluationsMedianAmongSuccesses": null
+    },
+    "random": {
+      "successes": 1,
+      "successRate": 0.05,
+      "evaluationsMedianAmongSuccesses": 23
+    }
+  },
+  "rows": [
+    {
+      "seed": 101,
+      "initialIds": [
+        "mp-aaabetcm",
+        "mp-aaaaammz",
+        "mp-aaaaceyh",
+        "mp-aaaabngl",
+        "mp-aaabnnxf"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.8773,
+      "aiHit": 29,
+      "randomHit": 17,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.8516,
+          "random": 3.8516,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.4239999999999995,
+          "random": 3.8516,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.4239999999999995,
+          "random": 3.8516,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.4239999999999995,
+          "random": 4.7791999999999994,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.4239999999999995,
+          "random": 4.7791999999999994,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.741,
+          "random": 4.7791999999999994,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.741,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.741,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.741,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.8986,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 4.8986,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.4308,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.368399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.8773,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.8773,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 102,
+      "initialIds": [
+        "mp-aaaabmoj",
+        "mp-aaabhhuj",
+        "mp-aaabfwgu",
+        "mp-aaaabvia",
+        "mp-aaaacbfr"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.1115,
+      "aiHit": 25,
+      "randomHit": 13,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.4978,
+          "random": 4.4978,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.4978,
+          "random": 4.4978,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.4978,
+          "random": 4.7068,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.4978,
+          "random": 4.7068,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.5993,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.5993,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.5993,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.5993,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.8773,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.9251000000000005,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.9251000000000005,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 5.9251000000000005,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 5.9251000000000005,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1035,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1035,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 6.1035,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 6.1035,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 6.1035,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1035,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.1115,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 103,
+      "initialIds": [
+        "mp-aaabnnys",
+        "mp-aaabodlz",
+        "mp-aaabcryc",
+        "mp-aaaaceyh",
+        "mp-aaaabmyl"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.6047,
+      "aiHit": 9,
+      "randomHit": 39,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.3222000000000005,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.3222000000000005,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 4.3222000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.2939,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.6047,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.6047,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.6047,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.6047,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.6047,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.6047,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 104,
+      "initialIds": [
+        "mp-aaabpjrv",
+        "mp-aaaabvlx",
+        "mp-aaaabmoj",
+        "mp-aaabodma",
+        "mp-aaaabmrb"
+      ],
+      "budget": 50,
+      "aiBest": 5.0778,
+      "randomBest": 5.9904,
+      "aiHit": null,
+      "randomHit": 7,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": 23
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.4507,
+          "random": 4.4507,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 27,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 29,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 31,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 33,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 35,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 37,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 39,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 41,
+          "ai": 4.8986,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 43,
+          "ai": 5.0778,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 45,
+          "ai": 5.0778,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 47,
+          "ai": 5.0778,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 49,
+          "ai": 5.0778,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        },
+        {
+          "evaluations": 50,
+          "ai": 5.0778,
+          "random": 5.9904,
+          "aiFound": false,
+          "randomFound": true
+        }
+      ]
+    },
+    {
+      "seed": 105,
+      "initialIds": [
+        "mp-aaabldfj",
+        "mp-aaaabgas",
+        "mp-aaaaazoy",
+        "mp-aaaaajzl",
+        "mp-aaaaajqv"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.2914,
+      "aiHit": 11,
+      "randomHit": 23,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.2722,
+          "random": 4.2722,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.1183000000000005,
+          "random": 4.4239,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1183000000000005,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.2914,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 106,
+      "initialIds": [
+        "mp-aaabnsev",
+        "mp-aaabfojg",
+        "mp-aaaabqlv",
+        "mp-aaabfvcc",
+        "mp-aaabqvhm"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.864999999999999,
+      "aiHit": 5,
+      "randomHit": 5,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 5.864999999999999,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 5.9251000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1183000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 6.1183000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 6.1183000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 6.1183000000000005,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.864999999999999,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 107,
+      "initialIds": [
+        "mp-aaaabnus",
+        "mp-aaaabnrx",
+        "mp-aaabfvfd",
+        "mp-aaaabmrd",
+        "mp-aaabqvgc"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.154,
+      "aiHit": 9,
+      "randomHit": null,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.4423,
+          "random": 3.4423,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.4308,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.4308,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.4308,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.4308,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.4308,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.4308,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 4.4057,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 4.5899,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 108,
+      "initialIds": [
+        "mp-aaabnsgi",
+        "mp-aaabfweq",
+        "mp-aaaaagcj",
+        "mp-aaaablrj",
+        "mp-aaabfqux"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.728999999999999,
+      "aiHit": 9,
+      "randomHit": 13,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 5.154,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 5.154,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 6.1183000000000005,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.1183000000000005,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.728999999999999,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 109,
+      "initialIds": [
+        "mp-aaaaajsn",
+        "mp-aaabmypb",
+        "mp-aaabfnrh",
+        "mp-aaabqvez",
+        "mp-aaabocxr"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.961,
+      "aiHit": 17,
+      "randomHit": 23,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.7407,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 5.7916,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 5.7916,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 5.7916,
+          "random": 4.7407,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.7916,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.7916,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.7916,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 5.7916,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 5.7916,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 5.7916,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 5.9251000000000005,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 5.9251000000000005,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 5.9251000000000005,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 5.9251000000000005,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1035,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.961,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 110,
+      "initialIds": [
+        "mp-aaaaagwc",
+        "mp-aaaabahq",
+        "mp-aaabefhe",
+        "mp-aaabqvdc",
+        "mp-aaabhhxa"
+      ],
+      "budget": 50,
+      "aiBest": 6.1035,
+      "randomBest": 7.2810999999999995,
+      "aiHit": 41,
+      "randomHit": 39,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.4186,
+          "random": 3.4186,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.4239999999999995,
+          "random": 3.4186,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.4239999999999995,
+          "random": 3.6557,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.4239999999999995,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.4239999999999995,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.741,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 4.8986,
+          "random": 4.3259,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 4.8986,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 4.8986,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 4.8986,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 4.8986,
+          "random": 5.154,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 4.8986,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 5.9251000000000005,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 5.9251000000000005,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 5.9251000000000005,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 5.9251000000000005,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 6.1035,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 6.1035,
+          "random": 7.2810999999999995,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 111,
+      "initialIds": [
+        "mp-aaabehzo",
+        "mp-aaaaaikc",
+        "mp-aaaaajmq",
+        "mp-aaaabvyc",
+        "mp-aaaabmrl"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.9117999999999995,
+      "aiHit": 19,
+      "randomHit": 31,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 2.9775,
+          "random": 2.9775,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 3.8003000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 3.8003000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 3.8003000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 3.8003000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 3.9223999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 3.9223999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 3.9223999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 6.4308,
+          "random": 3.9223999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 6.4308,
+          "random": 3.9223999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 3.9223999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 4.8474,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 4.8474,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.818099999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.9117999999999995,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 112,
+      "initialIds": [
+        "mp-aaaaapoq",
+        "mp-aaaabobl",
+        "mp-aaabfyia",
+        "mp-aaabmypc",
+        "mp-aaaabnyz"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.9746,
+      "aiHit": 23,
+      "randomHit": 19,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.8832000000000004,
+          "random": 3.8832000000000004,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 3.8832000000000004,
+          "random": 3.8832000000000004,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 3.8832000000000004,
+          "random": 3.8832000000000004,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 4.3237,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 4.6751000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 4.6751000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 4.6751000000000005,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.8986,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 5.7916,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 5.7916,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 5.7916,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 6.1183000000000005,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.9315,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.9746,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.9746,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 113,
+      "initialIds": [
+        "mp-aaabodmw",
+        "mp-aaaabvhg",
+        "mp-aaaablpj",
+        "mp-aaaabvgd",
+        "mp-aaaabchv"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 6.1035,
+      "aiHit": 25,
+      "randomHit": 37,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.7787000000000006,
+          "random": 3.7787000000000006,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 3.7787000000000006,
+          "random": 3.7787000000000006,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.0344999999999995,
+          "random": 3.8947000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.0344999999999995,
+          "random": 3.8947000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.4239999999999995,
+          "random": 3.9814000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.4239999999999995,
+          "random": 3.9814000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.741,
+          "random": 3.9814000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.741,
+          "random": 3.9814000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.741,
+          "random": 4.015599999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.741,
+          "random": 4.015599999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 6.4308,
+          "random": 4.015599999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 6.4308,
+          "random": 4.015599999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 6.4308,
+          "random": 4.015599999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 4.015599999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 4.4576,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 4.4576,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 6.1035,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 114,
+      "initialIds": [
+        "mp-aaaabgxn",
+        "mp-aaaabmil",
+        "mp-aaaabnbr",
+        "mp-aaabmhtu",
+        "mp-aaabesvt"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 4.864,
+      "aiHit": 9,
+      "randomHit": null,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.118600000000001,
+          "random": 4.118600000000001,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 4.118600000000001,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 4.118600000000001,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 7.2810999999999995,
+          "random": 4.118600000000001,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 7.2810999999999995,
+          "random": 4.150399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 7.2810999999999995,
+          "random": 4.150399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 7.2810999999999995,
+          "random": 4.150399999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 4.462999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 4.462999999999999,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 115,
+      "initialIds": [
+        "mp-aaaabrqy",
+        "mp-aaaabbyc",
+        "mp-aaabnoqw",
+        "mp-aaabpjte",
+        "mp-aaaaanoh"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 7.129,
+      "aiHit": 7,
+      "randomHit": 11,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 2.5882,
+          "random": 2.5882,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 6.1183000000000005,
+          "random": 4.6935,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.1183000000000005,
+          "random": 4.6935,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 7.2810999999999995,
+          "random": 5.2970999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 7.2810999999999995,
+          "random": 5.2970999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 7.2810999999999995,
+          "random": 5.2970999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 7.2810999999999995,
+          "random": 5.2970999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.2970999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 6.9796,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 7.129,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 7.129,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 7.129,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 116,
+      "initialIds": [
+        "mp-aaaaande",
+        "mp-aaaaartg",
+        "mp-aaabmzrd",
+        "mp-aaabikcy",
+        "mp-aaaabbza"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.7279,
+      "aiHit": 19,
+      "randomHit": 29,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.877,
+          "random": 4.877,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.877,
+          "random": 4.877,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 4.877,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.8986,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.1689,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.5815,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.7279,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 117,
+      "initialIds": [
+        "mp-aaaaapnv",
+        "mp-aaaabvnn",
+        "mp-aaabnilg",
+        "mp-aaabetmu",
+        "mp-aaaablvs"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.2141,
+      "aiHit": 9,
+      "randomHit": null,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.2387999999999995,
+          "random": 4.2387999999999995,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.2387999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 6.4308,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.2141,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 118,
+      "initialIds": [
+        "mp-aaaabutk",
+        "mp-aaabeidx",
+        "mp-aaaaauwx",
+        "mp-aaabnqgf",
+        "mp-aaabfvjw"
+      ],
+      "budget": 50,
+      "aiBest": 5.9251000000000005,
+      "randomBest": 5.9182,
+      "aiHit": 49,
+      "randomHit": 29,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 1.4076999999999993,
+          "random": 1.4076999999999993,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 1.4076999999999993,
+          "random": 2.8296,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 1.4076999999999993,
+          "random": 2.8296,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 1.4076999999999993,
+          "random": 2.8296,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.4239999999999995,
+          "random": 2.8924000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.4239999999999995,
+          "random": 2.8924000000000003,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 4.4239999999999995,
+          "random": 4.5257,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 4.4239999999999995,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 4.8986,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 4.8986,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 4.8986,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 4.8986,
+          "random": 4.864,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 4.8986,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 5.9251000000000005,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 5.9251000000000005,
+          "random": 5.9182,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 119,
+      "initialIds": [
+        "mp-aaabmzxs",
+        "mp-aaabodir",
+        "mp-aaabplxt",
+        "mp-aaaaazga",
+        "mp-aaaabgas"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.6723,
+      "aiHit": 17,
+      "randomHit": 7,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 4.1081,
+          "random": 4.1081,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 4.8986,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 4.8986,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 4.8986,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 6.1183000000000005,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 6.1183000000000005,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.3221,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.6723,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    },
+    {
+      "seed": 120,
+      "initialIds": [
+        "mp-aaaabmtv",
+        "mp-aaaaburt",
+        "mp-aaaabmyb",
+        "mp-aaaabmld",
+        "mp-aaabnuoe"
+      ],
+      "budget": 50,
+      "aiBest": 7.2810999999999995,
+      "randomBest": 5.0778,
+      "aiHit": 11,
+      "randomHit": null,
+      "rediscovery": {
+        "aiHit": null,
+        "randomHit": null
+      },
+      "traces": [
+        {
+          "evaluations": 5,
+          "ai": 3.845,
+          "random": 3.845,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 7,
+          "ai": 4.8986,
+          "random": 3.9360999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 9,
+          "ai": 4.8986,
+          "random": 3.9360999999999997,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 11,
+          "ai": 7.2810999999999995,
+          "random": 4.1135,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 13,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 15,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 17,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 19,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 21,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 23,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 25,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 27,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 29,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 31,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 33,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 35,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 37,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 39,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 41,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 43,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 45,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 47,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 49,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        },
+        {
+          "evaluations": 50,
+          "ai": 7.2810999999999995,
+          "random": 5.0778,
+          "aiFound": false,
+          "randomFound": false
+        }
+      ]
+    }
+  ],
+  "note": "Existing-label retrospective evaluation; shared five initial labels; uniform random without replacement; failures are censored at budget and never converted into invented savings. Rediscovery targets are excluded from initialization.",
+  "inputSha256": "730d100ba5ca0bb2383bf78e328559fb3195dcb4fb5a0c442a86ffb7d2960cd3",
+  "sourceVersion": {
+    "requestedSource": "mp-snapshot",
+    "effectiveSource": "mp-snapshot",
+    "objective": "band-gap",
+    "total": 2003,
+    "datasetVersion": "bbee5dc615014d73 + LLZO sourced case",
+    "fetchedAt": "2026-10-31T17:32:31.571581+00:00",
+    "excludedMissingTarget": 0,
+    "query": {
+      "source": "mp-snapshot",
+      "objective": "band-gap",
+      "elements": "Li,O",
+      "excludeElements": "",
+      "match": "contains",
+      "cohort": "",
+      "limit": 2000
+    },
+    "matchedTotal": 17520,
+    "sourceVersion": "2026-09-28",
+    "snapshotSha256": "669e5a3bdf1644633f8c771a98b434bf449451a9aa6ce2556d0901ba1dff235b",
+    "sourceURL": "https://materialsproject-build.s3.amazonaws.com/collections/summary/version%3D2026-09-28/part-00000-2cc5f2cc-2a79-4051-b013-2f9dec6a302e-c000.zstd.parquet",
+    "caseQuery": {
+      "source": "mp-snapshot",
+      "objective": "band-gap",
+      "elements": "La,Li,O,Zr",
+      "excludeElements": "",
+      "match": "exact",
+      "cohort": "",
+      "limit": 500
+    }
+  },
+  "generatedAt": "2026-11-12T07:14:20.029Z"
+}

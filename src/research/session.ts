@@ -17,7 +17,7 @@ export function captureSession(input: Omit<ResearchSession, "schema" | "savedAt"
     const dataset = material.datasetSource === "mp-live" ? "mp-snapshot" : material.datasetSource;
     return { ...safe, recordKey: materialRecordKey(material),
       ...(dataset && material.recordRevision ? { ref: { dataset, id: material.id, revision: material.recordRevision } } : {}),
-      ...(material.isSampled ? { observedValue: trueProperty } : {}) };
+      ...(material.isSampled ? { observedValue: trueProperty, observedProperties: objectiveValues ? { ...objectiveValues } : undefined } : {}) };
   });
   const modules = structuredClone(rest.modules);
   if (modules.pareto) modules.pareto.pool = modules.pareto.pool.filter(c => c.observed);
@@ -68,6 +68,7 @@ export function parseSession(value: unknown): ResearchSession {
   }
   if (new Set(s.candidates.map(c => c.recordKey)).size !== s.candidates.length) throw new Error("存档中有重复材料身份。");
   if (s.candidates.some(c => !c.recordKey || c.isSampled && !Number.isFinite(c.observedValue) || !c.isSampled && c.observedValue !== undefined)) throw new Error("存档的观察值与采样状态不一致。");
+  if (s.candidates.some(c => c.observedProperties && (!c.isSampled || Object.entries(c.observedProperties).some(([id, n]) => !Object.hasOwn(OBJECTIVES, id) || !Number.isFinite(n))))) throw new Error("存档辅助性质与观测状态不一致。");
   if (s.modules.pareto?.pool.some(c => !c.observed)) throw new Error("成果存档不包含未观测多目标标签。");
   return s;
 }
@@ -84,7 +85,7 @@ export async function restoreCandidatePool(session: ResearchSession, signal?: Ab
   signal?.throwIfAborted();
   const byKey = new Map(hydrated.map(m => [materialRecordKey(m), m]));
   const restored = session.candidates.map(saved => {
-    const { recordKey, observedValue, ref, ...snapshot } = saved;
+    const { recordKey, observedValue, observedProperties, ref, ...snapshot } = saved;
     let material: Material;
     if (ref) {
       const source = byKey.get(recordKey);
